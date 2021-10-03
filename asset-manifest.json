@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/Pineapple-Music/static/css/main.6d7f2637.chunk.css",
-    "main.js": "/Pineapple-Music/static/js/main.66878bce.chunk.js",
-    "main.js.map": "/Pineapple-Music/static/js/main.66878bce.chunk.js.map",
-    "runtime-main.js": "/Pineapple-Music/static/js/runtime-main.8d58593c.js",
-    "runtime-main.js.map": "/Pineapple-Music/static/js/runtime-main.8d58593c.js.map",
-    "static/js/2.8833cd6e.chunk.js": "/Pineapple-Music/static/js/2.8833cd6e.chunk.js",
-    "static/js/2.8833cd6e.chunk.js.map": "/Pineapple-Music/static/js/2.8833cd6e.chunk.js.map",
-    "static/js/3.ff0311e9.chunk.js": "/Pineapple-Music/static/js/3.ff0311e9.chunk.js",
-    "static/js/3.ff0311e9.chunk.js.map": "/Pineapple-Music/static/js/3.ff0311e9.chunk.js.map",
-    "index.html": "/Pineapple-Music/index.html",
-    "static/css/main.6d7f2637.chunk.css.map": "/Pineapple-Music/static/css/main.6d7f2637.chunk.css.map",
-    "static/js/2.8833cd6e.chunk.js.LICENSE.txt": "/Pineapple-Music/static/js/2.8833cd6e.chunk.js.LICENSE.txt"
+    "main.css": "/Pineapple-Music/my-app/static/css/main.6d7f2637.chunk.css",
+    "main.js": "/Pineapple-Music/my-app/static/js/main.66878bce.chunk.js",
+    "main.js.map": "/Pineapple-Music/my-app/static/js/main.66878bce.chunk.js.map",
+    "runtime-main.js": "/Pineapple-Music/my-app/static/js/runtime-main.b225f958.js",
+    "runtime-main.js.map": "/Pineapple-Music/my-app/static/js/runtime-main.b225f958.js.map",
+    "static/js/2.8833cd6e.chunk.js": "/Pineapple-Music/my-app/static/js/2.8833cd6e.chunk.js",
+    "static/js/2.8833cd6e.chunk.js.map": "/Pineapple-Music/my-app/static/js/2.8833cd6e.chunk.js.map",
+    "static/js/3.ff0311e9.chunk.js": "/Pineapple-Music/my-app/static/js/3.ff0311e9.chunk.js",
+    "static/js/3.ff0311e9.chunk.js.map": "/Pineapple-Music/my-app/static/js/3.ff0311e9.chunk.js.map",
+    "index.html": "/Pineapple-Music/my-app/index.html",
+    "static/css/main.6d7f2637.chunk.css.map": "/Pineapple-Music/my-app/static/css/main.6d7f2637.chunk.css.map",
+    "static/js/2.8833cd6e.chunk.js.LICENSE.txt": "/Pineapple-Music/my-app/static/js/2.8833cd6e.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.8d58593c.js",
+    "static/js/runtime-main.b225f958.js",
     "static/js/2.8833cd6e.chunk.js",
     "static/css/main.6d7f2637.chunk.css",
     "static/js/main.66878bce.chunk.js"
