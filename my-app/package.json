@@ -2,7 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://S-Tarr.github.io/Pineapple-Music",
+  "homepage": "http://S-Tarr.github.io/Pineapple-Music/my-app",
   "dependencies": {
     "@react-navigation/native-stack": "^6.2.2",
     "@testing-library/jest-dom": "^5.14.1",
