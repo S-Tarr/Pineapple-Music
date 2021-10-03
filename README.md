@@ -4,4 +4,8 @@
 Installation
 nodejs 14.18.0
 firebase version: ?
-npm install @react-navigation/native-stack
+Run:
+    npm install
+    npm install react-native-web
+
+    npm install @react-navigation/native
