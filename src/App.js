@@ -1,7 +1,10 @@
 import logo from './logo.svg';
 import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+import MyAccount from './MyAccount';
 
-function App() {
+function WelcomeScreen() {
   return (
     <div className="App">
       <header className="App-header">
@@ -19,6 +22,25 @@ function App() {
         </a>
       </header>
     </div>
+  )
+}
+
+// const Stack = createNativeStackNavigator();
+
+function App() {
+  return (
+    <Router>
+      <div className="content">
+        <Switch>
+          <Route exact path="/">
+            <WelcomeScreen />
+          </Route>
+          <Route exact path="/myaccount">
+            <MyAccount />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
   );
 }
 
