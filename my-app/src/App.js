@@ -1,8 +1,9 @@
 import logo from './logo.jpg';
 import './App.css';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Image } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import doorIcon from './images/icon-door.png' ;
 
 function HomeScreen( {navigation} ) {
   return (
@@ -10,7 +11,7 @@ function HomeScreen( {navigation} ) {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <TouchableOpacity onPress={() => navigation.navigate("example")}>
-          <Text>Example Button and Navigation</Text>
+          <Image src={doorIcon}></Image>
         </TouchableOpacity>
       </header>
     </div>
