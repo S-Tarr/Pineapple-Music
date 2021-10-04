@@ -1,10 +1,16 @@
+/**
+ * Builds the Signup form React component.
+ */
+
 import React, { useRef } from 'react'
 import { Form, Card, Button} from 'react-bootstrap'
+// import { useAuth } from '../contexts/AuthContext'
 
 export default function Signup() {
     const emailRef = useRef()
     const passwordRef = useRef()
     const passwordConfirmRef = useRef()
+    // const { signup } = useAuth()
 
     return (
       <main>

@@ -1,3 +1,8 @@
+/**
+ * Index file copy but specifically for testing the login components because I'm not totally sure
+ * how to get it to work in the original Index file.
+ */
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
