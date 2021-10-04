@@ -24,6 +24,24 @@
   color: rgb(76, 255, 21);
 }
 
+.Logout-Button {
+  background-color: #ffe455;
+  outline: none;
+  position:absolute;
+  top: 0;
+  right: 0;
+  height: 50px;
+  width: 50px;
+}
+
+.Logout-Icon {
+  position:absolute;
+  top: 0;
+  right: 0;
+  height: 50px;
+  width: 50px;
+}
+
 .App-link {
   color: #92fb61;
 }

@@ -1,18 +1,16 @@
 import logo from './logo.jpg';
 import './App.css';
-import { TouchableOpacity, Image } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import doorIcon from './images/icon-door.png' ;
+import { Linking } from 'react-native';
 
 function HomeScreen( {navigation} ) {
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <TouchableOpacity onPress={() => navigation.navigate("example")}>
-          <Image src={doorIcon}></Image>
-        </TouchableOpacity>
+        <button onClick={() => Linking.openURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley")} className="Logout-Button"><img src={doorIcon} className="Logout-Icon" /></button>
       </header>
     </div>
   )
