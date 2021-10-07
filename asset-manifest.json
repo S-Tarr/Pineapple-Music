@@ -1,9 +1,22 @@
 {
-  "main.css": "static/css/main.d845ed5e.css",
-  "main.css.map": "static/css/main.d845ed5e.css.map",
-  "main.js": "static/js/main.8c631138.js",
-  "main.js.map": "static/js/main.8c631138.js.map",
-  "static/js/0.45c5142e.chunk.js": "static/js/0.45c5142e.chunk.js",
-  "static/js/0.45c5142e.chunk.js.map": "static/js/0.45c5142e.chunk.js.map",
-  "static/media/logo.svg": "static/media/logo.06e73328.svg"
+  "files": {
+    "main.css": "/Pineapple-Music/static/css/main.fd726d47.chunk.css",
+    "main.js": "/Pineapple-Music/static/js/main.3f2482a9.chunk.js",
+    "main.js.map": "/Pineapple-Music/static/js/main.3f2482a9.chunk.js.map",
+    "runtime-main.js": "/Pineapple-Music/static/js/runtime-main.bdc8ebe5.js",
+    "runtime-main.js.map": "/Pineapple-Music/static/js/runtime-main.bdc8ebe5.js.map",
+    "static/js/2.c6f1e93d.chunk.js": "/Pineapple-Music/static/js/2.c6f1e93d.chunk.js",
+    "static/js/2.c6f1e93d.chunk.js.map": "/Pineapple-Music/static/js/2.c6f1e93d.chunk.js.map",
+    "static/js/3.8f0cfb2f.chunk.js": "/Pineapple-Music/static/js/3.8f0cfb2f.chunk.js",
+    "static/js/3.8f0cfb2f.chunk.js.map": "/Pineapple-Music/static/js/3.8f0cfb2f.chunk.js.map",
+    "index.html": "/Pineapple-Music/index.html",
+    "static/css/main.fd726d47.chunk.css.map": "/Pineapple-Music/static/css/main.fd726d47.chunk.css.map",
+    "static/js/2.c6f1e93d.chunk.js.LICENSE.txt": "/Pineapple-Music/static/js/2.c6f1e93d.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.bdc8ebe5.js",
+    "static/js/2.c6f1e93d.chunk.js",
+    "static/css/main.fd726d47.chunk.css",
+    "static/js/main.3f2482a9.chunk.js"
+  ]
 }
