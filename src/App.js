@@ -3,16 +3,20 @@ import './App.css';
 import { TouchableOpacity, Text } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import SearchPage from './SearchPage';
 
 function HomeScreen( {navigation} ) {
   return (
-    <div className="App">
+    /*<div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <TouchableOpacity onPress={() => navigation.navigate("example")}>
           <Text>Example Button and Navigation</Text>
         </TouchableOpacity>
       </header>
+    </div>*/
+    <div className="App">
+      <SearchPage placeholder="Enter a song name..." />
     </div>
   )
 }
