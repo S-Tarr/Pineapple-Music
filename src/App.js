@@ -1,25 +1,32 @@
-import React from "react";
-import logo from './logo.svg';
+import logo from './logo.jpg';
 import './App.css';
+import { TouchableOpacity, Text } from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-function App() {
+function HomeScreen( {navigation} ) {
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <TouchableOpacity onPress={() => navigation.navigate("example")}>
+          <Text>Example Button and Navigation</Text>
+        </TouchableOpacity>
       </header>
     </div>
+  )
+}
+
+const Stack = createNativeStackNavigator();
+
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen}>
+        </Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
