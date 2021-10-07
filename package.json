@@ -1,10 +1,11 @@
 {
-  "homepage": "http://S-Tarr.github.io/pineapple-music",
   "name": "pineapple-music",
+  "homepage": "http://S-Tarr.github.io/Pineapple-Music",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@react-navigation/native": "^6.0.4",
+    "@react-navigation/native-stack": "^6.2.2",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
@@ -14,16 +15,21 @@
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.4",
     "react-dom": "^17.0.2",
-    "react-scripts": "^1.1.5",
+    "react-native": "^0.66.0",
+    "react-native-safe-area-context": "^3.3.2",
+    "react-native-screen": "^1.0.1",
+    "react-native-web": "^0.17.5",
+    "react-navigation": "^4.4.4",
+    "react-scripts": "4.0.3",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
     "start": "react-scripts start",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm start",
-    "deploy": "gh-pages -d build"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -34,7 +40,6 @@
   "browserslist": {
     "production": [
       ">0.2%",
-      "not dead",
       "not op_mini all"
     ],
     "development": [
