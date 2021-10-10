@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   Button,
@@ -27,13 +27,15 @@ const getParamsFromSpotifyAuth = (hash) => {
 };
 
 function Register() {
+  const [authorized, setAuthorized] = useState(true);
+  console.log(authorized);
   useEffect(() => {
     if (window.location.hash) {
       getParamsFromSpotifyAuth(window.location.hash);
-
+      setAuthorized(false);
       //TODO: CONNECT TO FIREBASE TO STORE AUTH PARAMS FROM SPOTIFY
     }
-  });
+  }, [authorized]);
 
   const AppIcon =
     "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg";
@@ -71,9 +73,9 @@ function Register() {
             fullWidth
           />
           <TextField
-            id="password"
-            name="password"
-            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            type="confirmPassword"
             label="ConfirmPassword"
             fullWidth
           />
@@ -88,7 +90,8 @@ function Register() {
           </Button>
           <br />
           <br />
-          <Button type="submit" variant="contained" color="primary">
+          <Button type="submit" variant="contained" color="primary"
+          disabled={authorized}>
             Register
           </Button>
         </form>
