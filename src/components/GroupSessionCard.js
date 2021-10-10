@@ -1,29 +1,35 @@
 import React from "react";
+
 import { Button, Card, CardActions, CardContent } from "@material-ui/core";
 
-function GroupSession() {
+function GroupSessionCard({
+  card: { title, imageUrl, username, createdAt, sessionId },
+}) {
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardMedia
         component="img"
         height="140"
-        image="https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg"
+        image={imageUrl}
         alt="group session image"
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          Name of your group session
+          {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Group session explanation
+          Owner: {username}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Created at: {createdAt}
         </Typography>
       </CardContent>
       <CardActions>
         <Button size="small">Join</Button>
-        <Button size="small">Session ID</Button>
+        <Button size="small">{sessionId}</Button>
       </CardActions>
     </Card>
   );
 }
 
-export default GroupSession;
+export default GroupSessionCard;
