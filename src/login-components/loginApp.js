@@ -4,8 +4,8 @@
  */
 
 import React from "react";
-import '../App.css';
-import Signup from "./signup"
+import './App.css';
+import Signup from "./login-components/signup"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { Container } from 'react-bootstrap'
 
