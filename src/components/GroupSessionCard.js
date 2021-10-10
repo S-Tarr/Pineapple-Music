@@ -1,9 +1,9 @@
 import React from "react";
 
-import { Button, Card, CardActions, CardContent } from "@material-ui/core";
+import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@material-ui/core";
 
 function GroupSessionCard({
-  card: { title, imageUrl, username, createdAt, sessionId },
+  props: { title, imageUrl, username, createdAt, sessionId },
 }) {
   return (
     <Card sx={{ maxWidth: 345 }}>
