@@ -1,44 +1,23 @@
-import logo from './logo.svg';
 import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
-import MyAccount from './MyAccount';
-
-function WelcomeScreen() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  )
-}
-
-// const Stack = createNativeStackNavigator();
+import MyAccount from './pages/MyAccount';
+import Home from './pages/Home';
+import CreateGroup from './pages/CreateGroup';
+import Navbar from './components/Navbar/Navbar'; 
 
 function App() {
   return (
     <Router>
-      <div className="content">
-        <Switch>
-          <Route exact path="/">
-            <WelcomeScreen />
-          </Route>
-          <Route exact path="/myaccount">
-            <MyAccount />
-          </Route>
-        </Switch>
+      <div className="container">
+        <Navbar />
+        <div className="content">
+          <Switch>
+            <Route exact path="/" component={Home} />
+            <Route path="/creategroup" component={CreateGroup} />
+            <Route path="/myaccount" component={MyAccount} />
+          </Switch>
+        </div>
       </div>
     </Router>
   );
