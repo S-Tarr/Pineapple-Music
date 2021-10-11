@@ -47,31 +47,39 @@ function Register() {
         <Typography variant="h3">Register</Typography>
         <form noValidate>
           <TextField
+            required
             id="username"
             name="username"
             type="username"
             label="Username"
+            variant="filled"
             fullWidth
           />
           <TextField
+            required
             id="email"
             name="email"
             type="email"
             label="Email"
+            variant="filled"
             fullWidth
           />
           <TextField
+            required
             id="password"
             name="password"
             type="password"
             label="Password"
+            variant="filled"
             fullWidth
           />
           <TextField
+            required
             id="confirmPassword"
             name="confirmPassword"
             type="confirmPassword"
             label="ConfirmPassword"
+            variant="filled"
             fullWidth
           />
           <br />
