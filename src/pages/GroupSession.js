@@ -1,5 +1,6 @@
 import React from "react";
-import { Grid, Typography } from "@material-ui/core";
+import { Container, Grid, IconButton, Typography } from "@mui/material";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 import GroupSessionCard from "../components/GroupSessionCard";
 
@@ -15,7 +16,7 @@ function GroupSession() {
     sessionId: 1234,
   };
 
-  const cards = [props, props, props];
+  const cards = [props, props, props, props, props];
 
   return (
     <div>
@@ -28,13 +29,27 @@ function GroupSession() {
       >
         Group Listening
       </Typography>
-      <Grid container spacing={4}>
-        {cards.map((card) => (
-          <Grid item md={3}>
-            <GroupSessionCard props={card} />
+      <Container maxWidth="md">
+        <Grid container alignItems="center" justifyContent="center" spacing={9}>
+          <Grid
+            justifyContent="center"
+            align="center"
+            item
+            xs={12}
+            sm={6}
+            md={4}
+          >
+            <IconButton  color="primary">
+              <AddCircleIcon sx={{ fontSize: 80 }} />
+            </IconButton>
           </Grid>
-        ))}
-      </Grid>
+          {cards.map((card) => (
+            <Grid item key={card} xs={12} sm={6} md={4}>
+              <GroupSessionCard props={card} />
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@material-ui/core";
+import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@mui/material";
 
 function GroupSessionCard({
   props: { title, imageUrl, username, createdAt, sessionId },
@@ -26,7 +26,7 @@ function GroupSessionCard({
       </CardContent>
       <CardActions>
         <Button size="small">Join</Button>
-        <Button size="small">{sessionId}</Button>
+        <Button size="small">Session ID: {sessionId}</Button>
       </CardActions>
     </Card>
   );
