@@ -7,6 +7,8 @@ import GroupSessionCard from "../components/GroupSessionCard";
 function GroupSession() {
   var date = new Date();
   var dateTime = date.toLocaleDateString();
+
+ // example props added for testing
   const props = {
     title: "group session1",
     imageUrl:
@@ -15,7 +17,6 @@ function GroupSession() {
     createdAt: dateTime,
     sessionId: 1234,
   };
-
   const cards = [props, props, props, props, props];
 
   return (
@@ -42,6 +43,8 @@ function GroupSession() {
             <IconButton  color="primary">
               <AddCircleIcon sx={{ fontSize: 80 }} />
             </IconButton>
+            <br />
+            Create a new session
           </Grid>
           {cards.map((card) => (
             <Grid item key={card} xs={12} sm={6} md={4}>
