@@ -1,33 +1,26 @@
-import logo from './logo.jpg';
-import './App.css';
-import { TouchableOpacity, Text } from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+/**
+ * App file copy but specifically for testing the login components because I'm not totally sure
+ * how to get it to work in the original App file.
+ */
 
-function HomeScreen( {navigation} ) {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <TouchableOpacity onPress={() => navigation.navigate("example")}>
-          <Text>Example Button and Navigation</Text>
-        </TouchableOpacity>
-      </header>
-    </div>
-  )
-}
-
-const Stack = createNativeStackNavigator();
-
-function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen}>
-        </Stack.Screen>
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
-
-export default App;
+ import React from "react";
+ import './App.css';
+ import Signup from "./login-components/signup"
+ import "bootstrap/dist/css/bootstrap.min.css"
+ import { Container } from "react-bootstrap"
+ import { AuthProvider } from "./contexts/AuthContext"
+ 
+ function App() {
+   return (
+     <AuthProvider>  
+       <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: "100vh" }}>
+        <div className="w-100" style={{ maxWidth: "400px" }}>
+            <Signup/>
+        </div>
+       </Container>
+     </AuthProvider>
+ );
+ }
+ 
+ export default App;
+ 

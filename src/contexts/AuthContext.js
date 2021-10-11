@@ -9,6 +9,7 @@
  * level of the tree."
  */
 
+import { createUserWithEmailAndPassword } from 'firebase/auth'
 import React, { useContext, useState, useEffect } from 'react'
 import { auth } from '../firebase'
 
@@ -26,9 +27,11 @@ export function AuthProvider({ children }) {
 
     /**
      * Calls the firebase function to signup with username and password.
+     * 
+     * Utilized in 'signup.js'
      */
     function signup(email, password) {
-      return auth.createUserWithEmailAndPassword(email, password)
+      return createUserWithEmailAndPassword(auth, email, password)
     }
 
     /**
