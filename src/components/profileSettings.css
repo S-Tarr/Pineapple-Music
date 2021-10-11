@@ -1,0 +1,18 @@
+.profile-header {
+    background-color: #ffe455;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.image-container {
+    background-color: #bdbdbd;
+    margin-top: 100px;
+    height: 400px;
+    width:  400px;
+}
+
+.text {
+    color: white;
+    justify-content: center;
+}

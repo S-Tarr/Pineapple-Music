@@ -4,15 +4,21 @@ import { TouchableOpacity, Text } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import IconButton from '@mui/material/IconButton';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import profileSettings from './components/profileSettings';
+import { Linking } from 'react-native';
+
 function HomeScreen( {navigation} ) {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <TouchableOpacity onPress={() => navigation.navigate("example")}>
-          <Text>Example Button and Navigation</Text>
-        </TouchableOpacity>
-      </header>
+      <div className="App-header">
+        <img src={logo} alt="logo" width="100%" />
+        <button onClick={() => Linking.openURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley")} className="Profile-Button"><PersonOutlineIcon className="Profile-Icon"></PersonOutlineIcon></button>
+      </div>
+      <div className="screenDisplay">
+
+      </div>
     </div>
   )
 }
