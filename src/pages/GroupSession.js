@@ -10,6 +10,7 @@ import {
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 import GroupSessionCard from "../components/GroupSessionCard";
+import GroupSessionForm from "../components/GroupSessionForm";
 
 const style = {
   position: "absolute",
@@ -73,12 +74,7 @@ function GroupSession() {
               aria-describedby="modal-modal-description"
             >
               <Box sx={style}>
-                <Typography id="modal-modal-title" variant="h6" component="h2">
-                  Test modal
-                </Typography>
-                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                  Add a form here
-                </Typography>
+                <GroupSessionForm />
               </Box>
             </Modal>
             <br />
