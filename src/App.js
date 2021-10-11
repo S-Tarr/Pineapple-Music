@@ -11,8 +11,8 @@ import Register from "./pages/Register";
 function App() {
   return (
     <>
-    {/* <Register /> */}
-    <GroupSession />
+    <Register />
+    {/* <GroupSession /> */}
     </>
     // <div className="App">
     //   <header className="App-header">
