@@ -3,7 +3,14 @@
  */
 
 import React, { useRef, useState } from "react";
-import { Alert, Button, Card, CardContent, Container, TextField } from "@mui/material";
+import {
+  Alert,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  TextField,
+} from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 
 function Signup() {
@@ -70,7 +77,7 @@ function Signup() {
               required
               id="confirmPassword"
               name="confirmPassword"
-              type="confirmPassword"
+              type="password"
               label="ConfirmPassword"
               variant="filled"
               inputRef={passwordConfirmRef}
