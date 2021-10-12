@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Grid, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 
 function GroupSessionForm() {
   const handleSubmit = (event) => {
