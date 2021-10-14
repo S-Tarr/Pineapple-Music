@@ -30,7 +30,27 @@ body {
   align-items: center;
   font-size: 3rem;
 }
+  
+.App-header {
+  background-color: #ffe455;
+  min-height: 100vh;
+  font-size: calc(10px + 2vmin);
+  color: rgb(76, 255, 21);
+}
 
 .change-password-f {
   margin-bottom: 2rem;
+}
+  
+.App-link {
+  color: #92fb61;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
