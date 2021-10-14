@@ -12,6 +12,7 @@ import {
   TextField,
 } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
+import { Link, useHistory } from "react-router-dom"
 
 function Signup() {
   const emailRef = useRef();
@@ -19,7 +20,8 @@ function Signup() {
   const passwordConfirmRef = useRef();
   const { signup, currentUser } = useAuth();
   const [error, setError] = useState(""); // Error represents the current message we want displayed, no error message by default
-  const [loading, setLoading] = useState(false); // Loading represents the current state of the button, disabled by default
+  const [loading, setLoading] = useState(false); // Loading represents the current state of the button, enabled by default
+  const history = useHistory();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -33,6 +35,7 @@ function Signup() {
       setError("");
       setLoading(true); // disable the signup button
       await signup(emailRef.current.value, passwordRef.current.value);
+      history.push("/"); // redirect user to main page
     } catch {
       setError("Failed to create an account");
     }
@@ -51,7 +54,6 @@ function Signup() {
         <Card>
           <CardContent>
             <h2 className="text-center mt-4">Sign Up</h2>
-            {currentUser && currentUser.email}
             {error && <Alert variant="danger">{error}</Alert>}
             <TextField
               required
@@ -94,7 +96,7 @@ function Signup() {
           </CardContent>
         </Card>
         <div className="w-100 text-center mt-2">
-          Already have an account? Log In
+          Already have an account? <Link to="/login">Log In</Link>
         </div>
       </div>
     </Container>
