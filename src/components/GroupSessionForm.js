@@ -7,7 +7,7 @@ function GroupSessionForm() {
   }
 
   return (
-    <>
+    <div>
       <Typography id="modal-modal-title" variant="h6" component="h2">
         Create a new session
       </Typography>
@@ -32,7 +32,7 @@ function GroupSessionForm() {
           Create
         </Button>
       </form>
-    </>
+    </div>
   );
 }
 
