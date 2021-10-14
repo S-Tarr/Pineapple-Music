@@ -12,6 +12,7 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import React, { useContext, useState, useEffect } from 'react'
 import { auth } from '../firebase'
+import "firebase/firestore"
 
 const AuthContext = React.createContext()
 
@@ -31,7 +32,17 @@ export function AuthProvider({ children }) {
      * Utilized in 'signup.js'
      */
     function signup(email, password) {
-      return createUserWithEmailAndPassword(auth, email, password)
+      // console.log(params)
+      const created = createUserWithEmailAndPassword(auth, email, password)
+      .then(registeredUser => {
+        this.firestore.collection("users")
+        .add({
+          uid: registeredUser.user.uid,
+          SpotifyToken: "testing testing"
+        })
+      }
+      );
+      return created;
     }
 
     /**

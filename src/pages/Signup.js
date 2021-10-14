@@ -13,13 +13,39 @@ import {
 } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 
+const CLIENT_ID = "b85b37966e894d9cb8eb8d776047f000";
+const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
+
+const SPACE_DELIMITER = "%20";
+const REDIRECT_URL_AFTER_LOGIN = "http://localhost:3000/Pineapple-Music"; //TODO CHANGE LATER
+const SCOPES = ["user-read-currently-playing", "user-read-playback-state"]; //TODO CHANGE LATER IF NECESSARY
+const SCOPES_URL_PARAM = SCOPES.join(SPACE_DELIMITER);
+
+const getParamsFromSpotifyAuth = (hash) => {
+  const paramsUrl = hash.substring(1).split("&");
+  const params = paramsUrl.reduce((accumulator, currentValue) => {
+    const [key, value] = currentValue.split("=");
+    accumulator[key] = value;
+    return accumulator;
+  }, {});
+  return params;
+};
+
+const logParams = (params) => {
+    console.log(params);
+}
+
 function Signup() {
   const emailRef = useRef();
   const passwordRef = useRef();
   const passwordConfirmRef = useRef();
+
+
   const { signup, currentUser } = useAuth();
   const [error, setError] = useState(""); // Error represents the current message we want displayed, no error message by default
   const [loading, setLoading] = useState(false); // Loading represents the current state of the button, disabled by default
+
+  const [authorized, setAuthorized] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -29,22 +55,37 @@ function Signup() {
       return setError("Passwords do not match");
     }
 
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!re.test(String(emailRef.current.value).toLowerCase())) {
+        return setError("Email not valid");
+    }
+
+
     try {
       setError("");
       setLoading(true); // disable the signup button
+      window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
+      const params = await getParamsFromSpotifyAuth(window.location.hash);
       await signup(emailRef.current.value, passwordRef.current.value);
     } catch {
       setError("Failed to create an account");
     }
 
-    setLoading(false); // enable the signup button
-  }
+    setLoading(false);
+    
+    // console.log("hello hello this is testing");
+    // console.log(loading +  " " + authorized);
+    // if (loading === false && authorized === true) {
+    //     window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
+    //     const params = await getParamsFromSpotifyAuth(window.location.hash);
+    //     console.log(params);
+    // }
+}
 
   return (
     <Container
       align="center"
-      justifyContent="center"
-      className="d-flex align-items-center justify-content-center"
+      className="d-flex align-items-center"
       style={{ minHeight: "100vh" }}
     >
       <div className="w-100" style={{ maxWidth: "400px" }}>
@@ -89,7 +130,7 @@ function Signup() {
               type="submit"
               onClick={handleSubmit}
             >
-              Sign Up
+              Login to Spotify and Sign Up
             </Button>
           </CardContent>
         </Card>
