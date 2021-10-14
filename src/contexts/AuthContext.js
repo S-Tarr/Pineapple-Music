@@ -9,7 +9,7 @@
  * level of the tree."
  */
 
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import React, { useContext, useState, useEffect } from 'react'
 import { auth } from '../firebase'
 
@@ -40,6 +40,13 @@ export function AuthProvider({ children }) {
     }
 
     /**
+     * Calls the firebase function to logout the current user.
+     */
+    function logout() {
+      return signOut(auth)
+    }
+
+    /**
      * Sets the current user when the state changes and unsubscribes from the listener after.
      */
     useEffect(() => {
@@ -52,8 +59,9 @@ export function AuthProvider({ children }) {
 
     const value = {
       currentUser,
+      signup,
       login,
-      signup
+      logout
     }
 
     return (
