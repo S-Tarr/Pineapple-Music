@@ -4,9 +4,9 @@ import "./Components.css";
 function Player() {
     return(
         <div className="Player-Div">
-            <button className="Player">Rewind</button>
-            <button className="Player">Play/Pause</button>
             <button className="Player">Skip</button>
+            <button className="Player">Play/Pause</button>
+            <button className="Player">Rewind</button>
         </div>
     );
 }

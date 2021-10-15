@@ -28,7 +28,6 @@ function App() {
           {/* <PrivateRoute exact path="/" component={TestHomepage}/>  */}
           <Route path="/signup" component={Signup}/>
           <Route path="/login" component={Login}/>
-          <Route path="/Pineapple-Music/visual" component={Visualizer}/>
           <Route path="/resetpassword" component = {ResetPassword}/>
          </Switch>
         <div className="container">
@@ -41,6 +40,7 @@ function App() {
               <Route path="/Pineapple-Music/myaccount" component={MyAccount} />
               <Route path="/Pineapple-Music/profilepicture" component={AddProfilePicture} />
               <Route path="/Pineapple-Music/song" component={SongPage}/>
+              <Route path="/Pineapple-Music/visual" component={Visualizer}/>
             </Switch>
           </div>
         </div>
