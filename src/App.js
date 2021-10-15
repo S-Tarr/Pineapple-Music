@@ -21,7 +21,6 @@ const auth = getAuth();
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  // let loggedIn = true;
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
