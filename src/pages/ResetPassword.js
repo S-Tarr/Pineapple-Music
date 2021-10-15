@@ -15,11 +15,17 @@ function ResetPassword() {
       console.warn(email);
 
       if (email != "") {
-         try {
-            sendPasswordResetEmail(auth, resetEmail)
-            window.alert("An email has been sent.");
-         } catch {
-            window.alert("There was an error.");
+         const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+         if (!re.test(String(email).toLowerCase())) {
+            window.alert("Email not valid");
+         }
+         else {
+            try {
+               sendPasswordResetEmail(auth, resetEmail);
+               window.alert("An email has been sent.");
+            } catch {
+               window.alert("There was an error.");
+            }
          }
       }
       else {
