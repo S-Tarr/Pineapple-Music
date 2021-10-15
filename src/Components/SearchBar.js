@@ -31,6 +31,7 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
   useEffect(() => {
     if (!wordEntered) return setSearchResults([])
     spotifyApi.searchTracks(wordEntered).then(res => {
+        console.log(res.body.tracks.items);
         setSearchResults(
             res.body.tracks.items.map(track => {
               const smallestAlbumImage = track.album.images.reduce(

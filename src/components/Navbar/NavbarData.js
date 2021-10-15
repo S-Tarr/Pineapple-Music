@@ -10,7 +10,7 @@ export const NavbarData = [
     {
         title: "Home",
         icon: <HomeRoundedIcon />,
-        link: "/"
+        link: "/Pineapple-Music"
     },
 
     {
