@@ -53,7 +53,8 @@ export function AuthProvider({ children }) {
       try {
         const docRef = await addDoc(collection(db, "users"), {
           uid: "testUID",
-          SpotifyToken: "testToken"
+          SpotifyToken: "testToken",
+          profileImgSrc: "testSrc"
         });
         console.log("Doc written w/ ID: ", docRef.id);
       } catch (e) {
