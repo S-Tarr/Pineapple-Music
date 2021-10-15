@@ -26,13 +26,9 @@ const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
 async function create() {
-  const docRef = await setDoc(doc(db, "users", currentUser.uid), {
-    uid: "testUID",
-    SpotifyToken: "testToken",
-    profileImgSrc: "testSrc",
-  });
-  //console.log(currentUser.uid);
-  //   console.log("Doc written w/ ID: ", docRef.id);
+    const docRef = await setDoc(doc(db, "users", currentUser.uid), {
+        uid: currentUser.uid, SpotifyToken: "yo9NIlMIOIqh6zBODP5q9b1icJTkoaJyEBsGDpGfdbuChaxE",
+      });    
 }
 
 async function check() {
@@ -45,39 +41,47 @@ async function check() {
   }
 }
 
-export default class AddProfilePicture extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      picture: false,
-      src: false,
-    };
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        currentUser = auth.currentUser;
-        check();
-        photo = currentUser.photoURL;
-        //GET ACTUAL IMAGE
-        if (photo != null) {
-          const storage = getStorage();
-          getDownloadURL(ref(storage, photo))
-            .then((url) => {
-              console.log(url);
-              this.setState({
-                src: url,
-              });
-            })
-            .catch((error) => {
-              // Handle any errors
-            });
-        } else {
+export default class AddProfilePicture extends React.Component{
+    
+    constructor(props){
+        super(props);
+        
+        this.state = {
+            picture: false,
+            src: false
         }
+
+        onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // User is signed in, see docs for a list of available properties
+            // https://firebase.google.com/docs/reference/js/firebase.User
+            currentUser = auth.currentUser;
+            check();
+            photo = currentUser.photoURL;
+            console.log(currentUser.uid);
+            //GET ACTUAL IMAGE
+            if (photo != null) {
+
+                const storage = getStorage();
+                getDownloadURL(ref(storage, photo))
+                .then((url) => {
+                    console.log(url);
+                    this.setState({
+                        src: url
+                    });
+                })
+                .catch((error) => {
+                    // Handle any errors
+                });
+            }
+            else {
+                
+            }
+            // ...
+
+        } 
         // ...
-      } else {
+        else {
         // User is signed out
         // ...
         console.log("NOT CORRECT");
