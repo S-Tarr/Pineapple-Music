@@ -1,0 +1,12 @@
+.Page {
+    background-image: linear-gradient(90deg, #3a9c, #4f7a);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    align-items: center;
+}
+
+.Visual-Img {
+    margin: auto;
+}

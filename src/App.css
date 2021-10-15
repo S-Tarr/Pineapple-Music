@@ -21,7 +21,6 @@ body {
 }
 
 .home,
-.my-account,
 .create-group {
   width: 100%;
   height: 100%;
@@ -30,7 +29,28 @@ body {
   align-items: center;
   font-size: 3rem;
 }
-  
+
+.my-account {
+  background-image: linear-gradient(90deg, #3a9c, #4f7a);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+}
+
+.input-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+}
+
 .App-header {
   background-color: #ffe455;
   min-height: 100vh;
