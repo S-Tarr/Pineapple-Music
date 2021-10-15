@@ -48,19 +48,22 @@ export function AuthProvider({ children }) {
     /**
      * Calls the firebase function to signup with username and password.
      */
-    async function signup(email, password) {
-      const created = createUserWithEmailAndPassword(auth, email, password)
+    function signup(email, password) {
+      return createUserWithEmailAndPassword(auth, email, password)
+    }
+
+    async function addUserToFirestore() {
       try {
-        const docRef = await addDoc(collection(db, "users"), {
+        await addDoc(collection(db, "users"), {
           uid: "testUID",
           SpotifyToken: "testToken",
           profileImgSrc: "testSrc"
         });
-        console.log("Doc written w/ ID: ", docRef.id);
+        return true
       } catch (e) {
-        console.error("Error adding doc: ", e)
+        console.log("e: ", e)
+        return false
       }
-      return created
     }
 
     /**
@@ -95,6 +98,7 @@ export function AuthProvider({ children }) {
     const value = {
       currentUser,
       signup,
+      addUserToFirestore,
       login,
       logout,
       deleteAccount
