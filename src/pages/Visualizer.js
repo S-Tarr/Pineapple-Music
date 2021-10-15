@@ -1,15 +1,12 @@
-import { Link, useHistory } from "react-router-dom"
+import './Pages.css';
 import React from 'react';
-import Player from '../components/Player';
-import "./Pages.css"
 
-const Visualizer = () => {
-    return (
-    <div className="Page">Hello
-        <header>Visualizer Page</header>
-        <Player/>
-    </div>
-    );
+function Visualizer() {
+    return(
+        <div className="Page">
+            This is visualizer page
+        </div>
+    )
 }
 
 export default Visualizer;

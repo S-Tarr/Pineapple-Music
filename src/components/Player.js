@@ -3,8 +3,10 @@ import "./Components.css";
 
 function Player() {
     return(
-        <div>
-            <h1>Player Component Here</h1>
+        <div className="Player-Div">
+            <button className="Player">Rewind</button>
+            <button className="Player">Play/Pause</button>
+            <button className="Player">Skip</button>
         </div>
     );
 }

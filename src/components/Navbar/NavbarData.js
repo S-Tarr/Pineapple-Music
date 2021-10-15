@@ -27,5 +27,17 @@ export const NavbarData = [
         title: "Profile",
         icon: <ImageIcon />,
         link: "/profilepicture"
+    },
+
+    {
+        title: "Song",
+        icon: <ImageIcon />,
+        link: "/song"
+    },
+
+    {
+        title: "Visualizer",
+        icon: <ImageIcon />,
+        link: "/visual"
     }
 ];

@@ -11,10 +11,11 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login"
 import TestHomepage from "./pages/TestHomepage";
 import PrivateRoute from "./components/PrivateRoute";
-import Visualizer from "./pages/Visualizer";
+import SongPage from "./pages/SongPage";
 import addProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import AddProfilePicture from './pages/AddProfilePicture/addProfilePicture';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import Visualizer from "./pages/Visualizer";
 
 function App() {
 
@@ -35,6 +36,7 @@ function App() {
               <Route path="/creategroup" component={GroupSession} />
               <Route path="/myaccount" component={MyAccount} />
               <Route path="/profilepicture" component={AddProfilePicture} />
+              <Route path="/song" component={SongPage}/>
             </Switch>
           </div>
         </div>
