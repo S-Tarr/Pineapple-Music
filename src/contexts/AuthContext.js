@@ -12,9 +12,9 @@
 // Imports
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth"
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from 'firebase/auth'
 import React, { useContext, useState, useEffect } from 'react'
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore"
+import { getFirestore, collection, addDoc } from "firebase/firestore"
 
 // Firebase configuration
 const firebaseConfig = {
@@ -48,19 +48,22 @@ export function AuthProvider({ children }) {
     /**
      * Calls the firebase function to signup with username and password.
      */
-    async function signup(email, password) {
-      const created = createUserWithEmailAndPassword(auth, email, password)
+    function signup(email, password) {
+      return createUserWithEmailAndPassword(auth, email, password)
+    }
+
+    async function addUserToFirestore() {
       try {
-        const docRef = await addDoc(collection(db, "users"), {
+        await addDoc(collection(db, "users"), {
           uid: "testUID",
           SpotifyToken: "testToken",
           profileImgSrc: "testSrc"
         });
-        console.log("Doc written w/ ID: ", docRef.id);
+        return true
       } catch (e) {
-        console.error("Error adding doc: ", e)
+        console.log("e: ", e)
+        return false
       }
-      return created
     }
 
     /**
@@ -77,6 +80,10 @@ export function AuthProvider({ children }) {
       return signOut(auth)
     }
 
+    function deleteAccount() {
+      return deleteUser(auth.currentUser)
+    }
+
     /**
      * Sets the current user when the state changes and unsubscribes from the listener after.
      */
@@ -91,8 +98,10 @@ export function AuthProvider({ children }) {
     const value = {
       currentUser,
       signup,
+      addUserToFirestore,
       login,
-      logout
+      logout,
+      deleteAccount
     }
 
     return (
