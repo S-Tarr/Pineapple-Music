@@ -10,13 +10,10 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login"
 import ResetPassword from './pages/ResetPassword';
-import TestHomepage from "./pages/TestHomepage";
 import PrivateRoute from "./components/PrivateRoute";
 import SongPage from "./pages/SongPage";
-import addProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import SearchPage from './pages/SearchPage';
 import AddProfilePicture from './pages/AddProfilePicture/addProfilePicture';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import Visualizer from "./pages/Visualizer";
 
 function App() {
@@ -25,7 +22,6 @@ function App() {
     <Router>
       <AuthProvider>
         <Switch>
-          {/* <PrivateRoute exact path="/" component={TestHomepage}/>  */}
           <Route path="/signup" component={Signup}/>
           <Route path="/login" component={Login}/>
           <Route path="/visual" component={Visualizer}/>
