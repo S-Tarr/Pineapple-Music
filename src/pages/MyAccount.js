@@ -1,5 +1,6 @@
 import React from "react"
 import Input from "../components/Input.js"
+import LogoutButton from '../components/LogoutButton'
 
 function MyAccount() {
     return (
@@ -12,6 +13,7 @@ function MyAccount() {
                     Submit
                 </button>
             </form>
+            <LogoutButton />
         </div>
     )
 }
