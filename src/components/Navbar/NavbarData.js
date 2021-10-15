@@ -3,6 +3,8 @@ import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import PersonIcon from '@mui/icons-material/Person';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import ImageIcon from '@mui/icons-material/Image';
+import SearchIcon from '@mui/icons-material/Search';
+import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 
 export const NavbarData = [
     {
@@ -37,13 +39,13 @@ export const NavbarData = [
 
     {
         title: "Song",
-        icon: <ImageIcon />,
+        icon: <SearchIcon />,
         link: "/song"
     },
 
     {
         title: "Visualizer",
-        icon: <ImageIcon />,
+        icon: <GraphicEqIcon />,
         link: "/visual"
     }
 ];
