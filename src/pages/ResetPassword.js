@@ -40,6 +40,7 @@ function ResetPassword() {
          </h1>
          <input placeholder="Email Address" type="text" onChange={printEmail}/>
          <button onClick={sendResetEmail}>Confirmation Email</button>
+         <button onClick={()=>{window.location.pathname="/login";}}>Back to Login</button>
       </div>
    )
 }
