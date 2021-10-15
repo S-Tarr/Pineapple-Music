@@ -8,42 +8,42 @@ export const NavbarData = [
     {
         title: "Home",
         icon: <HomeRoundedIcon />,
-        link: "/Pineapple-Music"
+        link: "/"
     },
 
     {
         title: "Search",
         icon: <ImageIcon />,
-        link: "/Pineapple-Music/search"
+        link: "/search"
     },
 
     {
         title: "Group Session",
         icon: <AddRoundedIcon />,
-        link: "/Pineapple-Music/creategroup"
+        link: "/creategroup"
     },
 
     {
         title: "My Account",
         icon: <PersonIcon />,
-        link: "/Pineapple-Music/myaccount"
+        link: "/myaccount"
     },
 
     {
         title: "Profile",
         icon: <ImageIcon />,
-        link: "/Pineapple-Music/profilepicture"
+        link: "/profilepicture"
     },
 
     {
         title: "Song",
         icon: <ImageIcon />,
-        link: "/Pineapple-Music/song"
+        link: "/song"
     },
 
     {
         title: "Visualizer",
         icon: <ImageIcon />,
-        link: "/Pineapple-Music/visual"
+        link: "/visual"
     }
 ];
