@@ -36,6 +36,7 @@ function App() {
               <Route path="/myaccount" component={MyAccount} />
               <Route path="/profilepicture" component={AddProfilePicture} />
               <Route path="/song" component={SongPage}/>
+              <Route path="/visual" component={Visualizer}/>
             </Switch>
           </div>
         </div>
