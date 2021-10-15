@@ -11,8 +11,13 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login"
 import TestHomepage from "./pages/TestHomepage";
 import PrivateRoute from "./components/PrivateRoute";
+import addProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
+import AddProfilePicture from './pages/AddProfilePicture/addProfilePicture';
+
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 function App() {
+
   return (
     <Router>
       <AuthProvider>
@@ -26,8 +31,9 @@ function App() {
           <div className="content">
             <Switch>
               <Route exact path="/" component={Home} />
-              <Route path="/creategroup" component={CreateGroup} />
+              <Route path="/creategroup" component={GroupSession} />
               <Route path="/myaccount" component={MyAccount} />
+              <Route path="/profilepicture" component={AddProfilePicture} />
             </Switch>
           </div>
         </div>
