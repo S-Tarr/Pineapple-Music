@@ -7,9 +7,11 @@ import "./Pages.css"
 const SongPage = () => {
     return (
     <div className="Page">
-        <img className="Visual-Img" src={Pineapple} height={200} width={250} />
-        <text>Song Name Here</text>
-        <Player/>
+        <div className="Song-Div">
+            <img className="Song-Img" src={Pineapple} height={200} width={250} />
+            <text>Song Name Here</text>
+            <Player/>
+        </div>
     </div>
     );
 }
