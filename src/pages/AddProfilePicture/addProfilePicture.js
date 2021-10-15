@@ -1,18 +1,47 @@
 import './addProfilePic.css';
 import React from "react";
 import { useEffect, useState } from "react";
-import Firebase from '../../firebase';
-import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
+import createUser from "../../pages/Signup";
+
 import { useAuth } from "../../contexts/AuthContext";
+
+import Firebase from '../../firebase';
+import app from '../../firebase';
+import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
+import { getStorage, ref, uploadBytes, getDownloadURL} from "firebase/storage";
+import { getFirestore, collection, doc, getDoc, setDoc } from "firebase/firestore";
 
 let currentUser = null;
 let photo = null;
-const auth = getAuth();
 
 //not done
 
-export default class AddProfilePicture extends React.Component{
+const auth = getAuth(); // Authorization component 
+const db = getFirestore(app); // Firestore database
 
+async function create() {
+    const docRef = await setDoc(doc(db, "users", currentUser.uid), {
+        uid: "testUID",
+        SpotifyToken: "testToken",
+        profileImgSrc: "testSrc"
+      });
+      //console.log(currentUser.uid);
+    //   console.log("Doc written w/ ID: ", docRef.id);
+}
+
+async function check() {
+    const docRef = doc(db, "users", currentUser.uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        //console.log("Document data:", docSnap.data());
+    } else {
+        create();
+    }
+}
+
+
+export default class AddProfilePicture extends React.Component{
+    
     constructor(props){
         super(props);
         
@@ -26,11 +55,25 @@ export default class AddProfilePicture extends React.Component{
             // User is signed in, see docs for a list of available properties
             // https://firebase.google.com/docs/reference/js/firebase.User
             currentUser = auth.currentUser;
+            check();
             photo = currentUser.photoURL;
+            //GET ACTUAL IMAGE
             if (photo != null) {
-                this.setState({
-                    src: photo
+
+                const storage = getStorage();
+                getDownloadURL(ref(storage, photo))
+                .then((url) => {
+                    console.log(url);
+                    this.setState({
+                        src: url
+                    });
+                })
+                .catch((error) => {
+                    // Handle any errors
                 });
+            }
+            else {
+                
             }
             // ...
         } else {
@@ -45,14 +88,25 @@ export default class AddProfilePicture extends React.Component{
         var picture = event.target.files[0];
         var src     = URL.createObjectURL(picture);
         photo = src;
+
+        const storage = getStorage();
+        const storageRef = ref(storage, currentUser.uid);
+        // 'file' comes from the Blob or File API
+        // console.log(picture);
+        uploadBytes(storageRef, picture).then((snapshot) => {
+            console.log('Uploaded a blob or file!');
+        });
+        //MAY NEED TO CHANGE BELOW  
         
         updateProfile(auth.currentUser, {
-            photoURL: photo
+            photoURL: currentUser.uid
         }).then(() => {
         // Profile updated!
         // ...
             console.log("PROFILE UPDATED");
-            console.log(currentUser.photoURL);
+
+            // CORRECT
+            //console.log(currentUser.photoURL);
         }).catch((error) => {
         // An error occurred
         // ...
@@ -66,16 +120,17 @@ export default class AddProfilePicture extends React.Component{
     }
 
     render() {
-        console.log("HELLO@");
-        console.log(this.state.src);
+        //console.log(this.state.src);
         return (
             <div className="profile-header">
                 <div>
-                    <text className="text">Upload Profile Image</text>
+                    <text className="text">Change Profile Image</text>
+                </div>
+                <div className="button-header">
                     <input type="file" onChange={this.handlePictureSelected.bind(this)}/>
                 </div>
                 <div className="image-container">
-                    <img src={this.state.src} className="App-logo"/>
+                    <img src={this.state.src}/>
                 </div>
             </div>
           )

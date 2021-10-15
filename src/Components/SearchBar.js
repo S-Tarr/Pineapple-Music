@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useHistory } from 'react-router';
 import "./SearchBar.css";
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from "@material-ui/icons/Close";
@@ -6,13 +7,17 @@ import Track from './Track'
 var SpotifyWebApi = require('spotify-web-api-node');
 
 
+
 var spotifyApi = new SpotifyWebApi({
-    clientId : '477666821b8941c4bd163b4ff55ed9af',
-    clientSecret: '5a9f7c25c73a46ca958cf138c64f1297',
+    clientId : '0fbe30c6e814404e8324aa3838a7f322',
+    clientSecret: 'e414b612d1ff45dd9ba6643e3161bdff',
     redirectUri: 'localhost:3000/Pineapple-Music'
 });
 
 function SearchBar({ placeholder, spotifyData, authorized }) {
+
+  const history = useHistory()
+
   console.log(spotifyData);
   const [filteredData, setFilteredData] = useState([]);
   const [wordEntered, setWordEntered] = useState("");
@@ -57,6 +62,15 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
     setWordEntered("");
   };
 
+  function handleRedirect(track) {
+      console.log(track);
+
+      history.push({
+          pathname: '/song',
+          state: {name: track.title, picture: track.albumUrl}
+      });
+  }
+
   return (
     <div className="search">
       <div className="searchInputs">
@@ -81,6 +95,7 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
                 <Track
                     track={track}
                     key={track.uri}
+                    chooseTrack={handleRedirect}
                 />
             );
           })}

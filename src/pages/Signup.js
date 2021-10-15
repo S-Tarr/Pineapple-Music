@@ -36,7 +36,7 @@ function Signup() {
   const emailRef = useRef();
   const passwordRef = useRef();
   const passwordConfirmRef = useRef();
-  const { signup, currentUser } = useAuth();
+  const { signup, addUserToFirestore, currentUser } = useAuth();
   const [error, setError] = useState(""); // Error represents the current message we want displayed, no error message by default
   const [loading, setLoading] = useState(false); // Loading represents the current state of the button, enabled by default
   const history = useHistory();
@@ -59,10 +59,11 @@ function Signup() {
       setLoading(true); // disable the signup button
 
       // redirect user to Spotify Login
-      window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
-      const params = await getParamsFromSpotifyAuth(window.location.hash);
+      // window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
+      // const params = await getParamsFromSpotifyAuth(window.location.hash);
 
       await signup(emailRef.current.value, passwordRef.current.value);
+      addUserToFirestore();
       history.push("/"); // redirect user to main page
     } catch {
       setError("Failed to create an account");
