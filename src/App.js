@@ -28,7 +28,6 @@ function App() {
           {/* <PrivateRoute exact path="/" component={TestHomepage}/>  */}
           <Route path="/signup" component={Signup}/>
           <Route path="/login" component={Login}/>
-          <Route path="/visual" component={Visualizer}/>
           <Route path="/resetpassword" component = {ResetPassword}/>
          </Switch>
         <div className="container">
@@ -41,6 +40,7 @@ function App() {
               <Route path="/myaccount" component={MyAccount} />
               <Route path="/profilepicture" component={AddProfilePicture} />
               <Route path="/song" component={SongPage}/>
+              <Route path="/visual" component={Visualizer}/>
             </Switch>
           </div>
         </div>
