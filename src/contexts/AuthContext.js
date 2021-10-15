@@ -117,6 +117,7 @@ export function AuthProvider({ children }) {
     currentUser,
     //addUserToFirestore,
     signup,
+    deleteAccount,
     login,
     logout,
     addSpotifyToken,
