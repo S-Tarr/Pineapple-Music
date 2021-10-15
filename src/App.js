@@ -28,19 +28,19 @@ function App() {
           {/* <PrivateRoute exact path="/" component={TestHomepage}/>  */}
           <Route path="/signup" component={Signup}/>
           <Route path="/login" component={Login}/>
+          <Route path="/Pineapple-Music/visual" component={Visualizer}/>
           <Route path="/resetpassword" component = {ResetPassword}/>
          </Switch>
         <div className="container">
           <Navbar />
           <div className="content">
             <Switch>
-              <Route exact path="/" component={Home} />
-              <Route path="/search" component={SearchPage} />
-              <Route path="/creategroup" component={GroupSession} />
-              <Route path="/myaccount" component={MyAccount} />
-              <Route path="/profilepicture" component={AddProfilePicture} />
-              <Route path="/song" component={SongPage}/>
-              <Route path="/visual" component={Visualizer}/>
+              <Route exact path="/Pineapple-Music" component={Home} />
+              <Route path="/Pineapple-Music/search" component={SearchPage} />
+              <Route path="/Pineapple-Music/creategroup" component={GroupSession} />
+              <Route path="/Pineapple-Music/myaccount" component={MyAccount} />
+              <Route path="/Pineapple-Music/profilepicture" component={AddProfilePicture} />
+              <Route path="/Pineapple-Music/song" component={SongPage}/>
             </Switch>
           </div>
         </div>
