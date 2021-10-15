@@ -4,7 +4,7 @@ import SearchBar from '../components/SearchBar'
 import { Button } from "@mui/material";
 
 
-const CLIENT_ID = "477666821b8941c4bd163b4ff55ed9af";
+const CLIENT_ID = "0fbe30c6e814404e8324aa3838a7f322";
 const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
 
 const SPACE_DELIMITER = "%20";

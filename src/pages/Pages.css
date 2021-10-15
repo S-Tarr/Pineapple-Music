@@ -1,5 +1,5 @@
 .Page {
-    background-color: rgb(83, 175, 129);
+    background-image: linear-gradient(90deg, #3a9c, #4f7a);
     min-height: 100vh;
     display: flex;
     flex-direction: column;

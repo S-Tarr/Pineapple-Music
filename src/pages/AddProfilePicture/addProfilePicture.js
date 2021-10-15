@@ -124,13 +124,13 @@ export default class AddProfilePicture extends React.Component{
         return (
             <div className="profile-header">
                 <div>
-                    <text>Change Profile Image</text>
+                    <text className="text">Change Profile Image</text>
                 </div>
                 <div className="button-header">
                     <input type="file" onChange={this.handlePictureSelected.bind(this)}/>
                 </div>
                 <div className="image-container">
-                    <img className="image-jegg" src={this.state.src}/>
+                    <img src={this.state.src}/>
                 </div>
             </div>
           )

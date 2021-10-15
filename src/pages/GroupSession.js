@@ -44,7 +44,7 @@ function GroupSession() {
   const cards = [props, props, props, props, props];
 
   return (
-    <div>
+    <div className="Page">
       <Typography
         component="h1"
         variant="h2"
