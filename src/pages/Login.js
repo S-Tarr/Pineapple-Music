@@ -42,7 +42,6 @@
    return (
      <Container
        align="center"
-       justifyContent="center"
        className="d-flex align-items-center justify-content-center"
        style={{ minHeight: "100vh" }}
      >

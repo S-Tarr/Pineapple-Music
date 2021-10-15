@@ -2,6 +2,7 @@ import React from "react"
 import Input from "../components/Input.js"
 import LogoutButton from '../components/LogoutButton'
 import DeleteAccountButton from '../components/DeleteAccountButton'
+import ChangeAccount from '../components/ChangeAccount'
 
 function MyAccount() {
     return (
@@ -16,6 +17,7 @@ function MyAccount() {
             </form>
             <LogoutButton />
             <DeleteAccountButton />
+            <ChangeAccount />
         </div>
     )
 }

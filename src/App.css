@@ -27,6 +27,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-image: linear-gradient(90deg, #3a9c, #4f7a);
 }
 
 .home h1{
@@ -71,6 +72,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
   font-size: 3rem;
 }
 

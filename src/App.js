@@ -5,16 +5,16 @@ import MyAccount from './pages/MyAccount';
 import Home from './pages/Home';
 import CreateGroup from './pages/CreateGroup';
 import Navbar from './components/Navbar/Navbar'; 
-import GroupSession from "./pages/GroupSession";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { AuthProvider } from "./contexts/AuthContext";
+import GroupSession from "./pages/GroupSession";
 import Signup from "./pages/Signup";
-import Login from "./pages/Login"
-import ResetPassword from './pages/ResetPassword';
+import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import PrivateRoute from "./components/PrivateRoute";
 import SongPage from "./pages/SongPage";
-import SearchPage from './pages/SearchPage';
-import AddProfilePicture from './pages/AddProfilePicture/addProfilePicture';
+import SearchPage from "./pages/SearchPage";
+import AddProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import Visualizer from "./pages/Visualizer";
 
 const auth = getAuth();
