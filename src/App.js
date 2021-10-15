@@ -21,7 +21,6 @@ const auth = getAuth();
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  // let loggedIn = true;
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -89,7 +88,7 @@ function App() {
             <Navbar />
             <div className="content">
               <Switch>
-                <Route exact path="/" component={Home} />
+                <Route exact path="/Pineapple-Music" component={Home} />
                 <Route path="/search" component={SearchPage} />
                 <Route path="/creategroup" component={GroupSession} />
                 <Route path="/myaccount" component={MyAccount} />
