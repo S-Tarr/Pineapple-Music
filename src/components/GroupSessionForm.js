@@ -4,6 +4,7 @@ import { Button, TextField, Typography } from "@mui/material";
 function GroupSessionForm() {
   const handleSubmit = (event) => {
       event.prevnetDefault();
+
   }
 
   return (
