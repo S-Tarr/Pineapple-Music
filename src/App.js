@@ -12,11 +12,12 @@ import Login from "./pages/Login"
 import ResetPassword from './pages/ResetPassword';
 import TestHomepage from "./pages/TestHomepage";
 import PrivateRoute from "./components/PrivateRoute";
+import SongPage from "./pages/SongPage";
 import addProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import SearchPage from './pages/SearchPage';
 import AddProfilePicture from './pages/AddProfilePicture/addProfilePicture';
-
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import Visualizer from "./pages/Visualizer";
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
           {/* <PrivateRoute exact path="/" component={TestHomepage}/>  */}
           <Route path="/signup" component={Signup}/>
           <Route path="/login" component={Login}/>
+          <Route path="/visual" component={Visualizer}/>
           <Route path="/resetpassword" component = {ResetPassword}/>
          </Switch>
         <div className="container">
@@ -38,6 +40,7 @@ function App() {
               <Route path="/Pineapple-Music/creategroup" component={GroupSession} />
               <Route path="/Pineapple-Music/myaccount" component={MyAccount} />
               <Route path="/Pineapple-Music/profilepicture" component={AddProfilePicture} />
+              <Route path="/Pineapple-Music/song" component={SongPage}/>
             </Switch>
           </div>
         </div>

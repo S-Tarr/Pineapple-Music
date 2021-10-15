@@ -1,0 +1,12 @@
+.Page {
+    background-color: rgb(83, 175, 129);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    align-items: center;
+}
+
+.Visual-Img {
+    margin: auto;
+}
