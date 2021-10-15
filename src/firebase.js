@@ -21,4 +21,5 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig); 
 
 export const auth = getAuth() // Authorization component from Firebase
+
 export default app

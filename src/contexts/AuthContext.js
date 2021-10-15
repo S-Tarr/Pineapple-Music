@@ -1,5 +1,5 @@
 /**
- * React context storing logged in user information.
+ * Establishes the firebase connection and builds a React context storing logged in user information.
  * 
  * Contexts:
  * "In a typical React application, data is passed top-down (parent to child) via props,
@@ -9,10 +9,30 @@
  * level of the tree."
  */
 
+// Imports
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import React, { useContext, useState, useEffect } from 'react'
-import { auth } from '../firebase'
+import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore"
 
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyB_IknUnLChJp9vG9kip0_Xu1YaqKed2Sk",
+  authDomain: "pineapple-music-1ea51.firebaseapp.com",
+  projectId: "pineapple-music-1ea51",
+  storageBucket: "pineapple-music-1ea51.appspot.com",
+  messagingSenderId: "171412581022",
+  appId: "1:171412581022:web:bd4f9b6de4f7de0c17a98f",
+  measurementId: "G-QZK0B417MX"
+};
+
+// Initialize Firebase components
+const app = initializeApp(firebaseConfig); // Connected app instance
+const auth = getAuth() // Authorization component 
+const db = getFirestore(app); // Firestore database
+
+// Initialize AuthContext
 const AuthContext = React.createContext()
 
 export function useAuth() {
@@ -20,7 +40,7 @@ export function useAuth() {
 }
 
 /**
- * @returns The current user to be used anywhere in the application
+ * @returns The current user; can be used anywhere in the application
  */
 export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState()
@@ -28,8 +48,18 @@ export function AuthProvider({ children }) {
     /**
      * Calls the firebase function to signup with username and password.
      */
-    function signup(email, password) {
-      return createUserWithEmailAndPassword(auth, email, password)
+    async function signup(email, password) {
+      const created = createUserWithEmailAndPassword(auth, email, password)
+      try {
+        const docRef = await addDoc(collection(db, "users"), {
+          uid: "testUID",
+          SpotifyToken: "testToken"
+        });
+        console.log("Doc written w/ ID: ", docRef.id);
+      } catch (e) {
+        console.error("Error adding doc: ", e)
+      }
+      return created
     }
 
     /**

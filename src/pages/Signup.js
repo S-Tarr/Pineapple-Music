@@ -14,6 +14,24 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom"
 
+const CLIENT_ID = "b85b37966e894d9cb8eb8d776047f000";
+const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
+
+const SPACE_DELIMITER = "%20";
+const REDIRECT_URL_AFTER_LOGIN = "http://localhost:3000/Pineapple-Music"; //TODO CHANGE LATER
+const SCOPES = ["user-read-currently-playing", "user-read-playback-state"]; //TODO CHANGE LATER IF NECESSARY
+const SCOPES_URL_PARAM = SCOPES.join(SPACE_DELIMITER);
+
+const getParamsFromSpotifyAuth = (hash) => {
+  const paramsUrl = hash.substring(1).split("&");
+  const params = paramsUrl.reduce((accumulator, currentValue) => {
+    const [key, value] = currentValue.split("=");
+    accumulator[key] = value;
+    return accumulator;
+  }, {});
+  return params;
+};
+
 function Signup() {
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -31,9 +49,19 @@ function Signup() {
       return setError("Passwords do not match");
     }
 
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!re.test(String(emailRef.current.value).toLowerCase())) {
+        return setError("Email not valid");
+    }
+
     try {
       setError("");
       setLoading(true); // disable the signup button
+
+      // redirect user to Spotify Login
+      window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
+      const params = await getParamsFromSpotifyAuth(window.location.hash);
+
       await signup(emailRef.current.value, passwordRef.current.value);
       history.push("/"); // redirect user to main page
     } catch {
