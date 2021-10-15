@@ -4,6 +4,8 @@ import { TouchableOpacity, Text } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SearchPage from './SearchPage';
+//import BookData from "./Data.json";
+
 
 function HomeScreen( {navigation} ) {
   return (
