@@ -30,13 +30,11 @@ const handleSpotifyLogin = () => {
 function SearchPage() {
     const [authorized, setAuthorized] = useState(true);
     const [token, setToken] = useState({})
-    //var token = "BQDnY8nUbaBXf7Bg33X4AlCBvWLCkuUQzBEWwXaFNavv3T-X9mUwOisu2P_m9-giAap-UdStSZnzSNd1mFDtZpsm3wigaAoVXG1F0D7NvaaB1jJluVfWiGB2WUzxFu3eSTrlDZQM0QbsNAchLFwUmKd8AQX_WcH7DkzKB8vYr7k";
     useEffect(() => {
         if (window.location.hash) {
         setToken(getParamsFromSpotifyAuth(window.location.hash).access_token);
         console.log(token);
         setAuthorized(false);
-        //TODO: CONNECT TO FIREBASE TO STORE AUTH PARAMS FROM SPOTIFY
         }
     }, [authorized]);
     return (
