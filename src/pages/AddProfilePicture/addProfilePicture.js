@@ -21,12 +21,8 @@ const db = getFirestore(app); // Firestore database
 
 async function create() {
     const docRef = await setDoc(doc(db, "users", currentUser.uid), {
-        uid: "testUID",
-        SpotifyToken: "testToken",
-        profileImgSrc: "testSrc"
-      });
-      //console.log(currentUser.uid);
-    //   console.log("Doc written w/ ID: ", docRef.id);
+        uid: currentUser.uid, SpotifyToken: "yo9NIlMIOIqh6zBODP5q9b1icJTkoaJyEBsGDpGfdbuChaxE",
+      });    
 }
 
 async function check() {
@@ -38,7 +34,6 @@ async function check() {
         create();
     }
 }
-
 
 export default class AddProfilePicture extends React.Component{
     
@@ -57,6 +52,7 @@ export default class AddProfilePicture extends React.Component{
             currentUser = auth.currentUser;
             check();
             photo = currentUser.photoURL;
+            console.log(currentUser.uid);
             //GET ACTUAL IMAGE
             if (photo != null) {
 
