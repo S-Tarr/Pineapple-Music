@@ -16,10 +16,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  deleteUser,
 } from "firebase/auth";
 import React, { useContext, useState, useEffect } from "react";
-import { getFirestore, collection, addDoc, getDocs, setDoc } from "firebase/firestore";
-import { ConstructionOutlined } from "@mui/icons-material";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -32,24 +32,6 @@ const firebaseConfig = {
   measurementId: "G-QZK0B417MX",
 };
 
-const CLIENT_ID = "b85b37966e894d9cb8eb8d776047f000";
-const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
-
-const SPACE_DELIMITER = "%20";
-const REDIRECT_URL_AFTER_LOGIN = "http://localhost:3000/Pineapple-Music"; //TODO CHANGE LATER
-const SCOPES = ["user-read-currently-playing", "user-read-playback-state"]; //TODO CHANGE LATER IF NECESSARY
-const SCOPES_URL_PARAM = SCOPES.join(SPACE_DELIMITER);
-
-const getParamsFromSpotifyAuth = (hash) => {
-  console.log("trying to get the token");
-  const paramsUrl = hash.substring(1).split("&");
-  const params = paramsUrl.reduce((accumulator, currentValue) => {
-    const [key, value] = currentValue.split("=");
-    accumulator[key] = value;
-    return accumulator;
-  }, {});
-  return params;
-};
 
 // Initialize Firebase components
 const app = initializeApp(firebaseConfig); // Connected app instance
@@ -78,10 +60,7 @@ export function AuthProvider({ children }) {
     const created = createUserWithEmailAndPassword(auth, email, password).then(
       (userCredential) => {
         try {
-          setCurrentUser(userCredential)
-          localStorage.clear();
-          localStorage.setItem('uid', userCredential.user.uid);
-          console.log(userCredential.user.uid);
+          setCurrentUser(userCredential);
           console.log("Doc written w/ ID in signup: ");
         } catch (e) {
           console.error("Error adding doc in signup: ");
@@ -92,25 +71,21 @@ export function AuthProvider({ children }) {
     return created;
   }
 
-  async function loadPage() {
-    window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
-    const params = await getParamsFromSpotifyAuth(window.location.hash);
-    console.log(params)
-    return params.access_token;
-  }
-
   async function addSpotifyToken(uid, params) {
     console.log("adding token being called uid", currentUser);
     try {
       const docRef = await addDoc(collection(db, "users"), {
         uid: currentUser.uid,
-        SpotifyToken: params
+        SpotifyToken: params,
       });
       console.log("Doc written w/ ID in addToken: ", docRef.id);
     } catch (e) {
       console.error("Error adding doc in addToken: ", e);
     }
-    return params;
+  }
+
+  function deleteAccount() {
+    return deleteUser(auth.currentUser);
   }
 
   /**
@@ -140,6 +115,7 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
+    //addUserToFirestore,
     signup,
     login,
     logout,

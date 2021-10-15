@@ -1,0 +1,18 @@
+.Player {
+    background-color: aquamarine;
+    border: 1px solid black;
+    color:  blueviolet;
+    font-size: 16px;
+    max-width: 10px;
+    float: right;
+}
+
+.Player-Div {
+    margin: auto;
+    position: relative;
+    height: 20px;
+}
+
+.Song-Img {
+    margin: auto;
+}

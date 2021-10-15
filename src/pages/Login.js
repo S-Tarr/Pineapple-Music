@@ -12,7 +12,8 @@
    TextField,
  } from "@mui/material";
  import { useAuth } from "../contexts/AuthContext";
- import { Link, useHistory } from "react-router-dom"
+ import { Link, useHistory } from "react-router-dom";
+ import { getAuth, onAuthStateChanged } from "firebase/auth";
  
  function Login() {
    const emailRef = useRef();
@@ -29,6 +30,7 @@
        setError("");
        setLoading(true); // disable the login button
        await login(emailRef.current.value, passwordRef.current.value);
+       
        history.push("/"); // redirect user to main page
      } catch {
        setError("Failed to log in");
@@ -80,6 +82,9 @@
          </Card>
          <div className="w-100 text-center mt-2">
            Need an account? <Link to="/signup">Sign Up</Link>
+         </div>
+         <div className="w-100 text-center mt-2">
+          Forgot Password? <Link to="/resetpassword">Reset Password</Link>
          </div>
        </div>
      </Container>

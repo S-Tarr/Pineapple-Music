@@ -39,8 +39,6 @@ function Signup() {
   const passwordRef = useRef();
   const passwordConfirmRef = useRef();
 
-
-
   const { addSpotifyToken, signup, currentUser } = useAuth();
   const [error, setError] = useState(""); // Error represents the current message we want displayed, no error message by default
   const [loading, setLoading] = useState(false); // Loading represents the current state of the button, enabled by default
@@ -50,20 +48,20 @@ function Signup() {
 
   useEffect(() => {
     if (window.location.hash) {
-      console.log("trying to get token rn");
-      const params = getParamsFromSpotifyAuth(
-        window.location.hash
-      )
+      const params = getParamsFromSpotifyAuth(window.location.hash);
 
       localStorage.clear();
-      localStorage.setItem('spotifyToken', params.access_token);
+      localStorage.setItem("spotifyToken", params.access_token);
 
-      console.log("getting token", params)
+      console.log("getting token", params);
       addSpotifyToken("uid it is", params.access_token);
       console.log("got the access token: ");
     }
   });
 
+  function goToHome() {
+    history.push("/");
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -96,14 +94,6 @@ function Signup() {
     }
 
     setLoading(false);
-
-    // console.log("hello hello this is testing");
-    // console.log(loading +  " " + authorized);
-    // if (loading === false && authorized === true) {
-    //     window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
-    //     const params = await getParamsFromSpotifyAuth(window.location.hash);
-    //     console.log(params);
-    // }
   }
 
   return (
@@ -155,6 +145,7 @@ function Signup() {
             >
               Login to Spotify and Sign Up
             </Button>
+            <Button onClick={goToHome}>Go To Home</Button>
           </CardContent>
         </Card>
         <div className="w-100 text-center mt-2">
