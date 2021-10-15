@@ -33,11 +33,11 @@ function App() {
           <Navbar />
           <div className="content">
             <Switch>
-              <Route exact path="/" component={Home} />
-              <Route path="/search" component={SearchPage} />
-              <Route path="/creategroup" component={GroupSession} />
-              <Route path="/myaccount" component={MyAccount} />
-              <Route path="/profilepicture" component={AddProfilePicture} />
+              <Route exact path="/Pineapple-Music" component={Home} />
+              <Route path="/Pineapple-Music/search" component={SearchPage} />
+              <Route path="/Pineapple-Music/creategroup" component={GroupSession} />
+              <Route path="/Pineapple-Music/myaccount" component={MyAccount} />
+              <Route path="/Pineapple-Music/profilepicture" component={AddProfilePicture} />
             </Switch>
           </div>
         </div>
