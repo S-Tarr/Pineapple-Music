@@ -17,7 +17,7 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
   const [filteredData, setFilteredData] = useState([]);
   const [wordEntered, setWordEntered] = useState("");
   const [searchResults, setSearchResults] = useState([])
-  const access_token = 'BQBdR3UjvW8zYpbrOLSPd9taFSv8uHdHavHpJZ6StDPg1pSlR0sdFGbsPTm38V1XUMcxnUWtOfqe5Bbmuc5fqf6DUpM4pWUqfe3voZGR3qnAQAKHG35hFV-tPLsSVyj-3iUxsxM3P0cleWUBr9tvMRkzXVWPticEau1mmdi1GG5FG_mFECzYgDx979ZCvYQ6ZFkxNodiekzV_1mx1EeBh2LEibLgeVEjab3L0MxW4UcChb_BzGcdUtANrBO1yWBR9x_QVgZF4KVathktiqzFn802hFj7URPWjcQQ6p4o4ovvflPL2r6x';
+  const access_token = spotifyData;
   useEffect(() => {
     if (!access_token) return
     spotifyApi.setAccessToken(access_token)
