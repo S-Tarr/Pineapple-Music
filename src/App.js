@@ -5,7 +5,6 @@ import MyAccount from './pages/MyAccount';
 import Home from './pages/Home';
 import CreateGroup from './pages/CreateGroup';
 import Navbar from './components/Navbar/Navbar'; 
-import GroupSession from "./pages/GroupSession";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { AuthProvider } from "./contexts/AuthContext";
 import GroupSession from "./pages/GroupSession";
@@ -81,24 +80,6 @@ function App() {
     <Router>
       <AuthProvider>
         <Switch>
-<<<<<<< HEAD
-          <Route path="/signup" component={Signup} />
-          <Route path="/login" component={Login} />
-          <Route path="/resetpassword" component={ResetPassword} />
-        </Switch>
-        <div className="container">
-          <Navbar />
-          <div className="content">
-            <Switch>
-              <Route exact path="/" component={Home} />
-              <Route path="/search" component={SearchPage} />
-              <Route path="/creategroup" component={GroupSession} />
-              <Route path="/myaccount" component={MyAccount} />
-              <Route path="/profilepicture" component={AddProfilePicture} />
-              <Route path="/song" component={SongPage} />
-              <Route path="/visual" component={Visualizer} />
-            </Switch>
-=======
           <Route path="/signup" component={Signup}/>
           <Route path="/login" component={Login}/>
           <Route path="/resetpassword" component = {ResetPassword}/>
@@ -117,7 +98,6 @@ function App() {
                 <Route path="/visual" component={Visualizer}/>
               </Switch>
             </div>
->>>>>>> 8c5928386484aa6891dc5df1761b70c296b403b1
           </div>
 
           : null
