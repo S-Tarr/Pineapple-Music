@@ -33,7 +33,7 @@ function ChangeAccount() {
       localStorage.clear();
       localStorage.setItem("spotifyToken", params.access_token);
 
-      addSpotifyToken(currentUser.uid, params.access_token);
+      addSpotifyToken("testing uid", params.access_token);
       console.log("got the access token: ");
     }
   });

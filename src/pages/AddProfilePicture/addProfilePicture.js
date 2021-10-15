@@ -17,8 +17,6 @@ import {
   setDoc,
 } from "firebase/firestore";
 
-import ChangeAccount from "../../components/ChangeAccount";
-
 let currentUser = null;
 let photo = null;
 
@@ -137,9 +135,6 @@ export default class AddProfilePicture extends React.Component {
         <div className="image-container">
           <img src={this.state.src} />
         </div>
-
-        <br />
-        <ChangeAccount />
       </div>
     );
   }
