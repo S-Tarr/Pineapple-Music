@@ -84,6 +84,9 @@
          <div className="w-100 text-center mt-2">
            Need an account? <Link to="/signup">Sign Up</Link>
          </div>
+         <div className="w-100 text-center mt-2">
+          Forgot Password? <Link to="/resetpassword">Reset Password</Link>
+         </div>
        </div>
      </Container>
    );

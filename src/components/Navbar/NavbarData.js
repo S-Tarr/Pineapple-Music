@@ -12,6 +12,12 @@ export const NavbarData = [
     },
 
     {
+        title: "Search",
+        icon: <AddRoundedIcon />,
+        link: "/search"
+    },
+
+    {
         title: "Group Session",
         icon: <AddRoundedIcon />,
         link: "/creategroup"
