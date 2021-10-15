@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useHistory } from 'react-router';
 import "./SearchBar.css";
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from "@material-ui/icons/Close";
 import Track from './Track'
 var SpotifyWebApi = require('spotify-web-api-node');
+
 
 
 var spotifyApi = new SpotifyWebApi({
@@ -13,6 +15,9 @@ var spotifyApi = new SpotifyWebApi({
 });
 
 function SearchBar({ placeholder, spotifyData, authorized }) {
+
+  const history = useHistory()
+
   console.log(spotifyData);
   const [filteredData, setFilteredData] = useState([]);
   const [wordEntered, setWordEntered] = useState("");
@@ -57,6 +62,15 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
     setWordEntered("");
   };
 
+  function handleRedirect(track) {
+      console.log(track);
+
+      history.push({
+          pathname: '/song',
+          state: {name: track.title, picture: track.albumUrl}
+      });
+  }
+
   return (
     <div className="search">
       <div className="searchInputs">
@@ -81,6 +95,7 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
                 <Track
                     track={track}
                     key={track.uri}
+                    chooseTrack={handleRedirect}
                 />
             );
           })}
