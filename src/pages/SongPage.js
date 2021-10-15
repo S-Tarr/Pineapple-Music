@@ -6,11 +6,17 @@ import "./Pages.css"
 
 const SongPage = props => {
     const track = useLocation();
+    var image = Pineapple;
+    var name = 'example name';
+    if (track.state) {
+        image = track.state.picture;
+        name = track.state.name;
+    }
     
     return (
     <div className="Page">
-        <img className="Visual-Img" src={track.state.picture} style={{ height: "512px", width: "512px" }} />
-        <text>{track.state.name}</text>
+        <img className="Visual-Img" src={image} style={{ height: "512px", width: "512px" }} />
+        <text>{name}</text>
         <Player/>
     </div>
     );
