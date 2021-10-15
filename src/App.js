@@ -1,5 +1,5 @@
 import './App.css';
-import React from 'react';
+import React, { useRef, useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import MyAccount from './pages/MyAccount';
 import Home from './pages/Home';
@@ -17,8 +17,65 @@ import AddProfilePicture from './pages/AddProfilePicture/addProfilePicture';
 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-function App() {
+const auth = getAuth();
 
+function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  // let loggedIn = true;
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setLoggedIn(true);
+      console.warn(loggedIn);
+    } else {
+      setLoggedIn(false);
+      console.warn(loggedIn);
+    }
+  });
+
+  // useEffect(() => {
+  //   var auth = getAuth();
+  //   var user = auth.currentUser;
+
+  //   if (!!user) {
+  //     loggedIn = true;
+  //     console.log(loggedIn, user);
+  //   } else {
+  //     loggedIn = false;
+  //     console.log(loggedIn, user);
+  //   }
+  // // }, []);
+  // constructor(props){
+  //   super(props);
+    
+  //   this.state = {
+  //       picture: false,
+  //       src: false
+  //   }
+
+  //   onAuthStateChanged(auth, (user) => {
+  //     if (user) {
+  //       // User is signed in, see docs for a list of available properties
+  //       // https://firebase.google.com/docs/reference/js/firebase.User
+  //       currentUser = auth.currentUser;
+  //       photo = currentUser.photoURL;
+  //       if (photo != null) {
+  //           this.setState({
+  //               src: photo
+  //           });
+  //       }
+  //       // ...
+  //     } else {
+  //       // User is signed out
+  //       // ...
+  //       console.log("NOT CORRECT");
+  //     }
+  //   });
+  // }
+  // constructor(props) {
+  //   super(props);
+  // }
+  
   return (
     <Router>
       <AuthProvider>
@@ -27,18 +84,24 @@ function App() {
           <Route path="/signup" component={Signup}/>
           <Route path="/login" component={Login}/>
           <Route path="/resetpassword" component = {ResetPassword}/>
-         </Switch>
-        <div className="container">
-          <Navbar />
-          <div className="content">
-            <Switch>
-              <Route exact path="/" component={Home} />
-              <Route path="/creategroup" component={GroupSession} />
-              <Route path="/myaccount" component={MyAccount} />
-              <Route path="/profilepicture" component={AddProfilePicture} />
-            </Switch>
+        </Switch>
+        
+        {loggedIn ? 
+          <div className="container">
+            <Navbar />
+            <div className="content">
+              <Switch>
+                <Route exact path="/" component={Home} />
+                <Route path="/creategroup" component={GroupSession} />
+                <Route path="/myaccount" component={MyAccount} />
+                <Route path="/profilepicture" component={AddProfilePicture} />
+              </Switch>
+            </div>
           </div>
-        </div>
+
+          : null
+        }
+        {/* <h1>{!!useContext(AuthProvider)}</h1> */}
       </AuthProvider>
     </Router>
   );
