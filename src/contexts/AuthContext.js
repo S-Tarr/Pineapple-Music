@@ -82,6 +82,7 @@ export function AuthProvider({ children }) {
       console.error("Error adding doc in addToken: ", e);
     }
   }
+  
 
   function deleteAccount() {
     return deleteUser(auth.currentUser);
