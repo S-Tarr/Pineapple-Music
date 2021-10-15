@@ -60,7 +60,7 @@ function Signup() {
   });
 
   function goToHome() {
-    history.push("/");
+    history.push("/Pineapple-Music");
   }
 
   async function handleSubmit(e) {
