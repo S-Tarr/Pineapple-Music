@@ -17,7 +17,10 @@ function DeleteAccountButton() {
   }
 
   return (
-    <Button variant="link" onClick={handleDelete}>
+    <Button variant="link" onClick={() => {
+      if (window.confirm('Are you sure you wish to delete your account?')) {
+        handleDelete()
+      }}}>
         Delete Account
     </Button>
   )
