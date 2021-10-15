@@ -32,7 +32,6 @@ const firebaseConfig = {
   measurementId: "G-QZK0B417MX",
 };
 
-
 // Initialize Firebase components
 const app = initializeApp(firebaseConfig); // Connected app instance
 const auth = getAuth(); // Authorization component
