@@ -12,9 +12,9 @@
 // Imports
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth"
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from 'firebase/auth'
 import React, { useContext, useState, useEffect } from 'react'
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore"
+import { getFirestore, collection, addDoc } from "firebase/firestore"
 
 // Firebase configuration
 const firebaseConfig = {
@@ -76,6 +76,10 @@ export function AuthProvider({ children }) {
       return signOut(auth)
     }
 
+    function deleteAccount() {
+      return deleteUser(auth.currentUser)
+    }
+
     /**
      * Sets the current user when the state changes and unsubscribes from the listener after.
      */
@@ -91,7 +95,8 @@ export function AuthProvider({ children }) {
       currentUser,
       signup,
       login,
-      logout
+      logout,
+      deleteAccount
     }
 
     return (

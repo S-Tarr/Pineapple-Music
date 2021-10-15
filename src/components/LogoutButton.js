@@ -11,7 +11,9 @@ function LogoutButton() {
     try {
       await logout()
       history.push("/login")
-    } catch {}
+    } catch {
+      console.log("Failed to logout.")
+    }
   }
 
   return (
