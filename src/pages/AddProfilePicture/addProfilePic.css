@@ -7,11 +7,16 @@
     flex-direction: column;
 }
 
+.button-header {
+    margin-left: 60px;
+}
+
 .image-container {
     background-color: #bdbdbd;
     margin-top: 100px;
-    height: 400px;
-    width:  400px;
+    height: 200px;
+    width:  200px;
+    border-radius: 100px;
 }
 
 .text {
