@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./SearchPage.css";
-import SearchBar from './Components/SearchBar'
+import SearchBar from '../components/SearchBar'
 import { Button } from "@mui/material";
 
 

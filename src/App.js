@@ -1,38 +1,48 @@
-import logo from './logo.jpg';
 import './App.css';
-import { TouchableOpacity, Text } from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import SearchPage from './SearchPage';
-//import BookData from "./Data.json";
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+import MyAccount from './pages/MyAccount';
+import Home from './pages/Home';
+import CreateGroup from './pages/CreateGroup';
+import Navbar from './components/Navbar/Navbar'; 
+import GroupSession from "./pages/GroupSession";
+import { AuthProvider } from "./contexts/AuthContext";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login"
+import ResetPassword from './pages/ResetPassword';
+import TestHomepage from "./pages/TestHomepage";
+import PrivateRoute from "./components/PrivateRoute";
+import addProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
+import SearchPage from './pages/SearchPage';
+import AddProfilePicture from './pages/AddProfilePicture/addProfilePicture';
 
-
-function HomeScreen( {navigation} ) {
-  return (
-    /*<div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <TouchableOpacity onPress={() => navigation.navigate("example")}>
-          <Text>Example Button and Navigation</Text>
-        </TouchableOpacity>
-      </header>
-    </div>*/
-    <div className="App">
-      <SearchPage placeholder="Enter a song name..." />
-    </div>
-  )
-}
-
-const Stack = createNativeStackNavigator();
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 function App() {
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen}>
-        </Stack.Screen>
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Router>
+      <AuthProvider>
+        <Switch>
+          {/* <PrivateRoute exact path="/" component={TestHomepage}/>  */}
+          <Route path="/signup" component={Signup}/>
+          <Route path="/login" component={Login}/>
+          <Route path="/resetpassword" component = {ResetPassword}/>
+         </Switch>
+        <div className="container">
+          <Navbar />
+          <div className="content">
+            <Switch>
+              <Route exact path="/" component={Home} />
+              <Route path="/search" component={SearchPage} />
+              <Route path="/creategroup" component={GroupSession} />
+              <Route path="/myaccount" component={MyAccount} />
+              <Route path="/profilepicture" component={AddProfilePicture} />
+            </Switch>
+          </div>
+        </div>
+      </AuthProvider>
+    </Router>
   );
 }
 
