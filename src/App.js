@@ -89,7 +89,7 @@ function App() {
             <Navbar />
             <div className="content">
               <Switch>
-                <Route exact path="/" component={Home} />
+                <Route exact path="/Pineapple-Music" component={Home} />
                 <Route path="/search" component={SearchPage} />
                 <Route path="/creategroup" component={GroupSession} />
                 <Route path="/myaccount" component={MyAccount} />
