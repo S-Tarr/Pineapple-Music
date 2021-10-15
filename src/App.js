@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import CreateGroup from './pages/CreateGroup';
 import Navbar from './components/Navbar/Navbar'; 
 import GroupSession from "./pages/GroupSession";
+import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { AuthProvider } from "./contexts/AuthContext";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login"
@@ -89,6 +90,7 @@ function App() {
             <div className="content">
               <Switch>
                 <Route exact path="/" component={Home} />
+                <Route path="/search" component={SearchPage} />
                 <Route path="/creategroup" component={GroupSession} />
                 <Route path="/myaccount" component={MyAccount} />
                 <Route path="/profilepicture" component={AddProfilePicture} />
