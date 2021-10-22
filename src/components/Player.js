@@ -3,7 +3,7 @@ import "./Components.css";
 import song from "./testSong.wav"
 
 function Player() {
-    const [audio, setAudio] = useState(new Audio(song));
+    const [audio] = useState(new Audio(song));
     const [isPlaying, setState] = useState(false);
 
     const playPause = () => {
