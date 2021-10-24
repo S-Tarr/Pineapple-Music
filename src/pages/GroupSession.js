@@ -11,6 +11,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 import GroupSessionCard from "../components/GroupSessionCard";
 import GroupSessionForm from "../components/GroupSessionForm";
+import { ThirtyFpsSelectOutlined } from "@mui/icons-material";
 
 const style = {
   position: "absolute",
@@ -38,14 +39,13 @@ function GroupSession() {
     createdAt: dateTime,
     sessionId: 1234,
   };
-  const [cards, addCard] = useState([props, props]);
+  const [cards, addCard] = useState([]);
 
-  const handleCreate = () => {
-    var val = Math.floor(1000 + Math.random() * 9000);
-    props['sessionId'] = val
-    props['group session'] = val
+  const handleCreate = (title, sessionId) => {
+    props['title'] = title;
+    props["sessionId"] = sessionId;
     addCard(cards.concat(props));
-  }
+  };
 
   var date = new Date();
   var dateTime = date.toLocaleDateString();
@@ -71,7 +71,7 @@ function GroupSession() {
             sm={6}
             md={4}
           >
-            <IconButton color="primary" onClick={handleCreate}>
+            <IconButton color="primary" onClick={handleOpen}>
               <AddCircleIcon sx={{ fontSize: 80 }} />
             </IconButton>
             <Modal
@@ -79,11 +79,13 @@ function GroupSession() {
               onClose={handleClose}
               aria-labelledby="modal-modal-title"
               aria-describedby="modal-modal-description"
+              onSubmit={handleClose}
             >
               <Box sx={style}>
-                <GroupSessionForm />
+                <GroupSessionForm onSubmit={handleCreate}/>
               </Box>
             </Modal>
+            <br />
             <br />
             Create a new session
           </Grid>

@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Button, TextField, Typography } from "@mui/material";
 
-function GroupSessionForm() {
-  const handleSubmit = (event) => {
-      event.prevnetDefault();
+function GroupSessionForm(props) {
+  const nameRef = useRef();
+  const idRef = useRef();
 
+  async function handleSubmit(e) {
+    e.preventDefault();
+    props.onSubmit(nameRef.current.value, idRef.current.value);
   }
 
   return (
@@ -12,7 +15,7 @@ function GroupSessionForm() {
       <Typography id="modal-modal-title" variant="h6" component="h2">
         Create a new session
       </Typography>
-      <form noValidate>
+      <form noValidate onSubmit={handleSubmit}>
         <TextField
           required
           id="name"
@@ -20,6 +23,17 @@ function GroupSessionForm() {
           type="name"
           label="Name"
           variant="filled"
+          inputRef={nameRef}
+          fullWidth
+        />
+        <TextField 
+          requried
+          id="id"
+          name="id"
+          type="id"
+          label="ID"
+          variant="filled"
+          inputRef={idRef}
           fullWidth
         />
         <br />
@@ -28,7 +42,6 @@ function GroupSessionForm() {
           type="submit"
           variant="contained"
           color="primary"
-          onClick={handleSubmit}
         >
           Create
         </Button>
