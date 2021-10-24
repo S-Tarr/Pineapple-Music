@@ -39,28 +39,26 @@ function App() {
           <Route path="/signup" component={Signup}/>
           <Route path="/login" component={Login}/>
           <Route path="/resetpassword" component = {ResetPassword}/>
-
           {loggedIn ? 
-          <div className="container">
-            <Navbar />
-            <div className="content">
-              <Switch>
-                <Route exact path="/Pineapple-Music" component={Home} />
-                <Route path="/search" component={SearchPage} />
-                <Route path="/creategroup" component={GroupSession} />
-                <Route path="/myaccount" component={MyAccount} />
-                <Route path="/profilepicture" component={AddProfilePicture} />
-                <Route path="/song" component={SongPage}/>
-                <Route path="/visual" component={Visualizer}/>
-              </Switch>
+            <div className="container" >
+              <Navbar />
+              <div className="content">
+                <Switch>
+                  <Route exact path="/Pineapple-Music" component={Home} />
+                  <Route path="/search" component={SearchPage} />
+                  <Route path="/creategroup" component={GroupSession} />
+                  <Route path="/myaccount" component={MyAccount} />
+                  <Route path="/profilepicture" component={AddProfilePicture} />
+                  <Route path="/song" component={SongPage}/>
+                  <Route path="/visual" component={Visualizer}/>
+                </Switch>
+              </div>
             </div>
-          </div>
 
-          : <Redirect to="/login" />
+          : null
+          // : <Redirect to="/login" />
         }
         </Switch>
-        
-        {/* <h1>{!!useContext(AuthProvider)}</h1> */}
       </AuthProvider>
     </Router>
   );
