@@ -53,12 +53,15 @@ function GroupSessionCard({
         <Button size="small">Join</Button>
         <Button
           size="small"
-          onClick={(event) => { copyId(); handleClick(event)}}
+          onClick={(event) => {
+            copyId();
+            handleClick(event);
+          }}
         >
           Session ID: {sessionId}
         </Button>
         <Popover
-          id={sessionId}
+          id={id}
           open={open}
           anchorEl={anchorEl}
           onClose={handleClose}

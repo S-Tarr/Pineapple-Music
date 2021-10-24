@@ -26,23 +26,19 @@ function GroupSessionForm(props) {
           inputRef={nameRef}
           fullWidth
         />
-        <TextField 
+        <TextField
           required
           id="id"
           name="id"
           type="id"
-          label="ID"
+          label="Session ID"
           variant="filled"
           inputRef={idRef}
           fullWidth
         />
         <br />
         <br />
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-        >
+        <Button type="submit" variant="contained" color="primary">
           Create
         </Button>
       </form>

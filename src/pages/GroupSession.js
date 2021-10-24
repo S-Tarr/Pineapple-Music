@@ -29,25 +29,26 @@ function GroupSession() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  // example props added for testing
+  var date = new Date();
+  var dateTime = date.toLocaleDateString();
+
+  //TODO add sessions to the database
+
   const props = {
     title: "group session1",
     imageUrl:
       "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
-    username: "username",
+    username: "username goes here",
     createdAt: dateTime,
     sessionId: 1234,
   };
   const [cards, addCard] = useState([]);
 
   const handleCreate = (title, sessionId) => {
-    props['title'] = title;
+    props["title"] = title;
     props["sessionId"] = sessionId;
     addCard(cards.concat(props));
   };
-
-  var date = new Date();
-  var dateTime = date.toLocaleDateString();
 
   return (
     <div className="Page">
@@ -81,7 +82,7 @@ function GroupSession() {
               onSubmit={handleClose}
             >
               <Box sx={style}>
-                <GroupSessionForm onSubmit={handleCreate}/>
+                <GroupSessionForm onSubmit={handleCreate} />
               </Box>
             </Modal>
             <br />
