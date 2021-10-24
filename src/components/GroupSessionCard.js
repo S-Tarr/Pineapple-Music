@@ -7,12 +7,25 @@ import {
   CardContent,
   CardMedia,
   Typography,
+  Popover,
 } from "@mui/material";
 
 function GroupSessionCard({
   props: { title, imageUrl, username, createdAt, sessionId },
 }) {
-  
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
+
   const copyId = () => {
     navigator.clipboard.writeText(sessionId);
   };
@@ -38,9 +51,24 @@ function GroupSessionCard({
       </CardContent>
       <CardActions>
         <Button size="small">Join</Button>
-        <Button size="small" onClick={copyId}>
+        <Button
+          size="small"
+          onClick={(event) => { copyId(); handleClick(event)}}
+        >
           Session ID: {sessionId}
         </Button>
+        <Popover
+          id={sessionId}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+        >
+          <Typography sx={{ p: 2 }}>Session ID copied.</Typography>
+        </Popover>
       </CardActions>
     </Card>
   );

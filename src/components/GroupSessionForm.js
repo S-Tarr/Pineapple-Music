@@ -21,13 +21,13 @@ function GroupSessionForm(props) {
           id="name"
           name="name"
           type="name"
-          label="Name"
+          label="Group Session Name"
           variant="filled"
           inputRef={nameRef}
           fullWidth
         />
         <TextField 
-          requried
+          required
           id="id"
           name="id"
           type="id"
