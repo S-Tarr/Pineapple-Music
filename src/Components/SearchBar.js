@@ -4,7 +4,9 @@ import "./SearchBar.css";
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from "@material-ui/icons/Close";
 import Track from './Track'
+import Player from './SpotifyPlayer'
 var SpotifyWebApi = require('spotify-web-api-node');
+
 
 
 
@@ -19,9 +21,9 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
   const history = useHistory()
 
   console.log(spotifyData);
-  const [filteredData, setFilteredData] = useState([]);
   const [wordEntered, setWordEntered] = useState("");
   const [searchResults, setSearchResults] = useState([])
+  const [playingTrack, setPlayingTrack] = useState();
   const access_token = spotifyData;
   useEffect(() => {
     if (!access_token) return
@@ -50,19 +52,34 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
     setWordEntered(searchWord);
   };
 
-  const clearInput = () => {
-    setFilteredData([]);
-    setWordEntered("");
-  };
-
   function handleRedirect(track) {
       console.log(track);
 
       history.push({
           pathname: '/song',
-          state: {name: track.title, picture: track.albumUrl}
+          state: {name: track.title, picture: track.albumUrl, trackUri: track.uri, access_token: access_token}
       });
+      //setPlayingTrack(track);
   }
+  const playSong = (id) => {
+    spotifyApi
+      .play({
+        uris: [`spotify:track:${id}`],
+      })
+      /*.then((res) => {
+        spotifyApi
+        .getMyCurrentPlayingTrack().then((r) => {
+          dispatch({
+            type: "SET_ITEM",
+            item: r.item,
+          });
+          dispatch({
+            type: "SET_PLAYING",
+            playing: true,
+          });
+        });
+      });*/
+  };
 
   return (
     <div className="search">
@@ -74,13 +91,10 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
           onChange={handleFilter}
         />
         <div className="searchIcon">
-          {filteredData.length === 0 ? (
-            <SearchIcon />
-          ) : (
-            <CloseIcon id="clearBtn" onClick={clearInput} />
-          )}
+          
         </div>
       </div>
+      
       {searchResults.length != 0 && (
         <div className="dataResult">
           {searchResults.slice(0, 10).map((track) => {
