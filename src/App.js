@@ -1,6 +1,6 @@
 import './App.css';
 import React, { useRef, useState, useEffect, useContext } from 'react';
-import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import MyAccount from './pages/MyAccount';
 import Home from './pages/Home';
 import CreateGroup from './pages/CreateGroup';
@@ -31,49 +31,6 @@ function App() {
       console.warn(loggedIn);
     }
   });
-
-  // useEffect(() => {
-  //   var auth = getAuth();
-  //   var user = auth.currentUser;
-
-  //   if (!!user) {
-  //     loggedIn = true;
-  //     console.log(loggedIn, user);
-  //   } else {
-  //     loggedIn = false;
-  //     console.log(loggedIn, user);
-  //   }
-  // // }, []);
-  // constructor(props){
-  //   super(props);
-    
-  //   this.state = {
-  //       picture: false,
-  //       src: false
-  //   }
-
-  //   onAuthStateChanged(auth, (user) => {
-  //     if (user) {
-  //       // User is signed in, see docs for a list of available properties
-  //       // https://firebase.google.com/docs/reference/js/firebase.User
-  //       currentUser = auth.currentUser;
-  //       photo = currentUser.photoURL;
-  //       if (photo != null) {
-  //           this.setState({
-  //               src: photo
-  //           });
-  //       }
-  //       // ...
-  //     } else {
-  //       // User is signed out
-  //       // ...
-  //       console.log("NOT CORRECT");
-  //     }
-  //   });
-  // }
-  // constructor(props) {
-  //   super(props);
-  // }
   
   return (
     <Router>
@@ -82,8 +39,8 @@ function App() {
           <Route path="/signup" component={Signup}/>
           <Route path="/login" component={Login}/>
           <Route path="/resetpassword" component = {ResetPassword}/>
-        </Switch>
-        {loggedIn ? 
+
+          {loggedIn ? 
           <div className="container">
             <Navbar />
             <div className="content">
@@ -99,8 +56,10 @@ function App() {
             </div>
           </div>
 
-          : null
+          : <Redirect to="/login" />
         }
+        </Switch>
+        
         {/* <h1>{!!useContext(AuthProvider)}</h1> */}
       </AuthProvider>
     </Router>
