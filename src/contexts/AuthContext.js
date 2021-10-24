@@ -19,7 +19,13 @@ import {
   deleteUser,
 } from "firebase/auth";
 import React, { useContext, useState, useEffect } from "react";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  Timestamp,
+  getDocs,
+} from "firebase/firestore";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -70,19 +76,33 @@ export function AuthProvider({ children }) {
     return created;
   }
 
-  async function addSpotifyToken(uid, params) {
-    console.log("adding token being called uid", currentUser);
+  async function addSpotifyToken(params) {
+    console.log("adding token being called uid, currentUser:", currentUser);
+
     try {
-      const docRef = await addDoc(collection(db, "users"), {
-        uid: currentUser.uid,
-        SpotifyToken: params,
-      });
-      console.log("Doc written w/ ID in addToken: ", docRef.id);
+      if (currentUser !== undefined) {
+        const docSnap = await getDocs(collection(db, "users"));
+        let exists = false;
+        docSnap.forEach((doc) => {
+          if (doc.data().uid === currentUser.uid) {
+            exists = true;
+          }
+        });
+        if (exists) {
+          console.log("uid already exists:");
+        } else {
+          const docRef = await addDoc(collection(db, "users"), {
+            uid: currentUser.uid,
+            SpotifyToken: params,
+            createdAt: Timestamp.now(),
+          });
+          console.log("Doc written w/ ID in addToken: ", docRef.id);
+        }
+      }
     } catch (e) {
       console.error("Error adding doc in addToken: ", e);
     }
   }
-  
 
   function deleteAccount() {
     return deleteUser(auth.currentUser);
