@@ -11,7 +11,6 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 import GroupSessionCard from "../components/GroupSessionCard";
 import GroupSessionForm from "../components/GroupSessionForm";
-import { ThirtyFpsSelectOutlined } from "@mui/icons-material";
 
 const style = {
   position: "absolute",

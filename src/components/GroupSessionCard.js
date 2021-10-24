@@ -1,10 +1,22 @@
 import React from "react";
 
-import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Typography,
+} from "@mui/material";
 
 function GroupSessionCard({
   props: { title, imageUrl, username, createdAt, sessionId },
 }) {
+  
+  const copyId = () => {
+    navigator.clipboard.writeText(sessionId);
+  };
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardMedia
@@ -26,7 +38,9 @@ function GroupSessionCard({
       </CardContent>
       <CardActions>
         <Button size="small">Join</Button>
-        <Button size="small">Session ID: {sessionId}</Button>
+        <Button size="small" onClick={copyId}>
+          Session ID: {sessionId}
+        </Button>
       </CardActions>
     </Card>
   );
