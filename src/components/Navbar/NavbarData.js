@@ -5,17 +5,18 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import ImageIcon from '@mui/icons-material/Image';
 import SearchIcon from '@mui/icons-material/Search';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
+import AlbumIcon from '@mui/icons-material/Album';
 
 export const NavbarData = [
     {
         title: "Home",
         icon: <HomeRoundedIcon />,
-        link: "/"
+        link: "/Pineapple-Music"
     },
 
     {
         title: "Search",
-        icon: <ImageIcon />,
+        icon: <SearchIcon />,
         link: "/search"
     },
 
@@ -39,7 +40,7 @@ export const NavbarData = [
 
     {
         title: "Song",
-        icon: <SearchIcon />,
+        icon: <AlbumIcon />,
         link: "/song"
     },
 

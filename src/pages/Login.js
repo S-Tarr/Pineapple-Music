@@ -31,7 +31,7 @@
        setLoading(true); // disable the login button
        await login(emailRef.current.value, passwordRef.current.value);
        
-       history.push("/"); // redirect user to main page
+       history.push("/Pineapple-Music"); // redirect user to main page
      } catch {
        setError("Failed to log in");
      }

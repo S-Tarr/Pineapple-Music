@@ -25,10 +25,9 @@
 }
 .image-container img{
     flex-shrink: 0;
-    height: 200px;
-    width: 200px;
-    min-width: 100%;
-    min-height: 100%
+    height: 150px;
+    width: 150px;
+    
 }
 
 

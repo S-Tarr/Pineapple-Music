@@ -82,6 +82,7 @@ export function AuthProvider({ children }) {
       console.error("Error adding doc in addToken: ", e);
     }
   }
+  
 
   function deleteAccount() {
     return deleteUser(auth.currentUser);
@@ -116,6 +117,7 @@ export function AuthProvider({ children }) {
     currentUser,
     //addUserToFirestore,
     signup,
+    deleteAccount,
     login,
     logout,
     addSpotifyToken,
