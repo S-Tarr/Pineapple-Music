@@ -16,6 +16,7 @@ import SongPage from "./pages/SongPage";
 import SearchPage from "./pages/SearchPage";
 import AddProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import Visualizer from "./pages/Visualizer";
+import ChatRoom from "./pages/ChatRoom";
 
 const auth = getAuth();
 
@@ -95,6 +96,7 @@ function App() {
                 <Route path="/profilepicture" component={AddProfilePicture} />
                 <Route path="/song" component={SongPage}/>
                 <Route path="/visual" component={Visualizer}/>
+                <Route path="/chat" component={ChatRoom} />
               </Switch>
             </div>
           </div>

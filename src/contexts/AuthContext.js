@@ -20,7 +20,6 @@ import {
 } from "firebase/auth";
 import React, { useContext, useState, useEffect } from "react";
 import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, onSnapshot } from "firebase/firestore";
-import { useCollectionData } from "react-firebase-hooks/firestore";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -103,22 +102,6 @@ export function AuthProvider({ children }) {
     return signOut(auth);
   }
 
-  function GetChatMessages() {
-    const [messages, setMessages] = useState([]);
-
-    const messagesRef = collection(db, 'messages');
-    const messagesQuery = query(messagesRef, orderBy('createdAt'), limit(25))
-    onSnapshot(messagesQuery, querySnapshot => {
-      let msgs = []
-      querySnapshot.forEach(doc => {
-        msgs.push(doc.data());
-      })
-      setMessages(msgs)
-    })
-    
-    return messages;
-  }
-
   /**
    * Sets the current user when the state changes and unsubscribes from the listener after.
    */
@@ -137,7 +120,6 @@ export function AuthProvider({ children }) {
     deleteAccount,
     login,
     logout,
-    GetChatMessages,
     addSpotifyToken,
   };
 
