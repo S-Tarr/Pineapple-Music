@@ -1,13 +1,18 @@
 import React, { useRef } from "react";
 import { Button, TextField, Typography } from "@mui/material";
 
+import { useAuth } from "../contexts/AuthContext";
+
 function GroupSessionForm(props) {
   const nameRef = useRef();
   const idRef = useRef();
 
+  const { addGroupSession } = useAuth();
+
   async function handleSubmit(e) {
     e.preventDefault();
     props.onSubmit(nameRef.current.value, idRef.current.value);
+    addGroupSession(nameRef.current.value, idRef.current.value);
   }
 
   return (

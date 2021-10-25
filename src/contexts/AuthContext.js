@@ -76,6 +76,20 @@ export function AuthProvider({ children }) {
     return created;
   }
 
+  async function addGroupSession(name, sessionId) {
+    try {
+      const docRef = await addDoc(collection(db, "groupSessions"), {
+        createdAt: Timestamp.now(),
+        name: name,
+        ownerUid: currentUser.uid,
+        sessionId: sessionId
+      });
+      console.log("Doc written w/ ID in addGroupSession: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding doc in addGroupSession: ", e);
+    }
+  }
+
   async function addSpotifyToken(params) {
     console.log("adding token being called uid, currentUser:", currentUser);
 
@@ -141,6 +155,7 @@ export function AuthProvider({ children }) {
     login,
     logout,
     addSpotifyToken,
+    addGroupSession,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
