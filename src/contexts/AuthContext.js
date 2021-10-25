@@ -76,13 +76,62 @@ export function AuthProvider({ children }) {
     return created;
   }
 
+  function getFormattedDate(date) {
+    var year = date.getFullYear();
+
+    var month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : "0" + month;
+
+    var day = date.getDate().toString();
+    day = day.length > 1 ? day : "0" + day;
+
+    return month + "/" + day + "/" + year;
+  }
+
+  async function getYourGroupSessions() {
+    let cards = [];
+    console.log("in your get group sessions")
+    try {
+      if (currentUser !== undefined) {
+        console.log("getting group sessions: ", currentUser.uid);
+        const docSnap = await getDocs(collection(db, "groupSessions"));
+        docSnap.forEach((doc) => {
+          const props = {
+            title: "group session1",
+            imageUrl:
+              "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+            username: "username goes here",
+            createdAt: "",
+            sessionId: 1234,
+          };
+          if (doc.data().ownerUid === currentUser.uid) {
+            console.log(doc.data());
+            var date = getFormattedDate(
+              new Date(doc.data().createdAt.seconds * 1000)
+            );
+            console.log(date);
+            props["createdAt"] = date;
+            props["title"] = doc.data().name;
+            props["username"] = doc.data().ownerUid;
+            props["sessionId"] = doc.data().sessionId;
+            cards.push(props);
+          }
+        });
+      }
+    } catch (e) {
+      console.error("Error adding doc in addToken: ", e);
+    }
+    console.log("cards: ", cards);
+    return cards;
+  }
+
   async function addGroupSession(name, sessionId) {
     try {
       const docRef = await addDoc(collection(db, "groupSessions"), {
         createdAt: Timestamp.now(),
         name: name,
         ownerUid: currentUser.uid,
-        sessionId: sessionId
+        sessionId: sessionId,
       });
       console.log("Doc written w/ ID in addGroupSession: ", docRef.id);
     } catch (e) {
@@ -156,6 +205,7 @@ export function AuthProvider({ children }) {
     logout,
     addSpotifyToken,
     addGroupSession,
+    getYourGroupSessions,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

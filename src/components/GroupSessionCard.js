@@ -43,7 +43,7 @@ function GroupSessionCard({
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Owner: {username}
+          Owner UID: {username}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Created at: {createdAt}
