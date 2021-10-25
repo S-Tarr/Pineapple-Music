@@ -78,11 +78,18 @@ export function AuthProvider({ children }) {
 
   async function addGroupSession(name, sessionId) {
     try {
+      const songs = [];
       const docRef = await addDoc(collection(db, "groupSessions"), {
         createdAt: Timestamp.now(),
         name: name,
         ownerUid: currentUser.uid,
         sessionId: sessionId
+      });
+      const docRef2 = await addDoc(collection(db, "groupSessionQueue"), {
+        createdAt: Timestamp.now(),
+        queueId: docRef.id,
+        sessionId: sessionId,
+        songs : songs
       });
       console.log("Doc written w/ ID in addGroupSession: ", docRef.id);
     } catch (e) {

@@ -10,10 +10,21 @@ import {
   Popover,
 } from "@mui/material";
 
+import { useHistory } from "react-router";
+
 function GroupSessionCard({
   props: { title, imageUrl, username, createdAt, sessionId },
 }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const history = useHistory()
+  async function handleJoin() {
+
+    history.push({
+      pathname: '/groupsessionhome',
+      props: {title: title, imageUrl: imageUrl, username: username, createdAt: createdAt, sessionId: sessionId}
+    });
+  }
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -50,7 +61,7 @@ function GroupSessionCard({
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">Join</Button>
+        <Button size="small" onClick={handleJoin}>Join</Button>
         <Button
           size="small"
           onClick={(event) => {
