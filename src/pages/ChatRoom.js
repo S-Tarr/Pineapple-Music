@@ -41,27 +41,10 @@ const ChatRoom = () => {
   const [users, setUsers] = useState([])
   const [text, setText] = useState("");
 
-  currentUser = auth.currentUser;
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-    console.log("currentUser: ", currentUser);
-
-    await addDoc(collection(db, 'messages', currentUser.uid, 'chat'), {
-        text,
-        from: currentUser.uid,
-        createdAt: Timestamp.fromDate(new Date())
-    });
-    setText("");
-  }
-
   return <div className="home-container Page">
       <div className="messages-container">
         <MessageList />
         <MessageForm 
-          handleSubmit={handleSubmit}
-          text={text}
-          setText={setText}
         />
       </div>
     </div>
