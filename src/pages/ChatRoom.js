@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import ChatMessage from '../components/ChatMessage'
+import React, { useState, useEffect } from 'react';
+import ChatMessage from '../components/Chat/ChatMessage';
+import MessageForm from '../components/Chat/MessageForm';
 import app from "../firebase";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
-import { getFirestore, collection, where, addDoc, query, orderBy, limit, getDocs, onSnapshot } from "firebase/firestore";
+import { getFirestore, collection, where, addDoc, query, orderBy, limit, getDocs, onSnapshot, Timestamp } from "firebase/firestore";
 import './Pages.css';
+
+let currentUser = null;
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
@@ -36,25 +39,30 @@ function MessageList() {
 
 const ChatRoom = () => {
   const [users, setUsers] = useState([])
+  const [text, setText] = useState("");
 
-//   useEffect(() => {
-//     const usersRef = collection(db, 'users');
-//     const usersQuery = query(usersRef, where('uid', 'not-in', [auth.currentUser.uid]), limit(10));
-//     const unsubscribe = onSnapshot(usersQuery, querySnapshot => {
-//         let users = [];
-//         querySnapshot.forEach(doc => {
-//           users.push(doc.data());
-//         })
-//         setUsers(users);
-//     })
-//     return () => unsubscribe;
-//   }, [])
+  currentUser = auth.currentUser;
 
-//   console.log("users: ", users);
+  const handleSubmit = async e => {
+    e.preventDefault();
+    console.log("currentUser: ", currentUser);
+
+    await addDoc(collection(db, 'messages', currentUser.uid, 'chat'), {
+        text,
+        from: currentUser.uid,
+        createdAt: Timestamp.fromDate(new Date())
+    });
+    setText("");
+  }
 
   return <div className="home-container Page">
       <div className="messages-container">
         <MessageList />
+        <MessageForm 
+          handleSubmit={handleSubmit}
+          text={text}
+          setText={setText}
+        />
       </div>
     </div>
 }
