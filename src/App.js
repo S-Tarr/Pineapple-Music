@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useRef, useState, useEffect, useContext } from 'react';
+import React, { useRef, useState, useEffect, useContext, createContext } from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import MyAccount from './pages/MyAccount';
 import Home from './pages/Home';
@@ -18,9 +18,11 @@ import AddProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import Visualizer from "./pages/Visualizer";
 
 const auth = getAuth();
+const NavBarContext = createContext();
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [navBar] = useContext(true);
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -41,7 +43,9 @@ function App() {
           <Route path="/resetpassword" component = {ResetPassword}/>
           {loggedIn ? 
             <div className="container" >
-              <Navbar />
+              {navBar ?
+                <Navbar />
+              : null}
               <div className="content">
                 <Switch>
                   <Route exact path="/Pineapple-Music" component={Home} />
@@ -50,7 +54,11 @@ function App() {
                   <Route path="/myaccount" component={MyAccount} />
                   <Route path="/profilepicture" component={AddProfilePicture} />
                   <Route path="/song" component={SongPage}/>
-                  <Route path="/visual" component={Visualizer}/>
+                  <Route path="/visual">
+                    <NavBarContext.Provider value={true}>
+                      <Visualizer/>
+                    </NavBarContext.Provider>
+                  </Route>
                 </Switch>
               </div>
             </div>
