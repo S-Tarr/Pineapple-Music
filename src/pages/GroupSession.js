@@ -77,7 +77,7 @@ function GroupSession() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const { getYourGroupSessions, searchGroupSessions } = useAuth();
+  const { getGroupSessions, getYourGroupSessions, searchGroupSessions } = useAuth();
   const auth = getAuth();
 
   var date = new Date();
@@ -112,6 +112,7 @@ function GroupSession() {
   //   });
   // };
 
+
   const handleSearch = () => {
     const getCards = searchGroupSessions(sessionIdRef.current.value).then(
       (session) => {
@@ -123,14 +124,12 @@ function GroupSession() {
   };
 
   useEffect(() => {
-    const getCards = getYourGroupSessions().then((sessions) => {
+    const getCards = getGroupSessions().then((sessions) => {
       console.log("get cards");
       console.log(sessions);
       sessions.forEach((session) => {
         init.push(session);
       });
-      console.log(init);
-      console.log(cards);
       addCard(cards.concat(init));
     });
     setLoading(false);

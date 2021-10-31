@@ -162,6 +162,50 @@ export function AuthProvider({ children }) {
     return cards;
   }
 
+  async function getGroupSessions() {
+    let cards = [];
+    try {
+      if (currentUser !== undefined) {
+        let currGroupSessions = new Set();
+        console.log("getting group sessions new function: ", currentUser.uid);
+        const docSnap = await getDocs(collection(db, "users"));
+        docSnap.forEach((doc) => {
+          if (doc.data().uid === currentUser.uid) {
+            doc.data().groupSessions.forEach(item => currGroupSessions.add(item))
+            console.log(currGroupSessions);
+          }
+        });
+        const docSnapSessions = await getDocs(collection(db, "groupSessions"));
+        docSnapSessions.forEach((doc) => {
+          const props = {
+            title: "group session1",
+            imageUrl:
+              "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+            username: "username goes here",
+            createdAt: "",
+            sessionId: 1234,
+          };
+          if (currGroupSessions.has(doc.data().sessionId)) {
+            console.log(doc.data());
+            var date = getFormattedDate(
+              new Date(doc.data().createdAt.seconds * 1000)
+            );
+            console.log(date);
+            props["createdAt"] = date;
+            props["title"] = doc.data().name;
+            props["username"] = doc.data().ownerUid;
+            props["sessionId"] = doc.data().sessionId;
+            cards.push(props);
+          }
+        });
+      }
+    } catch (e) {
+      console.error("Error getting doc in getGroupSessions: ", e);
+    }
+    console.log("cards in getGroupSessions: ", cards);
+    return cards;
+  }
+
   async function addGroupSession(name, sessionId) {
     try {
       const docRef = await addDoc(collection(db, "groupSessions"), {
@@ -257,6 +301,7 @@ export function AuthProvider({ children }) {
     addGroupSession,
     getYourGroupSessions,
     searchGroupSessions,
+    getGroupSessions,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
