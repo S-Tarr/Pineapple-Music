@@ -8,35 +8,7 @@ import queueConverter from './Queue';
 import { doc, getDoc} from "firebase/firestore"; 
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import {
-  getFirestore,
-  collection,
-  doc,
-  getDoc,
-  setDoc,
-} from "firebase/firestore";
 var SpotifyWebApi = require('spotify-web-api-node');
-
-
-const auth = getAuth(); // Authorization component
-const db = getFirestore(app); // Firestore database
-
-
-var currentUser = auth.currentUser;
-
-
-function getUserQueue(currentUser) {
-  const queueRef = doc(db, "userQueue", userID).withConverter(queueConverter);
-  const docSnap = await getDoc(queueRef);
-  if (docSnap.exists()) {
-    // Convert to Queue object
-    const city = docSnap.data();
-    // Use a Queue instance method
-    console.log(city.toString());
-  } else {
-    console.log("No such document!");
-  }
-}
 
 var spotifyApi = new SpotifyWebApi({
     clientId : '0fbe30c6e814404e8324aa3838a7f322',
