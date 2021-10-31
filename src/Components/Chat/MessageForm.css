@@ -1,6 +1,6 @@
 .message-footer {
 	position: fixed;
-	width: 90%;
+	width: 50%;
 	bottom: 0;
 	border: 10mm;
 	border-color: blue;
@@ -18,13 +18,6 @@
 .input-field {
 	flex-grow: 2;
 }
-
-span {
-	display: block;
-	overflow: hidden;
-	padding-right: 10px;
-}
-
 .send-button {
 	flex-grow: 1;
 }

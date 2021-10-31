@@ -4,26 +4,23 @@ import Picker from 'emoji-picker-react';
 import AddReactionIcon from '@mui/icons-material/AddReaction';
 import SendIcon from '@mui/icons-material/Send';
 import app from '../../firebase';
-import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
-import { getFirestore, collection, where, addDoc, query, orderBy, limit, getDocs, onSnapshot, Timestamp } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getFirestore, collection, addDoc, Timestamp } from "firebase/firestore";
 import "./MessageForm.css";
-
-let currentUser = null;
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
-const MessageForm = () => {
-    currentUser = auth.currentUser;
+const MessageForm = ({ groupSessionID }) => {
     const [text, setText] = useState("");
     const [showEmojis, setShowEmojis] = useState(false);
 
     const handleSubmit = async e => {
         e.preventDefault();
 
-        await addDoc(collection(db, 'messages', currentUser.uid, 'chat'), {
+        await addDoc(collection(db, 'messages', groupSessionID, 'chat'), {
             text,
-            from: currentUser.uid,
+            from: auth.currentUser.uid,
             createdAt: Timestamp.fromDate(new Date())
         });
         setText("");

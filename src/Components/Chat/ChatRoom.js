@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import ChatMessage from './ChatMessage';
 import MessageForm from './MessageForm';
 import app from "../../firebase";
-import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
-import { getFirestore, collection, where, addDoc, query, orderBy, limit, getDocs, onSnapshot, Timestamp } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 import '../../pages/Pages.css';
-
-let currentUser = null;
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
@@ -19,11 +17,12 @@ const msgLstStyle = {
   "overflow-y": "scroll"
 }
 
-function GetChatMessages() {
+function GetChatMessages(groupSessionID) {
+    console.log(auth.currentUser.uid);
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        const messagesRef = collection(db, 'messages');
+        const messagesRef = collection(db, 'messages', groupSessionID, 'chat');
         const messagesQuery = query(messagesRef, orderBy('createdAt'), limit(25))
         const unsubscribe = onSnapshot(messagesQuery, querySnapshot => {
             let messages = [];
@@ -38,23 +37,25 @@ function GetChatMessages() {
     return messages;
 }
 
-function MessageList() {
-    const messages = GetChatMessages();
+function MessageList({ groupSessionID }) {
+    const messages = GetChatMessages(groupSessionID);
     return <div style={msgLstStyle}>
-                {messages.length ? messages.map((message, i) => <ChatMessage key={i} message={message} fromUser={auth.currentUser.uid} />) : null}
+                {messages.length ? messages.map((message, i) => <ChatMessage key={i} message={message} currUser={auth.currentUser.uid} />) : null}
            </div>
 }
 
-const ChatRoom = () => {
-  const [users, setUsers] = useState([])
+const ChatRoom = ({ groupSessionID, groupSessionTitle }) => {
+  // console.log("groupSessionID: ", groupSessionID);
+  // console.log("groupSessionTitle: ", groupSessionTitle);
+  const [users, setUsers] = useState([]);
   const [text, setText] = useState("");
 
   return <div className="messages-container Page">
             <div>
-              <MessageList />
+              <MessageList groupSessionID={groupSessionID} />
             </div>
             <div>
-              <MessageForm />
+              <MessageForm groupSessionID={groupSessionID} />
             </div>
           </div>
 }

@@ -2,11 +2,11 @@ import React from 'react'
 import Moment from 'react-moment'
 import "./ChatMessage.css"
 
-function ChatMessage({ message, fromUser }) {
+function ChatMessage({ message, currUser }) {
     return (
-      <div className={`message-wrapper ${message.uid === fromUser ? "me" : "other"}`}>
+      <div className={`message-wrapper ${message.from === currUser ? "me" : "other"}`}>
         <p>
-          From: {message.uid}
+          From: {message.from.substring(0, 5)}
           <br />
           {message.text}
           <br />

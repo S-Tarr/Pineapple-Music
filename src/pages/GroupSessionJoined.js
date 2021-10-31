@@ -66,7 +66,7 @@ export default class GroupSessionJoined extends React.Component{
                     </div>
                 </div>
                 <div className="chat-section" style={chatStyle}>
-                    <ChatRoom />
+                    <ChatRoom groupSessionID={this.state.sessionId} groupSessionTitle={this.state.title}/>
                 </div>
             </div>
       );
