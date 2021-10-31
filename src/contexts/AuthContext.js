@@ -19,7 +19,13 @@ import {
   deleteUser,
 } from "firebase/auth";
 import React, { useContext, useState, useEffect } from "react";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  Timestamp,
+  getDocs,
+} from "firebase/firestore";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -70,19 +76,103 @@ export function AuthProvider({ children }) {
     return created;
   }
 
-  async function addSpotifyToken(uid, params) {
-    console.log("adding token being called uid", currentUser);
+  function getFormattedDate(date) {
+    var year = date.getFullYear();
+
+    var month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : "0" + month;
+
+    var day = date.getDate().toString();
+    day = day.length > 1 ? day : "0" + day;
+
+    return month + "/" + day + "/" + year;
+  }
+
+  async function getYourGroupSessions() {
+    let cards = [];
+    console.log("in your get group sessions")
     try {
-      const docRef = await addDoc(collection(db, "users"), {
-        uid: currentUser.uid,
-        SpotifyToken: params,
+      if (currentUser !== undefined) {
+        console.log("getting group sessions: ", currentUser.uid);
+        const docSnap = await getDocs(collection(db, "groupSessions"));
+        docSnap.forEach((doc) => {
+          const props = {
+            title: "group session1",
+            imageUrl:
+              "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+            username: "username goes here",
+            createdAt: "",
+            sessionId: 1234,
+          };
+          if (doc.data().ownerUid === currentUser.uid) {
+            console.log(doc.data());
+            var date = getFormattedDate(
+              new Date(doc.data().createdAt.seconds * 1000)
+            );
+            console.log(date);
+            props["createdAt"] = date;
+            props["title"] = doc.data().name;
+            props["username"] = doc.data().ownerUid;
+            props["sessionId"] = doc.data().sessionId;
+            cards.push(props);
+          }
+        });
+      }
+    } catch (e) {
+      console.error("Error adding doc in addToken: ", e);
+    }
+    console.log("cards: ", cards);
+    return cards;
+  }
+
+  async function addGroupSession(name, sessionId) {
+    try {
+      const songs = [];
+      const docRef = await addDoc(collection(db, "groupSessions"), {
+        createdAt: Timestamp.now(),
+        name: name,
+        ownerUid: currentUser.uid,
+        sessionId: sessionId,
       });
-      console.log("Doc written w/ ID in addToken: ", docRef.id);
+      const docRef2 = await addDoc(collection(db, "groupSessionQueue"), {
+        createdAt: Timestamp.now(),
+        queueId: docRef.id,
+        sessionId: sessionId,
+        songs : songs
+      });
+      console.log("Doc written w/ ID in addGroupSession: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding doc in addGroupSession: ", e);
+    }
+  }
+
+  async function addSpotifyToken(params) {
+    console.log("adding token being called uid, currentUser:", currentUser);
+
+    try {
+      if (currentUser !== undefined) {
+        const docSnap = await getDocs(collection(db, "users"));
+        let exists = false;
+        docSnap.forEach((doc) => {
+          if (doc.data().uid === currentUser.uid) {
+            exists = true;
+          }
+        });
+        if (exists) {
+          console.log("uid already exists:");
+        } else {
+          const docRef = await addDoc(collection(db, "users"), {
+            uid: currentUser.uid,
+            SpotifyToken: params,
+            createdAt: Timestamp.now(),
+          });
+          console.log("Doc written w/ ID in addToken: ", docRef.id);
+        }
+      }
     } catch (e) {
       console.error("Error adding doc in addToken: ", e);
     }
   }
-  
 
   function deleteAccount() {
     return deleteUser(auth.currentUser);
@@ -121,6 +211,8 @@ export function AuthProvider({ children }) {
     login,
     logout,
     addSpotifyToken,
+    addGroupSession,
+    getYourGroupSessions,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
