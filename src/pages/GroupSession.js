@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Container,
   Grid,
   IconButton,
   Modal,
+  TextField,
   Typography,
 } from "@mui/material";
+import InputBase from "@mui/material/InputBase";
+import { styled, alpha } from "@mui/material/styles";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import SearchIcon from "@mui/icons-material/Search";
 import { getAuth } from "firebase/auth";
 
 import GroupSessionCard from "../components/GroupSessionCard";
@@ -26,12 +30,54 @@ const style = {
   p: 4,
 };
 
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: "100%",
+  [theme.breakpoints.up("sm")]: {
+    marginLeft: theme.spacing(1),
+    width: "auto",
+  },
+}));
+
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "inherit",
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      width: "40ch",
+      "&:focus": {
+        width: "50ch",
+      },
+    },
+  },
+}));
+
 function GroupSession() {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const { getYourGroupSessions } = useAuth();
+  const { getYourGroupSessions, searchGroupSessions } = useAuth();
   const auth = getAuth();
 
   var date = new Date();
@@ -45,6 +91,8 @@ function GroupSession() {
     createdAt: dateTime,
     sessionId: 1234,
   };
+
+  const sessionIdRef = useRef();
 
   const [cards, addCard] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +111,16 @@ function GroupSession() {
   //     addCard(cards.concat(init));
   //   });
   // };
+
+  const handleSearch = () => {
+    const getCards = searchGroupSessions(sessionIdRef.current.value).then(
+      (session) => {
+        console.log("in handleSearch");
+        addCard([]);
+        addCard(session);
+      }
+    );
+  };
 
   useEffect(() => {
     const getCards = getYourGroupSessions().then((sessions) => {
@@ -97,46 +155,53 @@ function GroupSession() {
       >
         Group Listening
       </Typography>
-        <Container maxWidth="md">
+      <Search>
+        <SearchIconWrapper>
+          <SearchIcon />
+        </SearchIconWrapper>
+        <StyledInputBase
+          inputRef={sessionIdRef}
+          onChange={handleSearch}
+          placeholder="Search group sessions using session ID"
+          inputProps={{ "aria-label": "search" }}
+        />
+      </Search>
+      <br />
+      <Container maxWidth="md">
+        <Grid container alignItems="center" justifyContent="center" spacing={9}>
           <Grid
-            container
-            alignItems="center"
             justifyContent="center"
-            spacing={9}
+            align="center"
+            item
+            xs={12}
+            sm={6}
+            md={4}
           >
-            <Grid
-              justifyContent="center"
-              align="center"
-              item
-              xs={12}
-              sm={6}
-              md={4}
+            <IconButton color="primary" onClick={handleOpen}>
+              <AddCircleIcon sx={{ fontSize: 80 }} />
+            </IconButton>
+            <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+              onSubmit={handleClose}
             >
-              <IconButton color="primary" onClick={handleOpen}>
-                <AddCircleIcon sx={{ fontSize: 80 }} />
-              </IconButton>
-              <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-                onSubmit={handleClose}
-              >
-                <Box sx={style}>
-                  <GroupSessionForm onSubmit={handleCreate} />
-                </Box>
-              </Modal>
-              <br />
-              <br />
-              Create a new session
-            </Grid>
-            {cards.map((card) => (
-              <Grid item key={card} xs={12} sm={6} md={4}>
-                <GroupSessionCard props={card} />
-              </Grid>
-            ))}
+              <Box sx={style}>
+                <GroupSessionForm onSubmit={handleCreate} />
+              </Box>
+            </Modal>
+            <br />
+            <br />
+            Create a new session
           </Grid>
-        </Container>
+          {cards.map((card) => (
+            <Grid item key={card} xs={12} sm={6} md={4}>
+              <GroupSessionCard props={card} />
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
     </div>
   );
 }

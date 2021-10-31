@@ -92,6 +92,40 @@ export function AuthProvider({ children }) {
     return month + "/" + day + "/" + year;
   }
 
+  async function searchGroupSessions(inputId) {
+    let cards = [];
+    try {
+      if (currentUser !== undefined) {
+        const docSnap = await getDocs(collection(db, "groupSessions"));
+        docSnap.forEach((doc) => {
+          const props = {
+            title: "group session1",
+            imageUrl:
+              "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+            username: "username goes here",
+            createdAt: "",
+            sessionId: 1234,
+          };
+          if (doc.data().sessionId === inputId) {
+            var date = getFormattedDate(
+              new Date(doc.data().createdAt.seconds * 1000)
+            );
+            console.log(date);
+            props["createdAt"] = date;
+            props["title"] = doc.data().name;
+            props["username"] = doc.data().ownerUid;
+            props["sessionId"] = doc.data().sessionId;
+            cards.push(props);
+          }
+        });
+      }
+    } catch (e) {
+      console.error("Error getting doc in searchGroupSessions: ", e);
+    }
+    console.log("cards: ", cards);
+    return cards;
+  }
+
   async function getYourGroupSessions() {
     let cards = [];
     try {
@@ -122,7 +156,7 @@ export function AuthProvider({ children }) {
         });
       }
     } catch (e) {
-      console.error("Error adding doc in addToken: ", e);
+      console.error("Error getting doc in getYourGroupSessions: ", e);
     }
     console.log("cards: ", cards);
     return cards;
@@ -222,6 +256,7 @@ export function AuthProvider({ children }) {
     addSpotifyToken,
     addGroupSession,
     getYourGroupSessions,
+    searchGroupSessions,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
