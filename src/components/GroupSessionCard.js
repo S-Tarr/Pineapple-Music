@@ -1,10 +1,46 @@
 import React from "react";
 
-import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Typography,
+  Popover,
+} from "@mui/material";
+
+import { useHistory } from "react-router";
 
 function GroupSessionCard({
   props: { title, imageUrl, username, createdAt, sessionId },
 }) {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const history = useHistory()
+  async function handleJoin() {
+
+    history.push({
+      pathname: '/groupsessionhome',
+      props: {title: title, imageUrl: imageUrl, username: username, createdAt: createdAt, sessionId: sessionId}
+    });
+  }
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
+
+  const copyId = () => {
+    navigator.clipboard.writeText(sessionId);
+  };
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardMedia
@@ -18,15 +54,35 @@ function GroupSessionCard({
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Owner: {username}
+          Owner UID: {username}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Created at: {createdAt}
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">Join</Button>
-        <Button size="small">Session ID: {sessionId}</Button>
+        <Button size="small" onClick={handleJoin}>Join</Button>
+        <Button
+          size="small"
+          onClick={(event) => {
+            copyId();
+            handleClick(event);
+          }}
+        >
+          Session ID: {sessionId}
+        </Button>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+        >
+          <Typography sx={{ p: 2 }}>Session ID copied.</Typography>
+        </Popover>
       </CardActions>
     </Card>
   );

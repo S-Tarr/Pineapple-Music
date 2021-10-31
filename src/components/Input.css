@@ -1,12 +1,4 @@
-/* .change-password-f {
-   height: 100%;
-   width: 100%;
-   display:list-item;
-   justify-content: center;
-   align-items: center;
-} */
-
-button {
+.default-button {
    width: 75%;
    max-width: 350px;
    min-width: 250px;
@@ -30,7 +22,7 @@ h1 {
    align-items: center;
 }
 
-button:hover {
+.default-button:hover {
    background-color: #2B331F;
 }
 
