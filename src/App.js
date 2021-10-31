@@ -8,6 +8,7 @@ import Navbar from './components/Navbar/Navbar';
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { AuthProvider } from "./contexts/AuthContext";
 import GroupSession from "./pages/GroupSession";
+import GroupSessionJoined from "./pages/GroupSessionJoined";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
@@ -55,9 +56,8 @@ function App() {
                   <Route path="/myaccount" component={MyAccount} />
                   <Route path="/profilepicture" component={AddProfilePicture} />
                   <Route path="/song" component={SongPage}/>
-                  <Route path="/visual">
-                    <Visualizer navigation={navigation}/>
-                  </Route>
+                  <Route path="/visual" component={Visualizer}/>
+                  <Route path="/groupsessionhome" component={GroupSessionJoined}/>
                 </Switch>
               </div>
             </div>

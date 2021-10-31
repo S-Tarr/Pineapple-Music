@@ -39,12 +39,10 @@ function Signup() {
   const passwordRef = useRef();
   const passwordConfirmRef = useRef();
 
-  const { addSpotifyToken, signup, currentUser } = useAuth();
+  const { addSpotifyToken, signup } = useAuth();
   const [error, setError] = useState(""); // Error represents the current message we want displayed, no error message by default
   const [loading, setLoading] = useState(false); // Loading represents the current state of the button, enabled by default
   const history = useHistory();
-
-  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
     if (window.location.hash) {
@@ -54,7 +52,7 @@ function Signup() {
       localStorage.setItem("spotifyToken", params.access_token);
 
       console.log("getting token", params);
-      addSpotifyToken("uid it is", params.access_token);
+      addSpotifyToken(params.access_token);
       console.log("got the access token: ");
     }
   });
@@ -81,10 +79,7 @@ function Signup() {
       setError("");
       setLoading(true); // disable the signup button
 
-      const userCredentials = await signup(
-        emailRef.current.value,
-        passwordRef.current.value
-      );
+      await signup(emailRef.current.value, passwordRef.current.value);
 
       window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
 
