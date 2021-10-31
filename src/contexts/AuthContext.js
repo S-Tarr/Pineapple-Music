@@ -20,11 +20,15 @@ import {
 } from "firebase/auth";
 import React, { useContext, useState, useEffect } from "react";
 import {
+  doc,
   getFirestore,
   collection,
   addDoc,
   Timestamp,
+  getDoc,
   getDocs,
+  updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 
 // Firebase configuration
@@ -90,7 +94,6 @@ export function AuthProvider({ children }) {
 
   async function getYourGroupSessions() {
     let cards = [];
-    console.log("in your get group sessions")
     try {
       if (currentUser !== undefined) {
         console.log("getting group sessions: ", currentUser.uid);
@@ -132,8 +135,21 @@ export function AuthProvider({ children }) {
         name: name,
         ownerUid: currentUser.uid,
         sessionId: sessionId,
+        users: [currentUser.uid],
       });
       console.log("Doc written w/ ID in addGroupSession: ", docRef.id);
+      const docSnap = await getDocs(collection(db, "users"));
+      docSnap.forEach((currDoc) => {
+        if (currDoc.data().uid === currentUser.uid) {
+          console.log("trying to add group sessions under users", doc);
+          const userRef = doc(db, "users", currDoc.id);
+
+          updateDoc(userRef, {
+            groupSessions: arrayUnion(sessionId),
+          });
+          console.log(currDoc.data().groupSessions);
+        }
+      });
     } catch (e) {
       console.error("Error adding doc in addGroupSession: ", e);
     }
