@@ -18,11 +18,11 @@ import AddProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import Visualizer from "./pages/Visualizer";
 
 const auth = getAuth();
-const NavBarContext = createContext();
+export const NavBarContext = createContext();
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [navBar] = useContext(true);
+  const [navigation, setNavigation] = useState(true);
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -37,13 +37,14 @@ function App() {
   return (
     <Router>
       <AuthProvider>
+        <NavBarContext.Provider value={navigation}>
         <Switch>
           <Route path="/signup" component={Signup}/>
           <Route path="/login" component={Login}/>
           <Route path="/resetpassword" component = {ResetPassword}/>
           {loggedIn ? 
             <div className="container" >
-              {navBar ?
+              {navigation ?
                 <Navbar />
               : null}
               <div className="content">
@@ -55,9 +56,7 @@ function App() {
                   <Route path="/profilepicture" component={AddProfilePicture} />
                   <Route path="/song" component={SongPage}/>
                   <Route path="/visual">
-                    <NavBarContext.Provider value={true}>
-                      <Visualizer/>
-                    </NavBarContext.Provider>
+                    <Visualizer navigation={navigation}/>
                   </Route>
                 </Switch>
               </div>
@@ -67,6 +66,7 @@ function App() {
           // : <Redirect to="/login" />
         }
         </Switch>
+        </NavBarContext.Provider>
       </AuthProvider>
     </Router>
   );
