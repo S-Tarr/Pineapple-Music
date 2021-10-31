@@ -11,6 +11,14 @@ let currentUser = null;
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
+const msgLstStyle = {
+  "padding-bottom": "50px",
+  "position": "fixed",
+  "height": "100%",
+  "width": "81%",
+  "overflow-y": "scroll"
+}
+
 function GetChatMessages() {
     const [messages, setMessages] = useState([]);
 
@@ -32,8 +40,8 @@ function GetChatMessages() {
 
 function MessageList() {
     const messages = GetChatMessages();
-    return <div>
-                {messages.length ? messages.map((message, i) => <ChatMessage key={i} message={message} />) : null}
+    return <div style={msgLstStyle}>
+                {messages.length ? messages.map((message, i) => <ChatMessage key={i} message={message} fromUser={auth.currentUser.uid} />) : null}
            </div>
 }
 
@@ -41,13 +49,14 @@ const ChatRoom = () => {
   const [users, setUsers] = useState([])
   const [text, setText] = useState("");
 
-  return <div className="home-container Page">
-      <div className="messages-container">
-        <MessageList />
-        <MessageForm 
-        />
-      </div>
-    </div>
+  return <div className="messages-container Page">
+            <div>
+              <MessageList />
+            </div>
+            <div>
+              <MessageForm />
+            </div>
+          </div>
 }
 
 export default ChatRoom;
