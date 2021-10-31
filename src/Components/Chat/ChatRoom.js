@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import ChatMessage from '../components/Chat/ChatMessage';
-import MessageForm from '../components/Chat/MessageForm';
-import app from "../firebase";
+import ChatMessage from './ChatMessage';
+import MessageForm from './MessageForm';
+import app from "../../firebase";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getFirestore, collection, where, addDoc, query, orderBy, limit, getDocs, onSnapshot, Timestamp } from "firebase/firestore";
-import './Pages.css';
+import '../../pages/Pages.css';
 
 let currentUser = null;
 

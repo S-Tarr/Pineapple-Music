@@ -17,7 +17,7 @@ import SongPage from "./pages/SongPage";
 import SearchPage from "./pages/SearchPage";
 import AddProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import Visualizer from "./pages/Visualizer";
-import ChatRoom from "./pages/ChatRoom";
+import ChatRoom from "./components/Chat/ChatRoom";
 
 const auth = getAuth();
 
