@@ -5,9 +5,10 @@ import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from "@material-ui/icons/Close";
 import Track from './Track'
 import queueConverter from './Queue';
-import { doc, getDoc} from "firebase/firestore"; 
+import app from '../firebase';
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getFirestore, collection, where, addDoc, query, orderBy, limit, getDocs, onSnapshot, Timestamp } from "firebase/firestore";
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var spotifyApi = new SpotifyWebApi({
@@ -16,7 +17,13 @@ var spotifyApi = new SpotifyWebApi({
     redirectUri: 'localhost:3000/Pineapple-Music'
 });
 
+const auth = getAuth(); // Authorization component
+const db = getFirestore(app); // Firestore database
+
 function SearchBar({ placeholder, spotifyData, authorized }) {
+  
+  const currentUser = auth.currentUser;
+  console.log(currentUser.uid);
   
   const history = useHistory()
 
@@ -52,9 +59,17 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
     setWordEntered(searchWord);
   };
 
+  async function handleSubmit(track) {
+    await addDoc(collection(db, 'userQueue', currentUser.uid, 'queue'), {
+        songUri: track.uri,
+        songName: track.title,
+    });
+  }
+
   function handleRedirect(track) {
       console.log(track);
-
+      setPlayingTrack(track);
+      handleSubmit(track);
       history.push({
           pathname: '/song',
           state: {name: track.title, picture: track.albumUrl, trackUri: track.uri, access_token: access_token}
