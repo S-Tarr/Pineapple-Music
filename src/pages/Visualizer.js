@@ -4,8 +4,8 @@ import Canvas from "../components/Canvas"
 import NavBarContext from "../App.js"
 
 function Visualizer() {
-    const [navigation, setNavBar] = useContext(NavBarContext);
-    setNavBar(false);
+    //const [navigation, setNavBar] = useContext(NavBarContext);
+    //setNavBar(false);
     return(
         <div className="Page">
             <Canvas />
