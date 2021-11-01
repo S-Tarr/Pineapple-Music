@@ -70,6 +70,15 @@
     pointer-events: none;
 }
 
+.info-section {
+    justify-content: center;
+    align-items: center;
+}
+
+.Player-Div {
+    float: right;
+}
+
 @media (prefers-reduced-motion: no-preference) {
 .App-Logo {
     animation: App-logo-spin infinite 20s linear;

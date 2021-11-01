@@ -92,6 +92,35 @@ export function AuthProvider({ children }) {
     return month + "/" + day + "/" + year;
   }
 
+  async function joinGroupSession(sessionId, uid) {
+    console.log("tyring to join a group session");
+    try {
+      const docSnapSessions = await getDocs(collection(db, "groupSessions"));
+      docSnapSessions.forEach((currDoc) => {
+        if (currDoc.data().sessionId === sessionId) {
+          console.log("found a group session");
+          const sessionRef = doc(db, "groupSessions", currDoc.id);
+          console.log("sessionRef", sessionRef);
+          const updated = updateDoc(sessionRef, {
+            users: arrayUnion(currentUser.uid),
+          });
+        }
+      });
+      const docSnapUsers = await getDocs(collection(db, "users"));
+      docSnapUsers.forEach((currDoc) => {
+        if (currDoc.data().uid === currentUser.uid) {
+          const userRef = doc(db, "users", currDoc.id);
+          console.log(sessionId);
+          updateDoc(userRef, {
+            groupSessions: arrayUnion(sessionId),
+          });
+        }
+      });
+    } catch (e) {
+      console.error("Error getting doc in joining groupSession: ", e);
+    }
+  }
+
   async function searchGroupSessions(inputId) {
     let cards = [];
     try {
@@ -171,7 +200,9 @@ export function AuthProvider({ children }) {
         const docSnap = await getDocs(collection(db, "users"));
         docSnap.forEach((doc) => {
           if (doc.data().uid === currentUser.uid) {
-            doc.data().groupSessions.forEach(item => currGroupSessions.add(item))
+            doc
+              .data()
+              .groupSessions.forEach((item) => currGroupSessions.add(item));
             console.log(currGroupSessions);
           }
         });
@@ -220,7 +251,7 @@ export function AuthProvider({ children }) {
         createdAt: Timestamp.now(),
         queueId: docRef.id,
         sessionId: sessionId,
-        songs : songs
+        songs: songs,
       });
       console.log("Doc written w/ ID in addGroupSession: ", docRef.id);
       const docSnap = await getDocs(collection(db, "users"));
@@ -309,6 +340,7 @@ export function AuthProvider({ children }) {
     getYourGroupSessions,
     searchGroupSessions,
     getGroupSessions,
+    joinGroupSession,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

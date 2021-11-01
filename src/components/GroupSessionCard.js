@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   Button,
   Card,
@@ -9,17 +8,19 @@ import {
   Typography,
   Popover,
 } from "@mui/material";
-
 import { useHistory } from "react-router";
+
+import { useAuth } from "../contexts/AuthContext";
 
 function GroupSessionCard({
   props: { title, imageUrl, username, createdAt, sessionId },
 }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const { joinGroupSession } = useAuth();
 
   const history = useHistory()
   async function handleJoin() {
-
+    const joinGroup = joinGroupSession(sessionId, username);
     history.push({
       pathname: '/groupsessionhome',
       props: {title: title, imageUrl: imageUrl, username: username, createdAt: createdAt, sessionId: sessionId}

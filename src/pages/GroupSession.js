@@ -77,7 +77,8 @@ function GroupSession() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const { getGroupSessions, getYourGroupSessions, searchGroupSessions } = useAuth();
+  const { getGroupSessions, getYourGroupSessions, searchGroupSessions } =
+    useAuth();
   const auth = getAuth();
 
   var date = new Date();
@@ -92,26 +93,12 @@ function GroupSession() {
     sessionId: 1234,
   };
 
-  const sessionIdRef = useRef();
+  const sessionIdRef = useRef("");
 
   const [cards, addCard] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const init = [];
-
-  // const getCards = () => {
-  //   getYourGroupSessions().then((sessions) => {
-  //     console.log("get cards");
-  //     console.log(sessions);
-  //     sessions.forEach((session) => {
-  //       init.push(session);
-  //     });
-  //     console.log(init);
-  //     console.log(cards);
-  //     addCard(cards.concat(init));
-  //   });
-  // };
-
 
   const handleSearch = () => {
     const getCards = searchGroupSessions(sessionIdRef.current.value).then(
@@ -124,17 +111,31 @@ function GroupSession() {
   };
 
   useEffect(() => {
-    const getCards = getGroupSessions().then((sessions) => {
-      console.log("get cards");
-      console.log(sessions);
-      sessions.forEach((session) => {
-        init.push(session);
+    if (sessionIdRef.current.value === "") {
+      const getCards = getGroupSessions().then((sessions) => {
+        console.log("get cards when search is empty");
+        console.log(sessions);
+        sessions.forEach((session) => {
+          init.push(session);
+        });
+        addCard([]);
+        addCard(sessions);
       });
-      addCard(cards.concat(init));
-    });
-    setLoading(false);
-    //return () => getCards();
-  }, [loading]);
+      setLoading(false);
+    }
+  }, [sessionIdRef.current.value, loading]);
+
+  // useEffect(() => {
+  //   const getCards = getGroupSessions().then((sessions) => {
+  //     console.log("get cards");
+  //     console.log(sessions);
+  //     sessions.forEach((session) => {
+  //       init.push(session);
+  //     });
+  //     addCard(cards.concat(init));
+  //   });
+  //   setLoading(false);
+  // }, [loading]);
 
   const handleCreate = (title, sessionId) => {
     props["title"] = title;
