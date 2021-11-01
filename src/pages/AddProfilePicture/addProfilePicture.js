@@ -1,11 +1,5 @@
 import "./addProfilePic.css";
 import React from "react";
-import { useEffect, useState } from "react";
-import createUser from "../../pages/Signup";
-
-import { useAuth } from "../../contexts/AuthContext";
-
-import Firebase from "../../firebase";
 import app from "../../firebase";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -14,6 +8,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   setDoc,
 } from "firebase/firestore";
 
@@ -32,11 +27,20 @@ async function create() {
 }
 
 async function check() {
-  const docRef = doc(db, "users", currentUser.uid);
+  const docSnaps = await getDocs(collection(db, "users"));
+  let docId;
+  docSnaps.forEach(currDoc => {
+    if (currDoc.data().uid === currentUser.uid) {
+      docId = currDoc.id;
+    }
+  });
+
+  const docRef = doc(db, "users", docId);
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
-    //console.log("Document data:", docSnap.data());
+    console.log("DocSnap exists");
   } else {
+    console.log("Creating user");
     create();
   }
 }
