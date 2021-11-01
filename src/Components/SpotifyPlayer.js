@@ -17,9 +17,10 @@ function GetQueue() {
     const unsubscribe = onSnapshot(queueQuery, querySnapshot => {
         let queue = [];
         querySnapshot.forEach(doc => {
-            queue.push(doc.data());
+            var data = doc.data();
+            queue.push(data.songUri);
         })
-        setSongQueue(queue);
+        setSongQueue(queue.reverse());
     })
     return () => unsubscribe;
   }, [])
@@ -27,28 +28,12 @@ function GetQueue() {
   return songQueue;
 }
 
-export default function Player({ accessToken, trackUri }) {
+export default function Player({ accessToken }) {
 
   const [play, setPlay] = useState(false)
-  const [songUri, setSongUri] = useState(trackUri);
-  const [firstSong, setFirstSong] = useState(true);
-  let queue = []
-  queue = GetQueue();
+  let queue = GetQueue();
   console.log(queue);
-  //var songUri = trackUri;
-  //setSongUri(trackUri);
-  var songIndex = 0;
-
-  useEffect(() => {
-    setPlay(true);
-    if (!firstSong) {
-      setSongUri(queue[++songIndex]);
-      console.log(queue[songIndex]);
-    }
-    setFirstSong(false);
-  })
-
-
+ 
   if (!accessToken) return null
   return (
     <SpotifyPlayer
@@ -57,8 +42,8 @@ export default function Player({ accessToken, trackUri }) {
         if (!state.isPlaying) setPlay(false)
       }}
       play={play}
-      uris={songUri ? [songUri] : []}
       autoPlay={true}
+      uris={queue}
     />
   )
 }
