@@ -22,6 +22,10 @@ import {
   getDoc,
   setDoc,
 } from "firebase/firestore";
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
+import FastRewindRoundedIcon from '@mui/icons-material/FastRewindRounded';
+import FastForwardRoundedIcon from '@mui/icons-material/FastForwardRounded';
 
 const pgStyle = {
     "display": "flex",
@@ -40,6 +44,7 @@ export default class GroupSessionJoined extends React.Component{
     constructor (props) {
         super(props);
         this.state = {
+            isPlaying: false,
             title: props.location.props.title,
             sessionId: props.location.props.sessionId,
             imageUrl: props.location.props.imageUrl, 
@@ -63,6 +68,14 @@ export default class GroupSessionJoined extends React.Component{
                     <div className="container">
                         <text>Group Session Song Queue</text>
                         <SearchIcon></SearchIcon>
+                    </div>
+                    <div className="Player-Div">
+                        <button className="forward-rewind"><FastRewindRoundedIcon/></button>
+                        {/* <button className="playPauseButton" onClick={() => this.setState({ isPlaying: !isPlaying })}>
+                            {isPlaying ? <PauseRoundedIcon style={{ fontSize: 50 }}/> : <PlayArrowRoundedIcon style={{ fontSize: 50 }}/>}
+                        </button> */}
+                        <button className="playPauseButton"><PlayArrowRoundedIcon/></button>
+                        <button className="forward-rewind"><FastForwardRoundedIcon/></button>
                     </div>
                 </div>
                 <div className="chat-section" style={chatStyle}>
