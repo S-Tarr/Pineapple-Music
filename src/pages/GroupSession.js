@@ -93,7 +93,7 @@ function GroupSession() {
     sessionId: 1234,
   };
 
-  const sessionIdRef = useRef();
+  const sessionIdRef = useRef("");
 
   const [cards, addCard] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -118,24 +118,24 @@ function GroupSession() {
         sessions.forEach((session) => {
           init.push(session);
         });
-        addCard(cards.concat(init));
+        addCard([]);
+        addCard(sessions);
       });
       setLoading(false);
     }
-  }, [sessionIdRef.current.value]);
+  }, [sessionIdRef.current.value, loading]);
 
-  useEffect(() => {
-    const getCards = getGroupSessions().then((sessions) => {
-      console.log("get cards");
-      console.log(sessions);
-      sessions.forEach((session) => {
-        init.push(session);
-      });
-      addCard(cards.concat(init));
-    });
-    setLoading(false);
-    //return () => getCards();
-  }, [loading]);
+  // useEffect(() => {
+  //   const getCards = getGroupSessions().then((sessions) => {
+  //     console.log("get cards");
+  //     console.log(sessions);
+  //     sessions.forEach((session) => {
+  //       init.push(session);
+  //     });
+  //     addCard(cards.concat(init));
+  //   });
+  //   setLoading(false);
+  // }, [loading]);
 
   const handleCreate = (title, sessionId) => {
     props["title"] = title;
