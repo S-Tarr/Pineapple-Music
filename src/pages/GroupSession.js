@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Container,
+  //CircularProgress,
   Grid,
   IconButton,
+  InputBase,
+  LinearProgress,
   Modal,
-  TextField,
   Typography,
 } from "@mui/material";
-import InputBase from "@mui/material/InputBase";
 import { styled, alpha } from "@mui/material/styles";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
@@ -77,8 +78,7 @@ function GroupSession() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const { getGroupSessions, getYourGroupSessions, searchGroupSessions } =
-    useAuth();
+  const { getGroupSessions, searchGroupSessions } = useAuth();
   const auth = getAuth();
 
   var date = new Date();
@@ -98,62 +98,49 @@ function GroupSession() {
   const [cards, addCard] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const init = [];
-
   const handleSearch = () => {
-    const getCards = searchGroupSessions(sessionIdRef.current.value).then(
-      (session) => {
+    if (sessionIdRef.current.value !== "") {
+      setLoading(true);
+      searchGroupSessions(sessionIdRef.current.value).then((session) => {
         console.log("in handleSearch");
         addCard([]);
         addCard(session);
-      }
-    );
+        if (session.length > 0) {
+          setLoading(false);
+        }
+      });
+    } else {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     if (sessionIdRef.current.value === "") {
-      const getCards = getGroupSessions().then((sessions) => {
+      getGroupSessions().then((sessions) => {
         console.log("get cards when search is empty");
-        console.log(sessions);
-        sessions.forEach((session) => {
-          init.push(session);
-        });
         addCard([]);
         addCard(sessions);
+        setLoading(false);
       });
-      setLoading(false);
     }
   }, [sessionIdRef.current.value, loading]);
-
-  // useEffect(() => {
-  //   const getCards = getGroupSessions().then((sessions) => {
-  //     console.log("get cards");
-  //     console.log(sessions);
-  //     sessions.forEach((session) => {
-  //       init.push(session);
-  //     });
-  //     addCard(cards.concat(init));
-  //   });
-  //   setLoading(false);
-  // }, [loading]);
 
   const handleCreate = (title, sessionId) => {
     props["title"] = title;
     props["sessionId"] = sessionId;
     props["username"] = auth.currentUser.uid;
-    addCard(cards.concat(props));
+    addCard([props, ...cards]);
   };
 
   return (
-    <div className="Page">
+    <div className="Page" align="center">
       <Typography
-        component="h1"
+        sx={{ fontWeight: "bold" }}
         variant="h2"
-        align="center"
-        color="text.primary"
+        component="div"
         gutterBottom
       >
-        Group Listening
+        Your Group Sessions
       </Typography>
       <Search>
         <SearchIconWrapper>
@@ -166,7 +153,6 @@ function GroupSession() {
           inputProps={{ "aria-label": "search" }}
         />
       </Search>
-      <br />
       <Container maxWidth="md">
         <Grid container alignItems="center" justifyContent="center" spacing={9}>
           <Grid
@@ -192,15 +178,21 @@ function GroupSession() {
               </Box>
             </Modal>
             <br />
-            <br />
             Create a new session
           </Grid>
-          {cards.map((card) => (
-            <Grid item key={card} xs={12} sm={6} md={4}>
-              <GroupSessionCard props={card} />
-            </Grid>
-          ))}
         </Grid>
+        <br />
+        {loading ? (
+          <LinearProgress />
+        ) : (
+          <Grid container alignItems="center" spacing={9}>
+            {cards.map((card) => (
+              <Grid item key={card} xs={12} sm={6} md={4}>
+                <GroupSessionCard props={card} />
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Container>
     </div>
   );

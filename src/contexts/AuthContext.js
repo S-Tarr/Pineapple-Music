@@ -92,7 +92,13 @@ export function AuthProvider({ children }) {
     return month + "/" + day + "/" + year;
   }
 
-  async function joinGroupSession(sessionId, uid) {
+  function compare(dateA, dateB) {
+    var a = Date.parse(dateA.createdAt.toString());
+    var b = Date.parse(dateB.createdAt.toString());
+    return a < b ? 1 : a > b ? -1 : 0;
+  }
+
+  async function joinGroupSession(sessionId) {
     console.log("tyring to join a group session");
     try {
       const docSnapSessions = await getDocs(collection(db, "groupSessions"));
@@ -151,7 +157,8 @@ export function AuthProvider({ children }) {
     } catch (e) {
       console.error("Error getting doc in searchGroupSessions: ", e);
     }
-    console.log("cards: ", cards);
+
+    cards.sort(compare);
     return cards;
   }
 
@@ -221,7 +228,6 @@ export function AuthProvider({ children }) {
             var date = getFormattedDate(
               new Date(doc.data().createdAt.seconds * 1000)
             );
-            console.log(date);
             props["createdAt"] = date;
             props["title"] = doc.data().name;
             props["username"] = doc.data().ownerUid;
@@ -233,7 +239,8 @@ export function AuthProvider({ children }) {
     } catch (e) {
       console.error("Error getting doc in getGroupSessions: ", e);
     }
-    console.log("cards in getGroupSessions: ", cards);
+
+    cards.sort(compare);
     return cards;
   }
 
