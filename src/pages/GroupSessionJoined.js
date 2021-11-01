@@ -23,6 +23,10 @@ import {
   getDoc,
   setDoc,
 } from "firebase/firestore";
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
+import FastRewindRoundedIcon from '@mui/icons-material/FastRewindRounded';
+import FastForwardRoundedIcon from '@mui/icons-material/FastForwardRounded';
 
 const pgStyle = {
     "display": "flex",
@@ -51,6 +55,7 @@ export default class GroupSessionJoined extends React.Component{
             opacity:1,
             color : "rgba(" +40 + "," + 40 + "," + 40 + "," + 0.2 + ")",
             buttonMessage :"Open Song Queue",
+            isPlaying: false,
         }
     }
     handleShow (event) {
@@ -109,7 +114,12 @@ export default class GroupSessionJoined extends React.Component{
                         </div>
                         )}
                     </Overlay>
-                        </div>
+                    <div className="Player-Div">
+                        <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }}/></button>
+                        <button className="playPauseButton"><PlayArrowRoundedIcon style={{ fontSize: 50 }}/></button>
+                        <button className="forward-rewind"><FastForwardRoundedIcon style={{ fontSize: 50 }}/></button>
+                    </div>
+                </div>
                 <div className="chat-section" style={chatStyle}>
                     <ChatRoom groupSessionID={this.state.sessionId} groupSessionTitle={this.state.title}/>
                 </div>
