@@ -99,20 +99,6 @@ function GroupSession() {
 
   const init = [];
 
-  // const getCards = () => {
-  //   getYourGroupSessions().then((sessions) => {
-  //     console.log("get cards");
-  //     console.log(sessions);
-  //     sessions.forEach((session) => {
-  //       init.push(session);
-  //     });
-  //     console.log(init);
-  //     console.log(cards);
-  //     addCard(cards.concat(init));
-  //   });
-  // };
-
-
   const handleSearch = () => {
     const getCards = searchGroupSessions(sessionIdRef.current.value).then(
       (session) => {
