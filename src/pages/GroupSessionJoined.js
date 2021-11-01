@@ -2,16 +2,17 @@ import React, { useState, createRef } from "react";
 
 import Overlay from 'react-bootstrap/Overlay';
 import Button from 'react-bootstrap/Button';
+import SearchIcon from '@mui/icons-material/Search';
 
 import {
   Box,
-  Container,
   Grid,
   IconButton,
   Modal,
   Typography,
 } from "@mui/material";
 import ChatRoom from "../components/Chat/ChatRoom";
+import SearchBar from '../components/SearchBar';
 
 import app from "../firebase";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
@@ -75,6 +76,7 @@ export default class GroupSessionJoined extends React.Component{
 
     render () {
         // const groupSession = useLocation();
+        const token = "";
         return (
             <div style={{backgroundColor: this.state.color, opacity: this.state.opacity}}>
                 <div className="info-section" style={infoStyle}>
@@ -94,6 +96,8 @@ export default class GroupSessionJoined extends React.Component{
                         <div
                             {...props}
                             style={{
+                                flex:1,
+                                flexDirection:"column",
                                 margin:"50px",
                                 backgroundColor: "#202020",
                                 padding: '2px 10px',
@@ -106,6 +110,20 @@ export default class GroupSessionJoined extends React.Component{
                             }}
                         >
                             <text>Group Session Song Queue</text>
+                            <SearchIcon></SearchIcon>
+                            <div>
+                                <SearchBar placeholder="Enter a song name..." spotifyData={token} authorized={true} />
+                                <br />
+                            <br />
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                            >
+                                Login to Spotify
+                            </Button>
+                            <br />
+                            <br />
+                            </div>
                         </div>
                         )}
                     </Overlay>
