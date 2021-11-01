@@ -63,6 +63,7 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
     await addDoc(collection(db, 'userQueue', currentUser.uid, 'queue'), {
         songUri: track.uri,
         songName: track.title,
+        addedAt: Timestamp.fromDate(new Date())
     });
   }
 
