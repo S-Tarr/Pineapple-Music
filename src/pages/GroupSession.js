@@ -155,7 +155,7 @@ function GroupSession() {
           inputProps={{ "aria-label": "search" }}
         />
       </Search>
-      <Container maxWidth="md">
+      <Container maxWidth="md" sx={{ marginTop: 2, paddingBottom: 4 }} >
         <Grid container alignItems="center" justifyContent="center" spacing={9}>
           <Grid
             justifyContent="center"
