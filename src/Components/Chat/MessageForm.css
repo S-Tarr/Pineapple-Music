@@ -15,11 +15,9 @@
 
 .emoji-icon {
 	flex-grow: 0.05;
-	position: absolute;
 }
 .input-field {
 	flex-grow: 2.5;
-	position: absolute;
 }
 
 
@@ -28,5 +26,4 @@
 	display: flex;
 	justify-content: right; */
 	flex-grow   : 0.7;
-	position: absolute;
 }
