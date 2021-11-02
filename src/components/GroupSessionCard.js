@@ -18,12 +18,18 @@ function GroupSessionCard({
   const [anchorEl, setAnchorEl] = React.useState(null);
   const { joinGroupSession } = useAuth();
 
-  const history = useHistory()
+  const history = useHistory();
   async function handleJoin() {
     joinGroupSession(sessionId, username);
     history.push({
-      pathname: '/groupsessionhome',
-      props: {title: title, imageUrl: imageUrl, username: username, createdAt: createdAt, sessionId: sessionId}
+      pathname: "/groupsessionhome",
+      props: {
+        title: title,
+        imageUrl: imageUrl,
+        username: username,
+        createdAt: createdAt,
+        sessionId: sessionId,
+      },
     });
   }
 
@@ -62,7 +68,9 @@ function GroupSessionCard({
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" onClick={handleJoin}>Join</Button>
+        <Button size="small" onClick={handleJoin}>
+          Join
+        </Button>
         <Button
           size="small"
           onClick={(event) => {

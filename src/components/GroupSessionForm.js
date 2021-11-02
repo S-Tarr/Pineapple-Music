@@ -65,8 +65,6 @@ function GroupSessionForm(props) {
     addGroupSession(nameRef.current.value, idRef.current.value);
   }
 
-  useEffect(() => {}, [error]);
-
   return (
     <>
       <Typography id="modal-modal-title" variant="h6" component="h2">

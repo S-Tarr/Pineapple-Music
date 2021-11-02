@@ -83,8 +83,11 @@ const ChatRoom = ({ groupSessionID, groupSessionTitle }) => {
         <div>
           <MessageForm groupSessionID={groupSessionID} />
         </div>
-        <div style={{ display: "flex", justifyContent: 'flex-end' }}>
-          <UserList sessionId={groupSessionID} style={{ marginLeft: "auto", marginTop: "3rem" }} />
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <UserList
+            sessionId={groupSessionID}
+            style={{ marginLeft: "auto", marginTop: "3rem" }}
+          />
         </div>
       </div>
     </>
