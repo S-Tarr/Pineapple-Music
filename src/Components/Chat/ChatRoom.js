@@ -13,16 +13,14 @@ import {
 } from "firebase/firestore";
 import "../../pages/Pages.css";
 
-import UserList from "../UserList";
-
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
 const msgLstStyle = {
-  "padding-bottom": "50px",
-  position: "fixed",
-  height: "100%",
-  width: "100%",
+  "padding-bottom": "200px",
+  "position": "fixed",
+  "height": "100%",
+  "width": "100%",
   "overflow-y": "scroll",
   "background-image": "linear-gradient(90deg, #3a9c, #4f7a)",
 };
@@ -33,22 +31,18 @@ const userListStyle = {
 };
 
 function GetChatMessages(groupSessionID, muted) {
-  console.log(auth.currentUser.uid);
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    let unsubscribe = null;
-    if (muted === false) {
-      const messagesRef = collection(db, "messages", groupSessionID, "chat");
-      const messagesQuery = query(messagesRef, orderBy("createdAt"), limit(25));
-      unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
-        let messages = [];
-        querySnapshot.forEach((doc) => {
-          messages.push(doc.data());
-        });
-        setMessages(messages);
+    const messagesRef = collection(db, "messages", groupSessionID, "chat");
+    const messagesQuery = query(messagesRef, orderBy("createdAt"), limit(25));
+    const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
+      let messages = [];
+      querySnapshot.forEach((doc) => {
+        messages.push(doc.data());
       });
-    }
+      setMessages(messages);
+    });
     return () => unsubscribe;
   }, []);
 
@@ -57,19 +51,25 @@ function GetChatMessages(groupSessionID, muted) {
 
 function MessageList({ groupSessionID, muted }) {
   const messages = GetChatMessages(groupSessionID, muted);
-  return (
-    <div style={msgLstStyle}>
-      {messages.length
-        ? messages.map((message, i) => (
-            <ChatMessage
-              key={i}
-              message={message}
-              currUser={auth.currentUser.uid}
-            />
-          ))
-        : null}
-    </div>
-  );
+
+  console.log("muted: ", muted)
+  if (muted === false) {
+    return (
+      <div style={msgLstStyle}>
+        {messages.length
+          ? messages.map((message, i) => (
+              <ChatMessage
+                key={i}
+                message={message}
+                currUser={auth.currentUser.uid}
+              />
+            ))
+          : null}
+      </div>
+    );
+  } else {
+    return <div></div>
+  }
 }
 
 const ChatRoom = ({ groupSessionID }) => {
@@ -83,12 +83,6 @@ const ChatRoom = ({ groupSessionID }) => {
         </div>
         <div>
           <MessageForm groupSessionID={groupSessionID} muted={muted} setMuted={setMuted}/>
-        </div>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <UserList
-            sessionId={groupSessionID}
-            style={{ marginLeft: "auto", marginTop: "3rem" }}
-          />
         </div>
       </div>
     </>
