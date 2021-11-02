@@ -22,7 +22,7 @@ const msgLstStyle = {
   "padding-bottom": "50px",
   position: "fixed",
   height: "100%",
-  width: "81%",
+  width: "100%",
   "overflow-y": "scroll",
   "background-image": "linear-gradient(90deg, #3a9c, #4f7a)",
 };

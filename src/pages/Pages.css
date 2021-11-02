@@ -72,7 +72,7 @@
 
 .info-section {
     display: flex;
-    min-height: 10vh;
+    height: 15vh;
     position: sticky;
     top: 0;
     justify-content: center;

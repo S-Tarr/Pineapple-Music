@@ -97,7 +97,7 @@ export default class GroupSessionJoined extends React.Component{
                         <Button variant="danger" ref={this.inputRef} onClick={this.handleShow.bind(this)}>
                             {this.state.buttonMessage}
                         </Button>
-                        {/* <Overlay target={this.inputRef.current} show={this.state.show} placement="right">
+                        <Overlay target={this.inputRef.current} show={this.state.show} placement="right">
                             {({ placement, arrowProps, show: _show, popper, ...props }) => (
                             <div
                                 {...props}
@@ -132,7 +132,7 @@ export default class GroupSessionJoined extends React.Component{
                                 </div>
                             </div>
                             )}
-                        </Overlay> */}
+                        </Overlay>
                     </div>
                     <div className="Player-Div">
                         <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }}/></button>
