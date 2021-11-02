@@ -91,6 +91,18 @@
     background-image: linear-gradient(90deg, #3a9c, #4f7a);
 }
 
+.muted-page {
+    padding-bottom: 200px;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    /* overflow-y: scroll; */
+    background-image: linear-gradient(90deg, #3a9c, #4f7a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @media (prefers-reduced-motion: no-preference) {
 .App-Logo {
     animation: App-logo-spin infinite 20s linear;

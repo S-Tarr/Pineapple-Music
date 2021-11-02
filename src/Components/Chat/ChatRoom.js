@@ -12,6 +12,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import "../../pages/Pages.css";
+import MicOffIcon from '@mui/icons-material/MicOff';
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
@@ -68,7 +69,9 @@ function MessageList({ groupSessionID, muted }) {
       </div>
     );
   } else {
-    return <div></div>
+    return <div className="muted-page">
+            <MicOffIcon sx={{ fontSize: 300, marginRight: 25 }}></MicOffIcon>
+          </div>
   }
 }
 
