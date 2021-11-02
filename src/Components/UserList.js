@@ -23,7 +23,8 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 const storage = getStorage(); //Firebase Storage
 const db = getFirestore(app); // Firestore database
 
-function ListInDrawer({ users }) {
+function ListInDrawer({sessionId}) {
+  const users = GetUsers(sessionId)
   let key = 0;
   return (
     <>
@@ -103,8 +104,6 @@ function UserList({ sessionId }) {
     setState({ ...state, [anchor]: open });
   };
 
-  const users = GetUsers(sessionId);
-
   return (
     <div>
       <Fragment key={anchor}>
@@ -118,7 +117,7 @@ function UserList({ sessionId }) {
           onClose={toggleDrawer(anchor, false)}
           onOpen={toggleDrawer(anchor, true)}
         >
-          <ListInDrawer users={users} />
+          <ListInDrawer sessionId={sessionId}/>
         </SwipeableDrawer>
       </Fragment>
     </div>
