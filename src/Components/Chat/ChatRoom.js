@@ -31,28 +31,31 @@ const userListStyle = {
   marginRight: "0rem",
 };
 
-function GetChatMessages(groupSessionID) {
+function GetChatMessages(groupSessionID, muted) {
   console.log(auth.currentUser.uid);
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    const messagesRef = collection(db, "messages", groupSessionID, "chat");
-    const messagesQuery = query(messagesRef, orderBy("createdAt"), limit(25));
-    const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
-      let messages = [];
-      querySnapshot.forEach((doc) => {
-        messages.push(doc.data());
+    let unsubscribe = null;
+    if (muted === false) {
+      const messagesRef = collection(db, "messages", groupSessionID, "chat");
+      const messagesQuery = query(messagesRef, orderBy("createdAt"), limit(25));
+      unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
+        let messages = [];
+        querySnapshot.forEach((doc) => {
+          messages.push(doc.data());
+        });
+        setMessages(messages);
       });
-      setMessages(messages);
-    });
+    }
     return () => unsubscribe;
   }, []);
 
   return messages;
 }
 
-function MessageList({ groupSessionID }) {
-  const messages = GetChatMessages(groupSessionID);
+function MessageList({ groupSessionID, muted }) {
+  const messages = GetChatMessages(groupSessionID, muted);
   return (
     <div style={msgLstStyle}>
       {messages.length
@@ -68,20 +71,17 @@ function MessageList({ groupSessionID }) {
   );
 }
 
-const ChatRoom = ({ groupSessionID, groupSessionTitle }) => {
-  // console.log("groupSessionID: ", groupSessionID);
-  // console.log("groupSessionTitle: ", groupSessionTitle);
-  const [users, setUsers] = useState([]);
-  const [text, setText] = useState("");
+const ChatRoom = ({ groupSessionID }) => {
+  const [muted, setMuted] = useState(false);
 
   return (
     <>
       <div className="messages-container Page">
         <div>
-          <MessageList groupSessionID={groupSessionID} />
+          <MessageList groupSessionID={groupSessionID} muted={muted} setMuted={setMuted}/>
         </div>
         <div>
-          <MessageForm groupSessionID={groupSessionID} />
+          <MessageForm groupSessionID={groupSessionID} muted={muted} setMuted={setMuted}/>
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <UserList
