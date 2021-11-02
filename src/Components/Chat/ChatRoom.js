@@ -13,16 +13,14 @@ import {
 } from "firebase/firestore";
 import "../../pages/Pages.css";
 
-import UserList from "../UserList";
-
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
 const msgLstStyle = {
-  "padding-bottom": "50px",
-  position: "fixed",
-  height: "100%",
-  width: "81%",
+  "padding-bottom": "200px",
+  "position": "fixed",
+  "height": "100%",
+  "width": "100%",
   "overflow-y": "scroll",
   "background-image": "linear-gradient(90deg, #3a9c, #4f7a)",
 };
@@ -85,12 +83,6 @@ const ChatRoom = ({ groupSessionID }) => {
         </div>
         <div>
           <MessageForm groupSessionID={groupSessionID} muted={muted} setMuted={setMuted}/>
-        </div>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <UserList
-            sessionId={groupSessionID}
-            style={{ marginLeft: "auto", marginTop: "3rem" }}
-          />
         </div>
       </div>
     </>

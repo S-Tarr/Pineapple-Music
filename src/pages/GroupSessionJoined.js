@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import ChatRoom from "../components/Chat/ChatRoom";
 import SearchBar from '../components/SearchBar';
+import UserList from "../components/UserList";
 
 import app from "../firebase";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
@@ -135,13 +136,14 @@ export default class GroupSessionJoined extends React.Component{
                         </Overlay> */}
                     </div>
                     <div className="Player-Div">
-                        <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }}/></button>
-                        <button className="playPauseButton"><PlayArrowRoundedIcon style={{ fontSize: 50 }}/></button>
-                        <button className="forward-rewind"><FastForwardRoundedIcon style={{ fontSize: 50 }}/></button>
+                        <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }} /></button>
+                        <button className="playPauseButton"><PlayArrowRoundedIcon style={{ fontSize: 50 }} /></button>
+                        <button className="forward-rewind"><FastForwardRoundedIcon style={{ fontSize: 50 }} /></button>
                     </div>
+                    <UserList sessionId={this.state.sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
                 </div>
-                <div className="chat-section" style={chatStyle}>
-                    <ChatRoom groupSessionID={this.state.sessionId} groupSessionTitle={this.state.title}/>
+                <div className="chat-section">
+                    <ChatRoom groupSessionID={this.state.sessionId} groupSessionTitle={this.state.title} />
                 </div>
             </div>
       );
