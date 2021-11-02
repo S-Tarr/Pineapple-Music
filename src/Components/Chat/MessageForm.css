@@ -1,23 +1,32 @@
 .message-footer {
-	position: fixed;
-	width: 100%;
-	bottom: 0;
-	border: 10mm;
+	position    : fixed;
+	width       : 100%;
+	bottom      : 0;
+	border      : 10mm;
 	border-color: blue;
 }
 
 .message-inputs {
-	display: flex;
-	flex-wrap: wrap;
+	display         : flex;
+	flex-wrap       : wrap;
+	width           : 100%;
 	background-color: lightgray;
 }
 
 .emoji-icon {
-	flex-grow: 1;
+	flex-grow: 0.05;
+	position: absolute;
 }
 .input-field {
-	flex-grow: 2;
+	flex-grow: 2.5;
+	position: absolute;
 }
+
+
 .send-button {
-	flex-grow: 1;
+	/* float: right;
+	display: flex;
+	justify-content: right; */
+	flex-grow   : 0.7;
+	position: absolute;
 }
