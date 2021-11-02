@@ -2,7 +2,8 @@ import React, { useState, useEffect, createRef } from 'react';
 import { Button } from '@mui/material';
 import Picker from 'emoji-picker-react';
 import AddReactionIcon from '@mui/icons-material/AddReaction';
-import MicOffIcon from '@mui/icons-material/MicOff';
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import SendIcon from '@mui/icons-material/Send';
 import app from '../../firebase';
 import { getAuth } from "firebase/auth";
@@ -12,9 +13,10 @@ import "./MessageForm.css";
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
-const MessageForm = ({ groupSessionID, muted, setMuted }) => {
+const MessageForm = ({ groupSessionID, muted, setMuted, messagesWaiting, setMessagesWaiting }) => {
     const [text, setText] = useState("");
     const [showEmojis, setShowEmojis] = useState(false);
+    console.log("messagesWaiting: ", messagesWaiting)
 
     const handleSubmit = async e => {
         e.preventDefault();
@@ -29,7 +31,7 @@ const MessageForm = ({ groupSessionID, muted, setMuted }) => {
 
     const muteReactions = () => {
         setMuted(!muted);
-        console.log("muted:" , muted);
+        setMessagesWaiting(false);
     }
 
     const togglePicker = () => {
@@ -53,7 +55,7 @@ const MessageForm = ({ groupSessionID, muted, setMuted }) => {
             {showEmojis ? <ReactionPicker /> : <div></div>}
             <div className="message-inputs">
                 <div className="mute-button">
-                    <Button onClick={muteReactions}><MicOffIcon /></Button>
+                    <Button onClick={muteReactions}>{(messagesWaiting && muted) ? <NotificationsActiveIcon color="primary"/> : <NotificationsOffIcon color="disabled"/>}</Button>
                 </div>
                 <div className="emoji-icon">
                     <Button onClick={togglePicker}><AddReactionIcon /></Button>
