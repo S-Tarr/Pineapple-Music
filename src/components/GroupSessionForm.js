@@ -81,6 +81,7 @@ function GroupSessionForm(props) {
           type="name"
           label="Group Session Name"
           variant="filled"
+          inputProps={{ maxLength: 15 }}
           inputRef={nameRef}
           fullWidth
         />
@@ -91,6 +92,7 @@ function GroupSessionForm(props) {
           type="id"
           label="Session ID (4 digits)"
           variant="filled"
+          inputProps={{ maxLength: 4 }}
           inputRef={idRef}
           fullWidth
         />
