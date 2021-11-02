@@ -85,53 +85,55 @@ export default class GroupSessionJoined extends React.Component{
         return (
             <div style={{backgroundColor: this.state.color, opacity: this.state.opacity}}>
                 <div className="info-section" style={infoStyle}>
-                    <Typography gutterBottom variant="h5" component="div">
-                        {this.state.title}
-                    </Typography>
-                    <text>Session ID: </text>
-                    <Typography gutterBottom variant="h5" component="div">
-                        {this.state.sessionId}
-                    </Typography>
+                    <div classname="info-items">
+                        <Typography gutterBottom variant="h5" component="div">
+                            {this.state.title}
+                        </Typography>
+                        <text>Session ID: </text>
+                        <Typography gutterBottom variant="h5" component="div">
+                            {this.state.sessionId}
+                        </Typography>
 
-                    <Button variant="danger" ref={this.inputRef} onClick={this.handleShow.bind(this)}>
-                        {this.state.buttonMessage}
-                    </Button>
-                    <Overlay target={this.inputRef.current} show={this.state.show} placement="right">
-                        {({ placement, arrowProps, show: _show, popper, ...props }) => (
-                        <div
-                            {...props}
-                            style={{
-                                flex:1,
-                                flexDirection:"column",
-                                margin:"50px",
-                                backgroundColor: "#202020",
-                                padding: '2px 10px',
-                                color: 'white',
-                                width:"600px",
-                                height:"500px",
-                                borderRadius: 50,
-                                textAlign:"center",
-                                ...props.style,
-                            }}
-                        >
-                            <text>Group Session Song Queue</text>
-                            <SearchIcon></SearchIcon>
-                            <div>
-                                <SearchBar placeholder="Enter a song name..." spotifyData={token} authorized={true} />
-                                <br />
-                            <br />
-                            <Button
-                                variant="outlined"
-                                color="primary"
+                        <Button variant="danger" ref={this.inputRef} onClick={this.handleShow.bind(this)}>
+                            {this.state.buttonMessage}
+                        </Button>
+                        {/* <Overlay target={this.inputRef.current} show={this.state.show} placement="right">
+                            {({ placement, arrowProps, show: _show, popper, ...props }) => (
+                            <div
+                                {...props}
+                                style={{
+                                    flex:1,
+                                    flexDirection:"column",
+                                    margin:"50px",
+                                    backgroundColor: "#202020",
+                                    padding: '2px 10px',
+                                    color: 'white',
+                                    width:"600px",
+                                    height:"500px",
+                                    borderRadius: 50,
+                                    textAlign:"center",
+                                    ...props.style,
+                                }}
                             >
-                                Login to Spotify
-                            </Button>
-                            <br />
-                            <br />
+                                <text>Group Session Song Queue</text>
+                                <SearchIcon></SearchIcon>
+                                <div>
+                                    <SearchBar placeholder="Enter a song name..." spotifyData={token} authorized={true} />
+                                    <br />
+                                <br />
+                                <Button
+                                    variant="outlined"
+                                    color="primary"
+                                >
+                                    Login to Spotify
+                                </Button>
+                                <br />
+                                <br />
+                                </div>
                             </div>
-                        </div>
-                        )}
-                    </Overlay>
+                            )}
+                        </Overlay> */}
+                    </div>
                     <div className="Player-Div">
                         <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }}/></button>
                         <button className="playPauseButton"><PlayArrowRoundedIcon style={{ fontSize: 50 }}/></button>
