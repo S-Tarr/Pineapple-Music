@@ -52,6 +52,37 @@ function ListInDrawer({ users }) {
   );
 }
 
+function GetUsers(sessionId) {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    setUsers([]);
+    const groupSessionRef = collection(db, "groupSessions");
+    const groupSession = query(
+      groupSessionRef,
+      where("sessionId", "==", sessionId)
+    );
+    getDocs(groupSession).then((querySnapshot) => {
+      let usersInSession = [];
+      querySnapshot.forEach((doc) => {
+        usersInSession = doc.data().users;
+      });
+      usersInSession.forEach((uid) => {
+        const props = { uid: uid, imageUrl: "" };
+        getDownloadURL(ref(storage, uid))
+          .then((url) => {
+            props.imageUrl = url;
+            setUsers((users) => [...users, props]);
+          })
+          .catch(() => {
+            setUsers((users) => [...users, props]);
+          });
+      });
+    });
+  }, []);
+  return users;
+}
+
 function UserList({ sessionId }) {
   const [state, setState] = useState({
     top: false,
@@ -72,40 +103,13 @@ function UserList({ sessionId }) {
     setState({ ...state, [anchor]: open });
   };
 
-  const [users, setUsers] = useState([]);
-
-  const getUsers = () => {
-    //useEffect(() => {
-      setUsers([]);
-      const groupSessionRef = collection(db, "groupSessions");
-      const groupSession = query(
-        groupSessionRef,
-        where("sessionId", "==", sessionId)
-      );
-      getDocs(groupSession).then((querySnapshot) => {
-        let usersInSession = [];
-        querySnapshot.forEach((doc) => {
-          usersInSession = doc.data().users;
-        });
-        usersInSession.forEach((uid) => {
-          const props = { uid: uid, imageUrl: "" };
-          getDownloadURL(ref(storage, uid))
-            .then((url) => {
-              props.imageUrl = url;
-              setUsers((users) => [...users, props]);
-            })
-            .catch(() => {
-              setUsers((users) => [...users, props]);
-            });
-        });
-      });
-    //}, []);
-  };
+  const users = GetUsers(sessionId);
 
   return (
     <div>
       <Fragment key={anchor}>
-        <IconButton onClick={() => { toggleDrawer(anchor, true); getUsers();}}>
+        {/* onClick={toggleDrawer(anchor, true)}  */}
+        <IconButton onClick={toggleDrawer(anchor, true)}>
           <PeopleAltIcon fontSize="large" />
         </IconButton>
         <SwipeableDrawer
