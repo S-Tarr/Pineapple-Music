@@ -12,7 +12,8 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import "../../pages/Pages.css";
-import MicOffIcon from '@mui/icons-material/MicOff';
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
@@ -31,7 +32,7 @@ const userListStyle = {
   marginRight: "0rem",
 };
 
-function GetChatMessages(groupSessionID, muted) {
+function GetChatMessages(groupSessionID, setMessagesWaiting) {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
@@ -43,17 +44,18 @@ function GetChatMessages(groupSessionID, muted) {
         messages.push(doc.data());
       });
       setMessages(messages);
+      setMessagesWaiting(true);
     });
     return () => unsubscribe;
   }, []);
 
+  console.log("messages: ", messages);
   return messages;
 }
 
-function MessageList({ groupSessionID, muted }) {
-  const messages = GetChatMessages(groupSessionID, muted);
+function MessageList({ groupSessionID, muted, messagesWaiting, setMessagesWaiting}) {
+  const messages = GetChatMessages(groupSessionID, setMessagesWaiting);
 
-  console.log("muted: ", muted)
   if (muted === false) {
     return (
       <div style={msgLstStyle}>
@@ -70,22 +72,23 @@ function MessageList({ groupSessionID, muted }) {
     );
   } else {
     return <div className="muted-page">
-            <MicOffIcon sx={{ fontSize: 300, marginRight: 25 }}></MicOffIcon>
+            {(messagesWaiting && muted) ? <NotificationsActiveIcon color="primary" sx={{ fontSize: 300, marginRight: 25}} /> : <NotificationsOffIcon color="disabled" sx={{ fontSize: 300, marginRight: 25}} />}
           </div>
   }
 }
 
 const ChatRoom = ({ groupSessionID }) => {
   const [muted, setMuted] = useState(false);
+  const [messagesWaiting, setMessagesWaiting] = useState(false);
 
   return (
     <>
       <div className="messages-container-page">
         <div>
-          <MessageList groupSessionID={groupSessionID} muted={muted} setMuted={setMuted}/>
+          <MessageList groupSessionID={groupSessionID} muted={muted} setMuted={setMuted} messagesWaiting={messagesWaiting} setMessagesWaiting={setMessagesWaiting}/>
         </div>
         <div>
-          <MessageForm groupSessionID={groupSessionID} muted={muted} setMuted={setMuted}/>
+          <MessageForm groupSessionID={groupSessionID} muted={muted} setMuted={setMuted} messagesWaiting={messagesWaiting} setMessagesWaiting={setMessagesWaiting}/>
         </div>
       </div>
     </>

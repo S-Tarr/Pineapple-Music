@@ -1,15 +1,15 @@
 .message-footer {
-	position    : fixed;
-	width       : 100%;
-	bottom      : 0;
-	border      : 10mm;
+	position: fixed;
+	width: 100%;
+	bottom: 0;
+	border: 10mm;
 	border-color: blue;
 }
 
 .message-inputs {
-	display         : flex;
-	flex-wrap       : wrap;
-	width           : 100%;
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
 	background-color: lightgray;
 }
 
@@ -20,10 +20,6 @@
 	flex-grow: 2.5;
 }
 
-
 .send-button {
-	/* float: right;
-	display: flex;
-	justify-content: right; */
-	flex-grow   : 0.7;
+	flex-grow: 0.85;
 }

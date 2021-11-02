@@ -1,8 +1,9 @@
-import React, { useState, useEffect, createRef } from "react";
+import React, { useState } from "react";
 import { Button, TextField } from "@mui/material";
 import Picker from "emoji-picker-react";
 import AddReactionIcon from "@mui/icons-material/AddReaction";
-import MicOffIcon from "@mui/icons-material/MicOff";
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import SendIcon from "@mui/icons-material/Send";
 import app from "../../firebase";
 import { getAuth } from "firebase/auth";
@@ -17,7 +18,7 @@ import "./MessageForm.css";
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
-const MessageForm = ({ groupSessionID, muted, setMuted }) => {
+const MessageForm = ({ groupSessionID, muted, setMuted, messagesWaiting, setMessagesWaiting }) => {
   const [text, setText] = useState("");
   const [showEmojis, setShowEmojis] = useState(false);
 
@@ -32,10 +33,10 @@ const MessageForm = ({ groupSessionID, muted, setMuted }) => {
     setText("");
   };
 
-  const muteReactions = () => {
-    setMuted(!muted);
-    console.log("muted:", muted);
-  };
+    const muteReactions = () => {
+        setMuted(!muted);
+        setMessagesWaiting(false);
+    }
 
   const togglePicker = () => {
     setShowEmojis(!showEmojis);
@@ -59,7 +60,7 @@ const MessageForm = ({ groupSessionID, muted, setMuted }) => {
       <div className="message-inputs">
         <div className="mute-button">
           <Button onClick={muteReactions}>
-            <MicOffIcon />
+            {(messagesWaiting && muted) ? <NotificationsActiveIcon color="primary"/> : <NotificationsOffIcon color="disabled"/>}
           </Button>
         </div>
         <div className="emoji-icon">
@@ -68,13 +69,6 @@ const MessageForm = ({ groupSessionID, muted, setMuted }) => {
           </Button>
         </div>
         <div className="input-field">
-          {/* <input
-            type="text"
-            readOnly="true"
-            placeholder="Enter reaction"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          /> */}
           <TextField
             type="text"
             InputProps={{
