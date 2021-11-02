@@ -117,13 +117,12 @@ function GroupSession() {
   useEffect(() => {
     if (sessionIdRef.current.value === "") {
       getGroupSessions().then((sessions) => {
-        console.log("get cards when search is empty");
         addCard([]);
         addCard(sessions);
         setLoading(false);
       });
     }
-  }, [sessionIdRef.current.value, loading]);
+  }, [sessionIdRef.current.value, loading, getGroupSessions]);
 
   const handleCreate = (title, sessionId) => {
     props["title"] = title;
@@ -131,6 +130,8 @@ function GroupSession() {
     props["username"] = auth.currentUser.uid;
     addCard([props, ...cards]);
   };
+
+  let key = 0;
 
   return (
     <div className="Page" align="center">
@@ -187,7 +188,7 @@ function GroupSession() {
         ) : (
           <Grid container alignItems="center" spacing={9}>
             {cards.map((card) => (
-              <Grid item key={card} xs={12} sm={6} md={4}>
+              <Grid item key={key++} xs={12} sm={6} md={4}>
                 <GroupSessionCard props={card} />
               </Grid>
             ))}

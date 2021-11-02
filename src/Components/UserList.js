@@ -1,82 +1,109 @@
-import React, { useRef, useState } from "react";
-import { Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
+import React, { Fragment, useEffect, useState } from "react";
+import {
+  Avatar,
+  IconButton,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  SwipeableDrawer,
+} from "@mui/material";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import app from "../firebase";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "firebase/firestore";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
-import { useAuth } from "../contexts/AuthContext";
+const storage = getStorage(); //Firebase Storage
+const db = getFirestore(app); // Firestore database
 
-function UserList(props) {
-  const nameRef = useRef();
-  const idRef = useRef();
-
-  const { addGroupSession } = useAuth();
-
+function ListInDrawer({ users }) {
+  let key = 0;
   return (
     <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Brunch this weekend?"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: "inline" }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                Ali Connors
-              </Typography>
-              {" — I'll be in your neighborhood doing errands this…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Summer BBQ"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: "inline" }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                to Scott, Alex, Jennifer
-              </Typography>
-              {" — Wish I could come, but I'm out of town this…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Oui Oui"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: "inline" }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                Sandra Adams
-              </Typography>
-              {" — Do you have Paris recommendations? Have you ever…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
+      {users.map((user) => (
+        <ListItem key={key++} alignItems="center">
+          <ListItemAvatar>
+            <Avatar alt={user.uid} src={user.imageUrl} />
+          </ListItemAvatar>
+          <ListItemText primary={user.uid} />
+        </ListItem>
+      ))}
     </List>
+  );
+}
+
+function UserList({ sessionId }) {
+  const [state, setState] = useState({
+    top: false,
+    left: false,
+    bottom: false,
+    right: false,
+  });
+  const anchor = "right";
+
+  const toggleDrawer = (anchor, open) => (event) => {
+    if (
+      event &&
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+    setState({ ...state, [anchor]: open });
+  };
+
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    setUsers([]);
+    const groupSessionRef = collection(db, "groupSessions");
+    const groupSession = query(
+      groupSessionRef,
+      where("sessionId", "==", sessionId)
+    );
+    getDocs(groupSession).then((querySnapshot) => {
+      let usersInSession = [];
+      querySnapshot.forEach((doc) => {
+        console.log(doc.data().users);
+        usersInSession = doc.data().users;
+      });
+      usersInSession.forEach((uid) => {
+        const props = { uid: uid, imageUrl: "" };
+        console.log("looping through ids rn", uid);
+        getDownloadURL(ref(storage, uid))
+          .then((url) => {
+            props.imageUrl = url;
+            setUsers((users) => [...users, props]);
+          })
+          .catch(() => {
+            setUsers((users) => [...users, props]);
+          });
+      });
+    });
+  }, [sessionId]);
+
+  return (
+    <div>
+      <Fragment key={anchor}>
+        <IconButton onClick={toggleDrawer(anchor, true)}>
+          <PeopleAltIcon fontSize="large" />
+        </IconButton>
+        <SwipeableDrawer
+          anchor={anchor}
+          open={state[anchor]}
+          onClose={toggleDrawer(anchor, false)}
+          onOpen={toggleDrawer(anchor, true)}
+        >
+          <ListInDrawer users={users} />
+        </SwipeableDrawer>
+      </Fragment>
+    </div>
   );
 }
 

@@ -20,7 +20,7 @@ function GroupSessionCard({
 
   const history = useHistory()
   async function handleJoin() {
-    const joinGroup = joinGroupSession(sessionId, username);
+    joinGroupSession(sessionId, username);
     history.push({
       pathname: '/groupsessionhome',
       props: {title: title, imageUrl: imageUrl, username: username, createdAt: createdAt, sessionId: sessionId}
