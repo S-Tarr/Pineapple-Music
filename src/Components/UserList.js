@@ -7,6 +7,7 @@ import {
   ListItemAvatar,
   ListItemText,
   SwipeableDrawer,
+  Typography,
 } from "@mui/material";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import app from "../firebase";
@@ -25,16 +26,29 @@ const db = getFirestore(app); // Firestore database
 function ListInDrawer({ users }) {
   let key = 0;
   return (
-    <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
-      {users.map((user) => (
-        <ListItem key={key++} alignItems="center">
-          <ListItemAvatar>
-            <Avatar alt={user.uid} src={user.imageUrl} />
-          </ListItemAvatar>
-          <ListItemText primary={user.uid} />
-        </ListItem>
-      ))}
-    </List>
+    <>
+      <br />
+      <div align="center">
+        <Typography
+          sx={{ fontWeight: "bold" }}
+          variant="h5"
+          component="div"
+          gutterBottom
+        >
+          Group Members
+        </Typography>{" "}
+      </div>
+      <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
+        {users.map((user) => (
+          <ListItem key={key++} alignItems="center">
+            <ListItemAvatar>
+              <Avatar alt={user.uid} src={user.imageUrl} />
+            </ListItemAvatar>
+            <ListItemText primary={user.uid} />
+          </ListItem>
+        ))}
+      </List>
+    </>
   );
 }
 

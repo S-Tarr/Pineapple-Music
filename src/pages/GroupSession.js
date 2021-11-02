@@ -135,13 +135,14 @@ function GroupSession() {
 
   return (
     <div className="Page" align="center">
+      <br />
       <Typography
         sx={{ fontWeight: "bold" }}
-        variant="h2"
+        variant="h3"
         component="div"
         gutterBottom
       >
-        Your Group Sessions
+        Group Sessions
       </Typography>
       <Search>
         <SearchIconWrapper>
