@@ -52,26 +52,7 @@ function ListInDrawer({ users }) {
   );
 }
 
-function UserList({ sessionId }) {
-  const [state, setState] = useState({
-    top: false,
-    left: false,
-    bottom: false,
-    right: false,
-  });
-  const anchor = "right";
-
-  const toggleDrawer = (anchor, open) => (event) => {
-    if (
-      event &&
-      event.type === "keydown" &&
-      (event.key === "Tab" || event.key === "Shift")
-    ) {
-      return;
-    }
-    setState({ ...state, [anchor]: open });
-  };
-
+function GetUsers(sessionId) {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -99,10 +80,35 @@ function UserList({ sessionId }) {
       });
     });
   }, []);
+  return users;
+}
+
+function UserList({ sessionId }) {
+  const [state, setState] = useState({
+    top: false,
+    left: false,
+    bottom: false,
+    right: false,
+  });
+  const anchor = "right";
+
+  const toggleDrawer = (anchor, open) => (event) => {
+    if (
+      event &&
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+    setState({ ...state, [anchor]: open });
+  };
+
+  const users = GetUsers(sessionId);
 
   return (
     <div>
       <Fragment key={anchor}>
+        {/* onClick={toggleDrawer(anchor, true)}  */}
         <IconButton onClick={toggleDrawer(anchor, true)}>
           <PeopleAltIcon fontSize="large" />
         </IconButton>
