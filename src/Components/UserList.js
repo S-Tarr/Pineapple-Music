@@ -98,7 +98,7 @@ function UserList({ sessionId }) {
           });
       });
     });
-  }, [sessionId]);
+  }, []);
 
   return (
     <div>
