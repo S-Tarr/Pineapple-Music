@@ -25,7 +25,6 @@ import {
   collection,
   addDoc,
   Timestamp,
-  getDoc,
   getDocs,
   updateDoc,
   arrayUnion,
@@ -99,15 +98,13 @@ export function AuthProvider({ children }) {
   }
 
   async function joinGroupSession(sessionId) {
-    console.log("tyring to join a group session");
     try {
       const docSnapSessions = await getDocs(collection(db, "groupSessions"));
       docSnapSessions.forEach((currDoc) => {
         if (currDoc.data().sessionId === sessionId) {
-          console.log("found a group session");
           const sessionRef = doc(db, "groupSessions", currDoc.id);
           console.log("sessionRef", sessionRef);
-          const updated = updateDoc(sessionRef, {
+          updateDoc(sessionRef, {
             users: arrayUnion(currentUser.uid),
           });
         }
@@ -116,7 +113,6 @@ export function AuthProvider({ children }) {
       docSnapUsers.forEach((currDoc) => {
         if (currDoc.data().uid === currentUser.uid) {
           const userRef = doc(db, "users", currDoc.id);
-          console.log(sessionId);
           updateDoc(userRef, {
             groupSessions: arrayUnion(sessionId),
           });
@@ -145,7 +141,6 @@ export function AuthProvider({ children }) {
             var date = getFormattedDate(
               new Date(doc.data().createdAt.seconds * 1000)
             );
-            console.log(date);
             props["createdAt"] = date;
             props["title"] = doc.data().name;
             props["username"] = doc.data().ownerUid;
@@ -182,7 +177,6 @@ export function AuthProvider({ children }) {
             var date = getFormattedDate(
               new Date(doc.data().createdAt.seconds * 1000)
             );
-            console.log(date);
             props["createdAt"] = date;
             props["title"] = doc.data().name;
             props["username"] = doc.data().ownerUid;
@@ -194,7 +188,6 @@ export function AuthProvider({ children }) {
     } catch (e) {
       console.error("Error getting doc in getYourGroupSessions: ", e);
     }
-    console.log("cards: ", cards);
     return cards;
   }
 
@@ -203,14 +196,12 @@ export function AuthProvider({ children }) {
     try {
       if (currentUser !== undefined) {
         let currGroupSessions = new Set();
-        console.log("getting group sessions new function: ", currentUser.uid);
         const docSnap = await getDocs(collection(db, "users"));
         docSnap.forEach((doc) => {
           if (doc.data().uid === currentUser.uid) {
             doc
               .data()
               .groupSessions.forEach((item) => currGroupSessions.add(item));
-            console.log(currGroupSessions);
           }
         });
         const docSnapSessions = await getDocs(collection(db, "groupSessions"));
@@ -224,7 +215,6 @@ export function AuthProvider({ children }) {
             sessionId: 1234,
           };
           if (currGroupSessions.has(doc.data().sessionId)) {
-            console.log(doc.data());
             var date = getFormattedDate(
               new Date(doc.data().createdAt.seconds * 1000)
             );

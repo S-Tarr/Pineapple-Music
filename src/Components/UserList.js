@@ -70,12 +70,10 @@ function UserList({ sessionId }) {
     getDocs(groupSession).then((querySnapshot) => {
       let usersInSession = [];
       querySnapshot.forEach((doc) => {
-        console.log(doc.data().users);
         usersInSession = doc.data().users;
       });
       usersInSession.forEach((uid) => {
         const props = { uid: uid, imageUrl: "" };
-        console.log("looping through ids rn", uid);
         getDownloadURL(ref(storage, uid))
           .then((url) => {
             props.imageUrl = url;
