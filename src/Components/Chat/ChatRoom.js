@@ -24,6 +24,7 @@ const msgLstStyle = {
   height: "100%",
   width: "81%",
   "overflow-y": "scroll",
+  "background-image": "linear-gradient(90deg, #3a9c, #4f7a)",
 };
 
 const userListStyle = {
@@ -76,7 +77,7 @@ const ChatRoom = ({ groupSessionID, groupSessionTitle }) => {
 
   return (
     <>
-      <div className="messages-container Page">
+      <div className="messages-container-page">
         <div>
           <MessageList groupSessionID={groupSessionID} />
         </div>
