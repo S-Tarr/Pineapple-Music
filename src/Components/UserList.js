@@ -74,36 +74,38 @@ function UserList({ sessionId }) {
 
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    setUsers([]);
-    const groupSessionRef = collection(db, "groupSessions");
-    const groupSession = query(
-      groupSessionRef,
-      where("sessionId", "==", sessionId)
-    );
-    getDocs(groupSession).then((querySnapshot) => {
-      let usersInSession = [];
-      querySnapshot.forEach((doc) => {
-        usersInSession = doc.data().users;
+  const getUsers = () => {
+    //useEffect(() => {
+      setUsers([]);
+      const groupSessionRef = collection(db, "groupSessions");
+      const groupSession = query(
+        groupSessionRef,
+        where("sessionId", "==", sessionId)
+      );
+      getDocs(groupSession).then((querySnapshot) => {
+        let usersInSession = [];
+        querySnapshot.forEach((doc) => {
+          usersInSession = doc.data().users;
+        });
+        usersInSession.forEach((uid) => {
+          const props = { uid: uid, imageUrl: "" };
+          getDownloadURL(ref(storage, uid))
+            .then((url) => {
+              props.imageUrl = url;
+              setUsers((users) => [...users, props]);
+            })
+            .catch(() => {
+              setUsers((users) => [...users, props]);
+            });
+        });
       });
-      usersInSession.forEach((uid) => {
-        const props = { uid: uid, imageUrl: "" };
-        getDownloadURL(ref(storage, uid))
-          .then((url) => {
-            props.imageUrl = url;
-            setUsers((users) => [...users, props]);
-          })
-          .catch(() => {
-            setUsers((users) => [...users, props]);
-          });
-      });
-    });
-  }, []);
+    //}, []);
+  };
 
   return (
     <div>
       <Fragment key={anchor}>
-        <IconButton onClick={toggleDrawer(anchor, true)}>
+        <IconButton onClick={() => { toggleDrawer(anchor, true); getUsers();}}>
           <PeopleAltIcon fontSize="large" />
         </IconButton>
         <SwipeableDrawer
