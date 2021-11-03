@@ -16,7 +16,6 @@ import PrivateRoute from "./components/PrivateRoute";
 import SongPage from "./pages/SongPage";
 import SearchPage from "./pages/SearchPage";
 import AddProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
-import Visualizer from "./pages/Visualizer";
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 
@@ -25,7 +24,6 @@ export const NavBarContext = createContext();
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [navigation, setNavigation] = useState(true);
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -56,7 +54,6 @@ function App() {
                     <Route path="/myaccount" component={MyAccount} />
                     <Route path="/profilepicture" component={AddProfilePicture} />
                     <Route path="/song" component={SongPage}/>
-                    <Route path="/visual" component={Visualizer}/>
                     <Route path="/groupsessionhome" component={GroupSessionJoined}/>
                   </Switch>
                 </div>

@@ -5,9 +5,9 @@ import songFile from './rocketMan.wav';
 let ctx, x_end, y_end, bar_height;
 
 // constants
-const width = window.innerWidth;
-const height = window.innerHeight;
-const bars = 555;
+const width = window.innerWidth / 1.5;
+const height = window.innerHeight / 1.3;
+const bars = 360;
 const bar_width = 1;
 const radius = 0;
 const center_x = width / 2;
