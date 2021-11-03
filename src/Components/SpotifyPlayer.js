@@ -3,51 +3,43 @@ import SpotifyPlayer from "react-spotify-web-playback"
 import app from "../firebase";
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection, query, orderBy, limit, getDoc, doc, onSnapshot} from "firebase/firestore";
+import { useScrollTrigger } from "@material-ui/core";
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
-function GetQueue() {
-  const [songQueue, setSongQueue] = useState();
-  const currentUser = auth.currentUser;
 
-  useEffect(() => {
-    const queueRef = collection(db, 'userQueue', currentUser.uid, 'queue');
-    const queueQuery = query(queueRef, orderBy('addedAt'), limit(25));
-    const unsubscribe = onSnapshot(queueQuery, querySnapshot => {
-        let queue = [];
-        querySnapshot.forEach(doc => {
-            var data = doc.data();
-            queue.push(data.songUri);
-        })
-        setSongQueue(queue.reverse());
-    })
-    return () => unsubscribe;
-  }, [])
-
-  return songQueue;
-}
-
-async function getAccessToken() {
-  const docRef = doc(db, "users", auth.currentUser.uid);
-  const docSnap = await getDoc(docRef);
-  return docSnap.data();
-}
 
 export default function Player() {
 
   const [accessToken, setAccessToken] = useState("")
-  var promise = getAccessToken();
-  promise.then((ret) => {
-    setAccessToken(ret.SpotifyToken);
-  });
-  console.log(accessToken);
+  const [queue, setQueue] = useState([]);
+
+  useEffect(() => {
+    const coRef = collection(db, 'users');
+    const docRef = doc(coRef, auth.currentUser.uid);
+    const docSnap = getDoc(docRef);
+    docSnap.data().then((ret) => {
+      setAccessToken(ret.SpotifyToken);
+    });
+    console.log(accessToken);
+  })
+  useEffect(() => { 
+      let tempQueue = [];
+      const currentUser = auth.currentUser;
+      const queueRef = collection(db, 'userQueue', currentUser.uid, 'queue');
+      const queueQuery = query(queueRef, orderBy('addedAt'), limit(25));
+      onSnapshot(queueQuery, querySnapshot => {
+        querySnapshot.forEach(doc => {
+            var data = doc.data();
+            tempQueue.push(data.songUri);
+        })
+      })
+      setQueue(tempQueue.reverse());
+
+  })
   
-
-
-  const [play, setPlay] = useState(false)
-  let queue = GetQueue();
-  console.log(queue);
+  const [play, setPlay] = useState(false);
  
   if (!accessToken) return null
   return (
