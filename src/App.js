@@ -17,6 +17,8 @@ import SongPage from "./pages/SongPage";
 import SearchPage from "./pages/SearchPage";
 import AddProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import Visualizer from "./pages/Visualizer";
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
 
 const auth = getAuth();
 
@@ -34,35 +36,37 @@ function App() {
   });
   
   return (
-    <Router>
-      <AuthProvider>
-        <Switch>
-          <Route path="/signup" component={Signup}/>
-          <Route path="/login" component={Login}/>
-          <Route path="/resetpassword" component = {ResetPassword}/>
-          {loggedIn ? 
-            <div className="container" >
-              <Navbar />
-              <div className="content">
-                <Switch>
-                  <Route exact path="/Pineapple-Music" component={Home} />
-                  <Route path="/search" component={SearchPage} />
-                  <Route path="/creategroup" component={GroupSession} />
-                  <Route path="/myaccount" component={MyAccount} />
-                  <Route path="/profilepicture" component={AddProfilePicture} />
-                  <Route path="/song" component={SongPage}/>
-                  <Route path="/visual" component={Visualizer}/>
-                  <Route path="/groupsessionhome" component={GroupSessionJoined}/>
-                </Switch>
+    <DndProvider backend={HTML5Backend}>
+      <Router>
+        <AuthProvider>
+          <Switch>
+            <Route path="/signup" component={Signup}/>
+            <Route path="/login" component={Login}/>
+            <Route path="/resetpassword" component = {ResetPassword}/>
+            {loggedIn ? 
+              <div className="container" >
+                <Navbar />
+                <div className="content">
+                  <Switch>
+                    <Route exact path="/Pineapple-Music" component={Home} />
+                    <Route path="/search" component={SearchPage} />
+                    <Route path="/creategroup" component={GroupSession} />
+                    <Route path="/myaccount" component={MyAccount} />
+                    <Route path="/profilepicture" component={AddProfilePicture} />
+                    <Route path="/song" component={SongPage}/>
+                    <Route path="/visual" component={Visualizer}/>
+                    <Route path="/groupsessionhome" component={GroupSessionJoined}/>
+                  </Switch>
+                </div>
               </div>
-            </div>
 
-          : null
-          // : <Redirect to="/login" />
-        }
-        </Switch>
-      </AuthProvider>
-    </Router>
+            : null
+            // : <Redirect to="/login" />
+          }
+          </Switch>
+        </AuthProvider>
+      </Router>
+    </DndProvider>
   );
 }
 

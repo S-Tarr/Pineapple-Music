@@ -2,17 +2,10 @@ import React, { useState, createRef } from "react";
 
 import Overlay from 'react-bootstrap/Overlay';
 import Button from 'react-bootstrap/Button';
-import SearchIcon from '@mui/icons-material/Search';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
-import {
-  Box,
-  Grid,
-  IconButton,
-  Modal,
-  Typography,
-} from "@mui/material";
+import { Typography } from "@mui/material";
 import ChatRoom from "../components/Chat/ChatRoom";
-import SearchBar from '../components/SearchBar';
 import UserList from "../components/UserList";
 
 import app from "../firebase";
@@ -25,10 +18,12 @@ import {
   getDoc,
   setDoc,
 } from "firebase/firestore";
+
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
-import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
 import FastRewindRoundedIcon from '@mui/icons-material/FastRewindRounded';
 import FastForwardRoundedIcon from '@mui/icons-material/FastForwardRounded';
+import { useDrag } from 'react-dnd';
+import GroupSessionQueueDisplay from "../components/GroupSessionQueueDisplay";
 
 const pgStyle = {
     "display": "flex",
@@ -47,6 +42,8 @@ export default class GroupSessionJoined extends React.Component{
     constructor (props) {
         super(props);
         this.inputRef = createRef();
+        this.inputRef2 = createRef();
+
         this.state = {
             title: props.location.props.title,
             sessionId: props.location.props.sessionId,
@@ -54,11 +51,13 @@ export default class GroupSessionJoined extends React.Component{
             username: props.location.props.username, 
             createdAt: props.location.props.createdAt,
             show :false,
+            showSearch : false,
             opacity:1,
             color : "rgba(" +40 + "," + 40 + "," + 40 + "," + 0.2 + ")",
             buttonMessage :"Open Song Queue",
             isPlaying: false,
         }
+        console.log(props);
     }
     handleShow (event) {
         this.setState({
@@ -80,70 +79,70 @@ export default class GroupSessionJoined extends React.Component{
         }
     };
 
+    handleSearchButton (event) {
+        this.setState({
+            showSearch: !this.state.showSearch,
+        })
+    }
+
     render () {
         // const groupSession = useLocation();
         const token = "";
+
+        // const cars = ["Saab by Drake", "Volvo by Kanye West", "BMW by J-Cole" , "Volvo by Drake", "BMW" , "Volvo", "BMW" , "Volvo", "BMW"];
+        // const listItems = cars.map((number) =>
+        //     <li>{number}</li>
+        // );
+
         return (
             <div style={{backgroundColor: this.state.color, opacity: this.state.opacity}}>
-                <div className="info-section" style={infoStyle}>
-                    <div classname="info-items">
-                        <Typography gutterBottom variant="h5" component="div">
-                            {this.state.title}
-                        </Typography>
-                        <text>Session ID: </text>
-                        <Typography gutterBottom variant="h5" component="div">
-                            {this.state.sessionId}
-                        </Typography>
 
-                        <Button variant="danger" ref={this.inputRef} onClick={this.handleShow.bind(this)}>
-                            {this.state.buttonMessage}
-                        </Button>
-                        <Overlay target={this.inputRef.current} show={this.state.show} placement="right">
-                            {({ placement, arrowProps, show: _show, popper, ...props }) => (
-                            <div
-                                {...props}
-                                style={{
-                                    flex:1,
-                                    flexDirection:"column",
-                                    margin:"50px",
-                                    backgroundColor: "#202020",
-                                    padding: '2px 10px',
-                                    color: 'white',
-                                    width:"600px",
-                                    height:"500px",
-                                    borderRadius: 50,
-                                    textAlign:"center",
-                                    ...props.style,
-                                }}
-                            >
-                                <text>Group Session Song Queue</text>
-                                <SearchIcon></SearchIcon>
-                                <div>
-                                    <SearchBar placeholder="Enter a song name..." spotifyData={token} authorized={true} />
-                                    <br />
-                                <br />
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                >
-                                    Login to Spotify
-                                </Button>
-                                <br />
-                                <br />
-                                </div>
-                            </div>
-                            )}
-                        </Overlay>
-                    </div>
+                <div className="info-section" style={infoStyle}>
+                    <Typography gutterBottom variant="h5" component="div">
+                        {this.state.title}
+                    </Typography>
+                    <text>Session ID: </text>
+                    <Typography gutterBottom variant="h5" component="div">
+                        {this.state.sessionId}
+                    </Typography>
+
+                    <Button variant="danger" ref={this.inputRef} onClick={this.handleShow.bind(this)}>
+                        {this.state.buttonMessage}
+                    </Button>
+                    <Overlay target={this.inputRef.current} show={this.state.show} placement="bottom">
+                        {({ placement, arrowProps, show: _show, popper, ...props }) => (
+                        <div
+                            {...props}
+                            style={{
+                                display: "flex",
+                                flexDirection:"column",
+                                margin:"50px",
+                                backgroundColor: "#202020",
+                                padding: '2px 10px',
+                                color: 'white',
+                                width:"600px",
+                                height:"500px",
+                                borderRadius: 50,
+                                textAlign:"center",
+                                ...props.style,
+                            }}
+                        >
+                            <text>Group Session Song Queue</text>
+
+                            <div style={{backgroundColor:"#202020"}}><GroupSessionQueueDisplay sessionId={this.state.sessionId} title={this.state.title}></GroupSessionQueueDisplay></div>
+                            
+                        </div>
+                        )}
+                    </Overlay>
                     <div className="Player-Div">
-                        <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }} /></button>
-                        <button className="playPauseButton"><PlayArrowRoundedIcon style={{ fontSize: 50 }} /></button>
-                        <button className="forward-rewind"><FastForwardRoundedIcon style={{ fontSize: 50 }} /></button>
+                        <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }}/></button>
+                        <button className="playPauseButton"><PlayArrowRoundedIcon style={{ fontSize: 50 }}/></button>
+                        <button className="forward-rewind"><FastForwardRoundedIcon style={{ fontSize: 50 }}/></button>
                     </div>
-                    <UserList sessionId={this.state.sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
+			<UserList sessionId={this.state.sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
                 </div>
-                <div className="chat-section">
-                    <ChatRoom groupSessionID={this.state.sessionId} groupSessionTitle={this.state.title} />
+                <div className="chat-section" style={chatStyle}>
+                    <ChatRoom groupSessionID={this.state.sessionId} groupSessionTitle={this.state.title}/>
                 </div>
             </div>
       );

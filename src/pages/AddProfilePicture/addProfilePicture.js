@@ -131,7 +131,6 @@ export default class AddProfilePicture extends React.Component{
   }
 
   render() {
-    //console.log(this.state.src);
     return (
       <div className="profile-header">
         <div>
@@ -147,5 +146,3 @@ export default class AddProfilePicture extends React.Component{
     );
   }
 }
-
-// export default AddProfilePicture;
