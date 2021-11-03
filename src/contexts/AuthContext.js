@@ -207,28 +207,6 @@ export function AuthProvider({ children }) {
               .groupSessions.forEach((item) => currGroupSessions.add(item));
           }
         });
-        // const docSnapSessions = await getDocs(collection(db, "groupSessions"));
-        // docSnapSessions.forEach((doc) => {
-        //   const props = {
-        //     title: "group session1",
-        //     imageUrl:
-        //       "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
-        //     username: "username goes here",
-        //     createdAt: "",
-        //     sessionId: 1234,
-        //   };
-        //   if (currGroupSessions.has(doc.data().sessionId)) {
-        //     var date = getFormattedDate(
-        //       new Date(doc.data().createdAt.seconds * 1000)
-        //     );
-        //     props["createdAt"] = date;
-        //     props["title"] = doc.data().name;
-        //     props["username"] = doc.data().ownerUid;
-        //     props["sessionId"] = doc.data().sessionId;
-        //     //cards.push(props);
-        //   }
-        // });
-        // }
 
         const sessionsRef = collection(db, "groupSessions");
         const sessionsQuery = query(sessionsRef, orderBy("createdAt"));
@@ -260,7 +238,6 @@ export function AuthProvider({ children }) {
     }
 
     //cards.sort(compare);
-    console.log(cards);
     return cards;
   }
 
