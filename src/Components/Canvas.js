@@ -1,5 +1,5 @@
 import React, { Component, createRef } from 'react';
-import songFile from './testSong.wav';
+import songFile from './rocketMan.wav';
 
 // Changing Variables
 let ctx, x_end, y_end, bar_height;
