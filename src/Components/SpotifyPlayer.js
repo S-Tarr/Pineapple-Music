@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react"
 import SpotifyPlayer from "react-spotify-web-playback"
 import app from "../firebase";
-import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
-import { getFirestore, collection, where, addDoc, query, orderBy, limit, getDocs, onSnapshot, Timestamp } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getFirestore, collection, query, orderBy, limit, getDoc, doc, onSnapshot} from "firebase/firestore";
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
@@ -28,7 +28,22 @@ function GetQueue() {
   return songQueue;
 }
 
-export default function Player({ accessToken }) {
+async function getAccessToken() {
+  const docRef = doc(db, "users", auth.currentUser.uid);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data();
+}
+
+export default function Player() {
+
+  const [accessToken, setAccessToken] = useState("")
+  var promise = getAccessToken();
+  promise.then((ret) => {
+    setAccessToken(ret.SpotifyToken);
+  });
+  console.log(accessToken);
+  
+
 
   const [play, setPlay] = useState(false)
   let queue = GetQueue();

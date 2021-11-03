@@ -20,7 +20,7 @@ const SongPage = props => {
         <div className="Song-Div">
             <img className="Visual-Img" src={image} style={{ height: "512px", width: "512px" }} />
             <text>{name}</text>
-            <Player accessToken={track.state.access_token} trackUri={track.state.trackUri} />
+            <Player/>
         </div>
     </div>
     );

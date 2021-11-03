@@ -8,7 +8,7 @@ import queueConverter from './Queue';
 import app from '../firebase';
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, where, addDoc, query, orderBy, limit, getDocs, onSnapshot, Timestamp } from "firebase/firestore";
+import { getFirestore, collection, where, doc, addDoc, query, orderBy, limit, getDocs, setDoc, onSnapshot, Timestamp } from "firebase/firestore";
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var spotifyApi = new SpotifyWebApi({
@@ -25,16 +25,17 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
   const currentUser = auth.currentUser;
   console.log(currentUser.uid);
   
-  const history = useHistory()
+  const history = useHistory();
 
   console.log(spotifyData);
   const [wordEntered, setWordEntered] = useState("");
-  const [searchResults, setSearchResults] = useState([])
+  const [searchResults, setSearchResults] = useState([]);
   const [playingTrack, setPlayingTrack] = useState();
   const access_token = spotifyData;
   useEffect(() => {
     if (!access_token) return
-    spotifyApi.setAccessToken(access_token)
+    spotifyApi.setAccessToken(access_token);
+    handleSubmitToken();
   }, [access_token])
 
   useEffect(() => {
@@ -59,7 +60,7 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
     setWordEntered(searchWord);
   };
 
-  async function handleSubmit(track) {
+  async function handleSubmitTrack(track) {
     await addDoc(collection(db, 'userQueue', currentUser.uid, 'queue'), {
         songUri: track.uri,
         songName: track.title,
@@ -67,10 +68,17 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
     });
   }
 
+  async function handleSubmitToken() {
+    const userRef = collection(db, 'users');
+    await setDoc(doc(userRef, currentUser.uid), {
+        SpotifyToken: access_token,
+    });
+  }
+
   function handleRedirect(track) {
       console.log(track);
       setPlayingTrack(track);
-      handleSubmit(track);
+      handleSubmitTrack(track);
       history.push({
           pathname: '/song',
           state: {name: track.title, picture: track.albumUrl, trackUri: track.uri, access_token: access_token}
