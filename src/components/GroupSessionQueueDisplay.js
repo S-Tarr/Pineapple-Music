@@ -18,9 +18,9 @@ import {
 
 const db = getFirestore(app);
 
-
-let title;
 let sessionId;
+let groupSessionQueueId;
+let groupSessionQueueDoc;
 
 function ExampleDrag(props) {
     //implement function for onDROP
@@ -58,11 +58,11 @@ function Drop(props) {
         }
       }))
 
-      return (
-          <div ref={drop}>
-              <ExampleDrag item={props.item} index={props.index} handleDrop={props.handleDrop} type={'BOX'} items={props.items}></ExampleDrag>
-          </div>
-      )
+    return (
+        <div ref={drop}>
+            <ExampleDrag item={props.item} index={props.index} handleDrop={props.handleDrop} type={'BOX'} items={props.items}></ExampleDrag>
+        </div>
+    )
 }
 
 function GetSongs(props) {
@@ -89,6 +89,8 @@ function GetSongs(props) {
                 getDocs(groupSessionQueue).then((querySnapshot) => {
                     let SongsInSession = [];
                     querySnapshot.forEach((doc) => {
+                        groupSessionQueueId = doc.id;
+                        groupSessionQueueDoc = doc.data();
                         SongsInSession = doc.data().songs;
                     });
                     setSongs(SongsInSession);
@@ -97,36 +99,41 @@ function GetSongs(props) {
           });
 
     }, []);
+    console.log(songs);
     return songs;
 }
 
 const inputRef = createRef();
-const inputRef2 = createRef();
 
 const handleDelete = (items, setItems, index2) => {
     var cloneArray = items.filter((item, index) => index !== index2)
-    setItems([...cloneArray])
     //set new docs in the firebase
+    ChangeDoc(cloneArray, setItems);
+}
+
+async function ChangeDoc (cloneArray, setItems) {
+    const docRef = await setDoc(doc(db, "groupSessionQueue", groupSessionQueueId), {
+        createdAt: groupSessionQueueDoc.createdAt, sessionId: groupSessionQueueDoc.sessionId, queueId: groupSessionQueueDoc.queueId, songs: cloneArray
+    });
+    setItems([...cloneArray]);
+    window.location.reload(false);
 }
 
 function GroupSessionQueueDisplay(props) {
     const cars = ["Island - Seven Lions", "Heat Check - Flight", "Sunday Morning - Maroon 5" , "Hotline Bling - Drake"];
 
-    //set map to array of values, make sure the array is saved in state
-    //when something is dragged over, have a function so that the array values change
-
-    title = props.title;
     sessionId = props.sessionId;
 
+    const [items, setItems] = useState(cars);
+
     var songs = GetSongs();
-    console.log(songs);
-    //const [items, setItems] = useState(songs);
+    useEffect(() =>{
+        setItems(songs);
+    })
 
     const [droppedIndex, setDroppedIndex] = useState();
     const [showSearch, setShowSearch] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
-
-    const [items, setItems] = useState(cars);
 
     const handleFilter = (event) => {
         setShowSearch(!showSearch);
@@ -137,7 +144,6 @@ function GroupSessionQueueDisplay(props) {
     }
 
     const handleDrop = (array, index, item) => {
-        //FIX THIS SHIT
         if (array) {
             // setItems(array.filter((value, currIndex)=> currIndex != index));
             if (droppedIndex < index) {
@@ -183,7 +189,6 @@ function GroupSessionQueueDisplay(props) {
             </Overlay>
             
             <Button variant="danger" onClick={handleDeleteButton}>DELETE SONG</Button>
-
             {items.map((number, index) => {
                 return (
                     <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
