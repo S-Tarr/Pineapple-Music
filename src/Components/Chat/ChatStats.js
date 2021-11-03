@@ -1,8 +1,7 @@
 import React from 'react'
 import Moment from 'react-moment'
-import "./ChatMessage.css"
 
-function ChatStats({ message, currUser }) {
+function ChatStats({ stats }) {
     return (
       <div className={`message-wrapper ${message.from === currUser ? "me" : "other"}`}>
         <p>
@@ -18,4 +17,4 @@ function ChatStats({ message, currUser }) {
     )
 }
 
-export default ChatMessage;
+export default ChatStats;

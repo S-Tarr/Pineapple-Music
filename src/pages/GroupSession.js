@@ -13,7 +13,16 @@ import {
 import { styled, alpha } from "@mui/material/styles";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
+import app from "../firebase";
 import { getAuth } from "firebase/auth";
+import {
+  getDocs,
+  getFirestore,
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
 
 import GroupSessionCard from "../components/GroupSessionCard";
 import GroupSessionForm from "../components/GroupSessionForm";
@@ -73,12 +82,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+const db = getFirestore(app); // Firestore database
+
 function GroupSession() {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const { getGroupSessions, searchGroupSessions } = useAuth();
+  const { searchGroupSessions, getFormattedDate } = useAuth();
   const auth = getAuth();
 
   var date = new Date();
@@ -116,13 +127,52 @@ function GroupSession() {
 
   useEffect(() => {
     if (sessionIdRef.current.value === "") {
-      getGroupSessions().then((sessions) => {
-        addCard([]);
-        addCard(sessions);
-        setLoading(false);
-      });
+      let currGroupSessions = new Set();
+      getDocs(collection(db, "users"))
+        .then((docSnap) => {
+          docSnap.forEach((doc) => {
+            if (doc.data().uid === auth.currentUser.uid) {
+              doc
+                .data()
+                .groupSessions.forEach((item) => currGroupSessions.add(item));
+            }
+          });
+        })
+        .then(() => {
+          const sessionsRef = collection(db, "groupSessions");
+          const sessionsQuery = query(sessionsRef, orderBy("createdAt"));
+          onSnapshot(sessionsQuery, (querySnapshot) => {
+            addCard([]);
+            querySnapshot.forEach((doc) => {
+              const props = {
+                title: "group session1",
+                imageUrl:
+                  "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+                username: "username goes here",
+                createdAt: "",
+                sessionId: 1234,
+              };
+              if (currGroupSessions.has(doc.data().sessionId)) {
+                var date = getFormattedDate(
+                  new Date(doc.data().createdAt.seconds * 1000)
+                );
+                props["createdAt"] = date;
+                props["title"] = doc.data().name;
+                props["username"] = doc.data().ownerUid;
+                props["sessionId"] = doc.data().sessionId;
+                addCard((cards) => [props, ...cards]);
+              }
+            });
+          });
+        });
+      setLoading(false);
     }
-  }, [sessionIdRef.current.value, loading, getGroupSessions]);
+  }, [
+    sessionIdRef.current.value,
+    loading,
+    auth.currentUser.uid,
+    getFormattedDate,
+  ]);
 
   const handleCreate = (title, sessionId) => {
     props["title"] = title;
@@ -155,7 +205,7 @@ function GroupSession() {
           inputProps={{ "aria-label": "search" }}
         />
       </Search>
-      <Container maxWidth="md" sx={{ marginTop: 2, paddingBottom: 4 }} >
+      <Container maxWidth="md" sx={{ marginTop: 2, paddingBottom: 4 }}>
         <Grid container alignItems="center" justifyContent="center" spacing={9}>
           <Grid
             justifyContent="center"
