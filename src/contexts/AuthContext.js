@@ -25,10 +25,12 @@ import {
   collection,
   addDoc,
   Timestamp,
-  getDoc,
   getDocs,
   updateDoc,
   arrayUnion,
+  query,
+  orderBy,
+  onSnapshot,
 } from "firebase/firestore";
 
 // Firebase configuration
@@ -92,6 +94,38 @@ export function AuthProvider({ children }) {
     return month + "/" + day + "/" + year;
   }
 
+  function compare(dateA, dateB) {
+    var a = Date.parse(dateA.createdAt.toString());
+    var b = Date.parse(dateB.createdAt.toString());
+    return a < b ? 1 : a > b ? -1 : 0;
+  }
+
+  async function joinGroupSession(sessionId) {
+    try {
+      const docSnapSessions = await getDocs(collection(db, "groupSessions"));
+      docSnapSessions.forEach((currDoc) => {
+        if (currDoc.data().sessionId === sessionId) {
+          const sessionRef = doc(db, "groupSessions", currDoc.id);
+          console.log("sessionRef", sessionRef);
+          updateDoc(sessionRef, {
+            users: arrayUnion(currentUser.uid),
+          });
+        }
+      });
+      const docSnapUsers = await getDocs(collection(db, "users"));
+      docSnapUsers.forEach((currDoc) => {
+        if (currDoc.data().uid === currentUser.uid) {
+          const userRef = doc(db, "users", currDoc.id);
+          updateDoc(userRef, {
+            groupSessions: arrayUnion(sessionId),
+          });
+        }
+      });
+    } catch (e) {
+      console.error("Error getting doc in joining groupSession: ", e);
+    }
+  }
+
   async function searchGroupSessions(inputId) {
     let cards = [];
     try {
@@ -110,7 +144,6 @@ export function AuthProvider({ children }) {
             var date = getFormattedDate(
               new Date(doc.data().createdAt.seconds * 1000)
             );
-            console.log(date);
             props["createdAt"] = date;
             props["title"] = doc.data().name;
             props["username"] = doc.data().ownerUid;
@@ -122,7 +155,8 @@ export function AuthProvider({ children }) {
     } catch (e) {
       console.error("Error getting doc in searchGroupSessions: ", e);
     }
-    console.log("cards: ", cards);
+
+    cards.sort(compare);
     return cards;
   }
 
@@ -146,7 +180,6 @@ export function AuthProvider({ children }) {
             var date = getFormattedDate(
               new Date(doc.data().createdAt.seconds * 1000)
             );
-            console.log(date);
             props["createdAt"] = date;
             props["title"] = doc.data().name;
             props["username"] = doc.data().ownerUid;
@@ -158,7 +191,6 @@ export function AuthProvider({ children }) {
     } catch (e) {
       console.error("Error getting doc in getYourGroupSessions: ", e);
     }
-    console.log("cards: ", cards);
     return cards;
   }
 
@@ -167,42 +199,45 @@ export function AuthProvider({ children }) {
     try {
       if (currentUser !== undefined) {
         let currGroupSessions = new Set();
-        console.log("getting group sessions new function: ", currentUser.uid);
         const docSnap = await getDocs(collection(db, "users"));
         docSnap.forEach((doc) => {
           if (doc.data().uid === currentUser.uid) {
-            doc.data().groupSessions.forEach(item => currGroupSessions.add(item))
-            console.log(currGroupSessions);
+            doc
+              .data()
+              .groupSessions.forEach((item) => currGroupSessions.add(item));
           }
         });
-        const docSnapSessions = await getDocs(collection(db, "groupSessions"));
-        docSnapSessions.forEach((doc) => {
-          const props = {
-            title: "group session1",
-            imageUrl:
-              "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
-            username: "username goes here",
-            createdAt: "",
-            sessionId: 1234,
-          };
-          if (currGroupSessions.has(doc.data().sessionId)) {
-            console.log(doc.data());
-            var date = getFormattedDate(
-              new Date(doc.data().createdAt.seconds * 1000)
-            );
-            console.log(date);
-            props["createdAt"] = date;
-            props["title"] = doc.data().name;
-            props["username"] = doc.data().ownerUid;
-            props["sessionId"] = doc.data().sessionId;
-            cards.push(props);
-          }
+
+        const sessionsRef = collection(db, "groupSessions");
+        const sessionsQuery = query(sessionsRef, orderBy("createdAt"));
+        await onSnapshot(sessionsQuery, (querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            const props = {
+              title: "group session1",
+              imageUrl:
+                "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+              username: "username goes here",
+              createdAt: "",
+              sessionId: 1234,
+            };
+            if (currGroupSessions.has(doc.data().sessionId)) {
+              var date = getFormattedDate(
+                new Date(doc.data().createdAt.seconds * 1000)
+              );
+              props["createdAt"] = date;
+              props["title"] = doc.data().name;
+              props["username"] = doc.data().ownerUid;
+              props["sessionId"] = doc.data().sessionId;
+              cards.push(props);
+            }
+          });
         });
       }
     } catch (e) {
       console.error("Error getting doc in getGroupSessions: ", e);
     }
-    console.log("cards in getGroupSessions: ", cards);
+
+    //cards.sort(compare);
     return cards;
   }
 
@@ -220,7 +255,7 @@ export function AuthProvider({ children }) {
         createdAt: Timestamp.now(),
         queueId: docRef.id,
         sessionId: sessionId,
-        songs : songs
+        songs: songs,
       });
       console.log("Doc written w/ ID in addGroupSession: ", docRef.id);
       const docSnap = await getDocs(collection(db, "users"));
@@ -309,6 +344,8 @@ export function AuthProvider({ children }) {
     getYourGroupSessions,
     searchGroupSessions,
     getGroupSessions,
+    joinGroupSession,
+    getFormattedDate,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

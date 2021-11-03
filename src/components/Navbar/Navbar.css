@@ -1,8 +1,10 @@
 .Navbar {
-   height: 100vh;
+   height: 100vh; 
    min-width: 262px;
    background-color: #2c3336;
-   /* position: fixed;  */
+   position: sticky; /* changed this -Kichul*/
+   position: -webkit-sticky; /* Safari */
+   top: 0;
    /* display: flex; */
  }
  
