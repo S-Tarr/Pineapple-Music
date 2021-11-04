@@ -31,6 +31,7 @@ class Canvas extends Component {
         this.y = 0;
         this.barBump = 200;
         this.colors = '#2032CD';
+        this.epilepsy = true;
 
         this.state = {
             visColor: '#2032CD',
@@ -69,7 +70,13 @@ class Canvas extends Component {
         gradient.addColorStop(1, "rgba(204, 83, 51, 1)");
         ctx.fillStyle = gradient;
         
-        const lineColor = this.colors;//this.state.visColor;
+        var lineColor;
+        if (this.epilepsy) {
+            lineColor = this.colors;
+        }
+        else {
+            lineColor = this.state.visColor;
+        }
         ctx.strokeStyle = lineColor;
         ctx.lineWidth = bar_width;
         ctx.beginPath();
@@ -111,14 +118,14 @@ class Canvas extends Component {
                 }
             }
             if (this.elapsedTime >= this.context.segments[this.y].start) {
-                console.log("PITCHES: " + this.context.segments[this.y].pitches[0]);
+                //console.log("PITCHES: " + this.context.segments[this.y].pitches[0]);
                 this.colors = this.state.visColor;
                 this.colors = this.colors.substring(1);
                 var temp = parseInt(this.colors, 16);
                 console.log("TEMP: " + temp);
                 temp = parseInt(temp * (1 - this.context.segments[this.y].pitches[0]));
                 this.colors = "#" + temp.toString(16);
-                console.log("HEX: " + this.colors);
+                //console.log("HEX: " + this.colors);
                 this.y++;
             }
             //console.log("BarBump: " + this.barBump);
@@ -160,6 +167,15 @@ class Canvas extends Component {
             this.toStart = true;
         }
     }
+
+    toggleColor = () => {
+        if (this.epilepsy) {
+            this.epilepsy = false;
+        }
+        else {
+            this.epilepsy = true;
+        }
+    }
     
     render() {
         return <>
@@ -191,6 +207,9 @@ class Canvas extends Component {
                             color={ this.state.visColor }
                             onChangeComplete={ this.handleChangeComplete }
                         />
+                        <button onClick={this.toggleColor}>
+                            Toggle Colors
+                        </button>
                     </div>
                 </div>
                 )}
