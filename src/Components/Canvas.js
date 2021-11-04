@@ -1,5 +1,8 @@
-import React, { Component, createRef } from 'react';
+import React, { Component, createRef, useRef } from 'react';
 import songFile from './rocketMan.wav';
+import Overlay from 'react-bootstrap/Overlay';
+import Button from 'react-bootstrap/Button';
+import { SketchPicker } from 'react-color';
 
 // Changing Variables
 let ctx, x_end, y_end, bar_height;
@@ -18,6 +21,14 @@ class Canvas extends Component {
         super(props)
         this.audio = new Audio(songFile);
         this.canvas = createRef();
+        this.target = createRef();
+
+        this.state = {
+            visColor: '#2032CD',
+            show: false,
+            opacity: 1,
+            buttonMessage: "Settings"
+        }
     }
 
     animationLooper(canvas) {
@@ -48,8 +59,8 @@ class Canvas extends Component {
         gradient.addColorStop(0, "rgba(35, 7, 77, 1)");
         gradient.addColorStop(1, "rgba(204, 83, 51, 1)");
         ctx.fillStyle = gradient;
-
-        const lineColor = "rgb(" + frequency + ", " + frequency + ", " + 205 + ")";
+        
+        const lineColor = this.state.visColor;//"rgb(" + 20 + ", " + 50 + ", " + 205 + ")";
         ctx.strokeStyle = lineColor;
         ctx.lineWidth = bar_width;
         ctx.beginPath();
@@ -94,9 +105,64 @@ class Canvas extends Component {
         this.source.disconnect();
     }
 
+    handleShow (event) {
+        this.setState({
+            show :!this.state.show,
+        });
+        if (this.state.opacity == 1) {
+            this.setState({
+                opacity :0.5,
+                buttonMessage:"Close",
+            })
+        }
+        else {
+            this.setState({
+                opacity :1,
+                buttonMessage: "Settings",
+            })
+        }
+    }
+
+    handleChangeComplete = (color) => {
+        this.setState({
+            visColor: color.hex
+        })
+    }
+
     render() {
         return <>
             <button onClick={this.togglePlay}>Play/Pause</button>
+            <Button variant="danger" ref={this.target} onClick={this.handleShow.bind(this)}>
+                {this.state.buttonMessage}
+            </Button>
+            <Overlay target={this.target.current} show={this.state.show} placement="bottom">
+                {({ placement, arrowProps, show: _show, popper, ...props }) => (
+                <div
+                    {...props}
+                    style={{
+                        display: "flex",
+                        flexDirection:"column",
+                        margin:"50px",
+                        backgroundColor: "#202020",
+                        padding: '2px 10px',
+                        color: 'white',
+                        width:"600px",
+                        height:"500px",
+                        borderRadius: 50,
+                        textAlign:"center",
+                        ...props.style,
+                    }}
+                >
+                    <text>Visualizer Settings</text>
+                    <div style={{backgroundColor:"#202020"}}>
+                        <SketchPicker
+                            color={ this.state.visColor }
+                            onChangeComplete={ this.handleChangeComplete }
+                        />
+                    </div>
+                </div>
+                )}
+            </Overlay>
             <canvas ref={this.canvas}  />
         </>
     }
