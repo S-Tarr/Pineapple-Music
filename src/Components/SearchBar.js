@@ -48,13 +48,6 @@ function SearchBar({ placeholder, spotifyData }) {
     promise.then((ret) => setCurSession(ret));
     console.log(curSession);
   }, [])
-
-
- /* useEffect(() => {
-    const promise = GetSessionUID(curSession);
-    promise.then((ret) => setCurSessionID(ret));
-    console.log(curSessionID);
-  }, [isLoaded])*/
   
   const currentUser = auth.currentUser;
   console.log(currentUser.uid);
@@ -126,7 +119,6 @@ function SearchBar({ placeholder, spotifyData }) {
           pathname: '/song',
           state: {name: track.title, picture: track.albumUrl, trackUri: track.uri, access_token: access_token}
       });
-      //setPlayingTrack(track);
   }
 
   return (

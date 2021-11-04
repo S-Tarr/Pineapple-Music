@@ -40,15 +40,15 @@ async function getAccessToken() {
   return docSnap.data();
 }
 
-export default function Player({getTime}) {
+export default function Player() {
   const [isLoaded, setIsLoaded] = useState(true);
-  const [accessToken, setAccessToken] = useState("")
-  const [trackId, setTrackId] = useState();
+  const [accessToken, setAccessToken] = useState("");
   const {setTime} = useContext(TimeContext);
   useEffect(() => {
     var promise = getAccessToken();
     promise.then((ret) => {
       setAccessToken(ret.SpotifyToken);
+      spotifyApi.setAccessToken(ret.SpotifyToken);
     });
     console.log(accessToken);
   }, [isLoaded])
@@ -65,7 +65,6 @@ export default function Player({getTime}) {
 
 
   if (!accessToken) return null;
-  spotifyApi.setAccessToken(accessToken);
   return (
     <SpotifyPlayer
       token={accessToken}
