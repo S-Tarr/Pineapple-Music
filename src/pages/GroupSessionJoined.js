@@ -158,11 +158,11 @@ export default class GroupSessionJoined extends React.Component{
                         </div>
                         )}
                     </Overlay>
-                    <div className="Player-Div">
+                    {/* <div className="Player-Div">
                         <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }}/></button>
                         <button className="playPauseButton"><PlayArrowRoundedIcon style={{ fontSize: 50 }}/></button>
                         <button className="forward-rewind"><FastForwardRoundedIcon style={{ fontSize: 50 }}/></button>
-                    </div>
+                    </div> */}
 			<UserList sessionId={this.state.sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
                 </div>
                 <div className="chat-section" style={chatStyle}>
