@@ -27,6 +27,8 @@ class Canvas extends Component {
         this.elapsedTime = 0;
         this.endTime = new Date();
         this.toStart = true;
+        this.i = 0;
+        this.barBump = 200;
 
         this.state = {
             visColor: '#2032CD',
@@ -47,7 +49,7 @@ class Canvas extends Component {
             const rads = Math.PI * 2 / bars;
 
             // Math is magical
-            bar_height = 130 /*this.frequency_array[i]*/ * 2;
+            bar_height = this.barBump /*this.frequency_array[i]*/;
 
             const x = center_x + Math.cos(rads * i) * (radius);
             const y = center_y + Math.sin(rads * i) * (radius);
@@ -92,8 +94,21 @@ class Canvas extends Component {
         }
         else {
             this.endTime = new Date();
-            this.elapsedTime = (this.endTime - this.context.timeStamp) + this.context.elapsed;
-            console.log("Time: " + this.elapsedTime);
+            this.elapsedTime = ((this.endTime - this.context.timeStamp) + this.context.elapsed) / 1000;
+            console.log("TIME: " + this.elapsedTime);
+            console.log("START: " + this.context.beats[this.i].start);
+            if (this.elapsedTime >= this.context.beats[this.i].start) {
+                if (this.barBump < 260) {
+                    this.barBump = this.barBump + 60;
+                }
+                this.i++;
+            }
+            else {
+                if (this.barBump >= 100) {
+                    this.barBump = this.barBump - 3;
+                }
+            }
+            console.log("BarBump: " + this.barBump);
             this.animationLooper(this.canvas.current);
             this.rafId = requestAnimationFrame(this.tick);
         }
@@ -135,7 +150,7 @@ class Canvas extends Component {
 
     render() {
         return <>
-            <button onClick={this.toggleStart}>Play/Pause</button>
+            <button onClick={this.toggleStart}>Start/Stop Visualizer</button>
             <Button variant="danger" ref={this.target} onClick={this.handleShow.bind(this)}>
                 {this.state.buttonMessage}
             </Button>

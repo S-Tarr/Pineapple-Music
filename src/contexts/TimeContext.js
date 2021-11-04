@@ -6,11 +6,13 @@ class TimeContextProvider extends Component {
     state = {
         timeStamp: new Date(),
         elapsed: 0,
-        isPlaying: false
+        isPlaying: false,
+        beats: []
     }
     setTime = (newTime) => {
         this.setState({timeStamp: newTime.timeStamp,
-            elapsed: newTime.elapsed, isPlaying: newTime.isPlaying})
+            elapsed: newTime.elapsed, isPlaying: newTime.isPlaying,
+            beats: newTime.beats})
     }
     render() {
         return (
