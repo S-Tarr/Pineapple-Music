@@ -8,7 +8,7 @@ import queueConverter from './Queue';
 import app from '../firebase';
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getFirestore, collection, where, doc, addDoc, query, orderBy, limit, getDocs, setDoc, onSnapshot, Timestamp } from "firebase/firestore";
+import { getFirestore, collection, where, doc, addDoc, updateDoc, getDoc, query, orderBy, limit, getDocs, setDoc, onSnapshot, Timestamp } from "firebase/firestore";
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var spotifyApi = new SpotifyWebApi({
@@ -20,7 +20,41 @@ var spotifyApi = new SpotifyWebApi({
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
-function SearchBar({ placeholder, spotifyData, authorized }) {
+async function getCurrentSession() {
+  const docRef = doc(db, "users", auth.currentUser.uid);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data();
+}
+async function GetSessionUID(groupID) {
+  //const [sessionID, setSessionID] = useState();
+  const q = query(collection(db, 'groupSessions'), where('sessionId', '==',  groupID));
+  const docSnap = await getDocs(q);
+  docSnap.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    console.log(doc.id, " => ", doc.data());
+    return doc.id;
+  });
+}
+
+
+function SearchBar({ placeholder, spotifyData }) {
+
+  const [curSession, setCurSession] = useState();
+  const [curSessionID, setCurSessionID] = useState();
+  const [isLoaded, setIsLoaded] = useState(true);
+
+  useEffect(() => {
+    const promise = getCurrentSession();
+    promise.then((ret) => setCurSession(ret));
+    console.log(curSession);
+  }, [])
+
+
+ /* useEffect(() => {
+    const promise = GetSessionUID(curSession);
+    promise.then((ret) => setCurSessionID(ret));
+    console.log(curSessionID);
+  }, [isLoaded])*/
   
   const currentUser = auth.currentUser;
   console.log(currentUser.uid);
@@ -69,9 +103,17 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
     });
   }
 
+  async function handleSubmitGroupTrack(track) {
+    await addDoc(collection(db, 'groupSessions', curSessionID, 'queue'), {
+        songUri: track.uri,
+        songName: track.title,
+        addedAt: Timestamp.fromDate(new Date())
+    });
+  }
+
   async function handleSubmitToken() {
     const userRef = collection(db, 'users');
-    await setDoc(doc(userRef, currentUser.uid), {
+    await updateDoc(doc(userRef, currentUser.uid), {
         SpotifyToken: access_token,
     });
   }

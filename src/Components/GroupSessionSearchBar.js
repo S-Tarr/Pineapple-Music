@@ -13,6 +13,8 @@ import {
     where,
     getDocs,
     setDoc,
+    addDoc,
+    Timestamp,
   } from "firebase/firestore";
   
 const db = getFirestore(app);
@@ -83,8 +85,18 @@ function GroupSessionSearchBar({ placeholder, spotifyData, authorized, groupSess
     setWordEntered("");
   };
 
+  async function handleSubmitTrack(track) {
+    await addDoc(collection(db, 'groupSessionQueue', groupSessionQueueId, 'queue'), {
+        songUri: track.uri,
+        songName: track.title,
+        addedAt: Timestamp.fromDate(new Date())
+    });
+  }
+
   async function handleRedirect(track) {
     console.log(track);
+
+    handleSubmitTrack(track);
 
     const docRef = await setDoc(doc(db, "groupSessionQueue", groupSessionQueueId), {
         createdAt: groupSessionQueueDoc.createdAt, sessionId: groupSessionQueueDoc.sessionId, queueId: groupSessionQueueDoc.queueId, songs: [...groupSessionQueueDoc.songs, track]

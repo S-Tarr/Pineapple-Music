@@ -7,7 +7,6 @@ import { getFirestore, collection, query, orderBy, limit, getDoc, doc, onSnapsho
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 function GetQueue() {
-  var fakeChange = 0;
   const [songQueue, setSongQueue] = useState();
   const currentUser = auth.currentUser;
   useEffect(() => {

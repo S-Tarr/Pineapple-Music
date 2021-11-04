@@ -5,6 +5,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import app from "../firebase";
 import GroupSessionSearchBar from '../components/GroupSessionSearchBar';
 import Track from './Track';
+import Player from './GroupSpotifyPlayer'
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
@@ -242,8 +243,11 @@ function GroupSessionQueueDisplay(props) {
                     </div>
                 )   
             })}
-
+            <div>
+                <Player groupSessionQueueId={groupSessionQueueId} groupSessionQueueDoc={groupSessionQueueDoc} sessionId={sessionId}/>
+            </div>
         </div>
+        
         
     )
 }

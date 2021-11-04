@@ -11,6 +11,19 @@ import {
 import { useHistory } from "react-router";
 
 import { useAuth } from "../contexts/AuthContext";
+import app from "../firebase";
+import { getAuth } from "firebase/auth";
+import { getFirestore, collection, setDoc, addDoc, updateDoc, query, orderBy, limit, getDoc, doc, onSnapshot} from "firebase/firestore";
+
+const auth = getAuth(); // Authorization component
+const db = getFirestore(app); // Firestore database
+
+async function handleSubmitGroup(groupID) {
+  const userRef = collection(db, 'users');
+  await updateDoc(doc(userRef, auth.currentUser.uid), {
+      currentGroup: groupID,
+  });
+}
 
 function GroupSessionCard({
   props: { title, imageUrl, username, createdAt, sessionId },
@@ -20,6 +33,7 @@ function GroupSessionCard({
 
   const history = useHistory();
   async function handleJoin() {
+    handleSubmitGroup(sessionId);
     joinGroupSession(sessionId, username);
     history.push({
       pathname: "/groupsessionhome",
