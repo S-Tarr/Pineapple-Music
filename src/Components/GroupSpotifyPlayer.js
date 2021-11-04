@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react"
 import SpotifyPlayer from "react-spotify-web-playback"
 import app from "../firebase";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, query, orderBy, limit, getDoc, getDocs, where, doc, onSnapshot} from "firebase/firestore";
+import { getFirestore, collection, query, orderBy, limit, getDoc, getDocs, updateDoc, where, doc, onSnapshot} from "firebase/firestore";
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import FastRewindRoundedIcon from '@mui/icons-material/FastRewindRounded';
+import FastForwardRoundedIcon from '@mui/icons-material/FastForwardRounded';
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
@@ -73,7 +76,24 @@ async function getAccessToken() {
   return docSnap.data();
 }
 
-export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sessionId }) {
+export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sessionId, docId}) {
+  const [play, setPlay] = useState(false);
+
+  useEffect (() => {
+        const stateRef = collection(db, "groupSessions")
+        const stateQuery = query(stateRef, where("sessionId", "==", sessionId))
+        const unsubscribe = onSnapshot(stateQuery, (querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                if (doc.data().playState) {
+                    setPlay(true);
+                }
+                else {
+                    setPlay(false);
+                }
+            })
+        });
+        return () => unsubscribe; 
+    }, []);
 
   const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("")
@@ -91,20 +111,66 @@ export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sess
   console.log(isLoaded)
 
   
-  const [play, setPlay] = useState(false)
   let queue = GetQueue(sessionId, groupSessionQueueID, groupSessionQueueDoc);
   console.log(queue);
- 
+
+//   const [player, setPlayer] = useState(undefined);
+//   useEffect(() => {
+//     const script = document.createElement("script");
+//     script.src = "https://sdk.scdn.co/spotify-player.js";
+//     script.async = true;
+
+//     document.body.appendChild(script);
+
+//     window.onSpotifyWebPlaybackSDKReady = () => {
+
+//         const player = new window.Spotify.Player({
+//             name: 'Web Playback SDK',
+//             getOAuthToken: cb => getAccessToken(),
+//             volume: 0.5
+//         });
+
+//         setPlayer(player);
+
+//         player.addListener('ready', ({ device_id }) => {
+//             console.log('Ready with Device ID', device_id);
+//         });
+
+//         player.addListener('not_ready', ({ device_id }) => {
+//             console.log('Device ID has gone offline', device_id);
+//         });
+
+
+//         player.connect();
+
+//     };
+//   }, []);
+  async function handlePlayPause() {
+    await updateDoc(doc(db, 'groupSessions', docId), {
+        playState: !play,
+    });
+  }
+
   if (!accessToken) return null
   return (
-    <SpotifyPlayer
-      token={accessToken}
-      callback={state => {
-        if (!state.isPlaying) console.log("shit")//setPlay(false)
-      }}
-      play={play}
-      autoPlay={true}
-      uris={queue}
-    />
+
+
+    <>
+        <SpotifyPlayer
+            token={accessToken}
+            callback={state => {
+                if (play)
+                    console.log("shit"); 
+                    state.play = true//setPlay(false)
+            } }
+            play={play}
+            autoPlay={true}
+            uris={queue} />
+            <div className="Player-Div">
+                <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }} /></button>
+                <button className="playPauseButton" onClick={() => handlePlayPause()}><PlayArrowRoundedIcon style={{ fontSize: 50 }} /></button>
+                <button className="forward-rewind"><FastForwardRoundedIcon style={{ fontSize: 50 }} /></button>
+            </div>
+    </>
   )
 }

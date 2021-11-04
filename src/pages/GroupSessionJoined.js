@@ -54,9 +54,9 @@ export default class GroupSessionJoined extends React.Component{
         this.state = {
             title: data.title,
             sessionId: data.sessionId,
-            imageUrl: data.imageUrl, 
-            username: data.username, 
-            createdAt: data.createdAt,
+            imageUrl: persistentData.imageUrl, 
+            username: persistentData.username, 
+            createdAt: persistentData.createdAt,
             show :false,
             showSearch : false,
             opacity:1,

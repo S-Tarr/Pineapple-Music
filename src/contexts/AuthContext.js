@@ -250,6 +250,7 @@ export function AuthProvider({ children }) {
         ownerUid: currentUser.uid,
         sessionId: sessionId,
         users: [currentUser.uid],
+        playState: false,
       });
       const docRef2 = await addDoc(collection(db, "groupSessionQueue"), {
         createdAt: Timestamp.now(),

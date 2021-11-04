@@ -22,6 +22,7 @@ const db = getFirestore(app);
 
 let sessionId;
 let groupSessionQueueId;
+let groupSessionId;
 let groupSessionQueueDoc;
 
 const CLIENT_ID = "477666821b8941c4bd163b4ff55ed9af";
@@ -101,7 +102,7 @@ function GetSongs(props) {
             groupSessionRef,
             where("sessionId", "==", sessionId)
         );
-        let groupSessionId;
+        //let groupSessionId;
         getDocs(groupSession).then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 groupSessionId = doc.id;
@@ -145,7 +146,7 @@ function GroupSessionQueueDisplay(props) {
         setAuthorized(false);
         }
     }, [authorized]);
-
+    
     sessionId = props.sessionId;
 
     const [items, setItems] = useState(cars);
@@ -244,7 +245,7 @@ function GroupSessionQueueDisplay(props) {
                 )   
             })}
             <div>
-                <Player groupSessionQueueId={groupSessionQueueId} groupSessionQueueDoc={groupSessionQueueDoc} sessionId={sessionId}/>
+                <Player groupSessionQueueId={groupSessionQueueId} groupSessionQueueDoc={groupSessionQueueDoc} sessionId={sessionId} docId={groupSessionId}/>
             </div>
         </div>
         
