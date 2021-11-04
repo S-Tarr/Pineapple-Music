@@ -78,6 +78,7 @@ async function getAccessToken() {
 
 export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sessionId, docId}) {
   const [play, setPlay] = useState(false);
+  const [offset, setOffset] = useState(0);
 
   useEffect (() => {
         const stateRef = collection(db, "groupSessions")
@@ -90,10 +91,23 @@ export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sess
                 else {
                     setPlay(false);
                 }
+                // console.log(doc.data().queueOffset);
+                setOffset(doc.data().queueOffset);
             })
         });
         return () => unsubscribe; 
     }, []);
+
+  // useEffect (() => {
+  //   const stateRef = collection(db, "groupSessions")
+  //   const stateQuery = query(stateRef, where("sessionId", "==", sessionId))
+  //   const unsubscribe = onSnapshot(stateQuery, (querySnapshot) => {
+  //       querySnapshot.forEach((doc) => {
+  //         setOffset(doc.data().offset);
+  //       })
+  //   });
+  //   return () => unsubscribe; 
+  // }, []);
 
   const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("")
@@ -110,9 +124,16 @@ export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sess
   }
   console.log(isLoaded)
 
-  
-  let queue = GetQueue(sessionId, groupSessionQueueID, groupSessionQueueDoc);
-  console.log(queue);
+  const songQueue = GetQueue(sessionId, groupSessionQueueID, groupSessionQueueDoc);
+
+  // setQueue(temp)
+  // console.log(songQueue);
+  // const temp = GetQueue(sessionId, groupSessionQueueID, groupSessionQueueDoc);
+
+  // useEffect(() => {
+  //   setQueue(temp);
+  // }, [])
+  console.log(songQueue);
 
 //   const [player, setPlayer] = useState(undefined);
 //   useEffect(() => {
@@ -146,30 +167,54 @@ export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sess
 //     };
 //   }, []);
   async function handlePlayPause() {
+    console.log(songQueue)
     await updateDoc(doc(db, 'groupSessions', docId), {
         playState: !play,
     });
   }
 
+  async function handleSkip() {
+    // setQueue(queue.slice(queue.indexOf(uri)));
+    if (offset == songQueue.length - 1) {
+      return;
+    }
+
+    await updateDoc(doc(db, 'groupSessions', docId), {
+        queueOffset: offset + 1,
+    });
+  }
+
+  async function handleReverse() {
+    if (offset == 0) {
+      return;
+    }
+
+    await updateDoc(doc(db, 'groupSessions', docId), {
+      queueOffset: offset - 1,
+    });
+  }
+
   if (!accessToken) return null
   return (
-
-
     <>
         <SpotifyPlayer
             token={accessToken}
             callback={state => {
-                if (play)
+                if (play) {
                     console.log("shit"); 
                     state.play = true//setPlay(false)
+                }
+                state.offset = offset;
             } }
             play={play}
             //autoPlay={true}
-            uris={queue} />
+            uris={songQueue}
+            offset={offset} />
+            
             <div className="Player-Div">
-                <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }} /></button>
+                <button className="forward-rewind" onClick={() => handleReverse()}><FastRewindRoundedIcon style={{ fontSize: 50 }} /></button>
                 <button className="playPauseButton" onClick={() => handlePlayPause()}><PlayArrowRoundedIcon style={{ fontSize: 50 }} /></button>
-                <button className="forward-rewind"><FastForwardRoundedIcon style={{ fontSize: 50 }} /></button>
+                <button className="forward-rewind" onClick={() => handleSkip()}><FastForwardRoundedIcon style={{ fontSize: 50 }} /></button>
             </div>
     </>
   )
