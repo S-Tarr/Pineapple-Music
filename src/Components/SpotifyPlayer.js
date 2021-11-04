@@ -4,6 +4,14 @@ import app from "../firebase";
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection, query, orderBy, limit, getDoc, doc, onSnapshot} from "firebase/firestore";
 import { TimeContext } from '../contexts/TimeContext';
+import { Done } from "@material-ui/icons";
+var SpotifyWebApi = require('spotify-web-api-node');
+
+var spotifyApi = new SpotifyWebApi({
+  clientId : '0fbe30c6e814404e8324aa3838a7f322',
+  clientSecret: 'e414b612d1ff45dd9ba6643e3161bdff',
+  redirectUri: 'localhost:3000/Pineapple-Music'
+});
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
@@ -53,17 +61,29 @@ export default function Player({getTime}) {
   let queue = GetQueue();
   console.log(queue);
  
-  if (!accessToken) return null
+  if (!accessToken) return null;
+  spotifyApi.setAccessToken(accessToken);
   return (
     <SpotifyPlayer
       token={accessToken}
+      play={play2}
+      autoPlay={true}
       callback={state => {
         if (!state.isPlaying) play2 = false;
         else play2 = true;
-        setTime({timeStamp: new Date(), elapsed: state.progressMs, isPlaying: play2});
+        console.log("Track id" + state.track.id);
+        if (state.track.id != undefined) {
+        spotifyApi.getAudioAnalysisForTrack(state.track.id)
+          .then(function(data) {
+            console.log("Beats Info: " + data.body.beats);
+          setTime({timeStamp: new Date(), elapsed: state.progressMs,
+            isPlaying: play2, beats: data.body.beats});
+          }, 
+          function(err) {
+            console.log(err);
+          });
+        }
       }}
-      play={play2}
-      autoPlay={true}
       uris={queue}
     />
   )
