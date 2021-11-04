@@ -13,7 +13,7 @@ const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
 
 const SPACE_DELIMITER = "%20";
 const REDIRECT_URL_AFTER_LOGIN = "http://localhost:3000/Pineapple-Music"; //CHANGE LATER
-const SCOPES = ["user-read-currently-playing", "user-read-playback-state"];
+const SCOPES = ["user-read-currently-playing", "user-read-playback-state", "user-read-recently-played", "user-top-read", "user-modify-playback-state"];
 const SCOPES_URL_PARAM = SCOPES.join(SPACE_DELIMITER);
 
 const getParamsFromSpotifyAuth = (hash) => {
