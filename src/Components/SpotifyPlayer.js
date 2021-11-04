@@ -7,6 +7,7 @@ import { getFirestore, collection, query, orderBy, limit, getDoc, doc, onSnapsho
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 function GetQueue() {
+  var fakeChange = 0;
   const [songQueue, setSongQueue] = useState();
   const currentUser = auth.currentUser;
   useEffect(() => {
@@ -32,16 +33,22 @@ async function getAccessToken() {
 }
 
 export default function Player() {
-
+  const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("")
-  var promise = getAccessToken();
-  promise.then((ret) => {
-    setAccessToken(ret.SpotifyToken);
-  });
-  console.log(accessToken);
+  useEffect(() => {
+    var promise = getAccessToken();
+    promise.then((ret) => {
+      setAccessToken(ret.SpotifyToken);
+    });
+    console.log(accessToken);
+  }, [isLoaded])
 
+  if (accessToken == undefined) {
+    setIsLoaded(false)
+  }
+  console.log(isLoaded)
 
-
+  
   const [play, setPlay] = useState(false)
   let queue = GetQueue();
   console.log(queue);
@@ -51,7 +58,7 @@ export default function Player() {
     <SpotifyPlayer
       token={accessToken}
       callback={state => {
-        if (!state.isPlaying) setPlay(false)
+        if (!state.isPlaying) console.log("shit")//setPlay(false)
       }}
       play={play}
       autoPlay={true}
