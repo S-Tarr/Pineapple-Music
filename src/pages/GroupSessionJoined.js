@@ -44,12 +44,19 @@ export default class GroupSessionJoined extends React.Component{
         this.inputRef = createRef();
         this.inputRef2 = createRef();
 
+        if (localStorage.getItem("user-data") == null) {
+            const groupSessionData = {title: props.location.props.title, sessionId: props.location.props.sessionId, imageUrl: props.location.props.imageUrl, username: props.location.props.userName, createdAt: props.location.props.createdAt}
+            localStorage.setItem("user-data", JSON.stringify(groupSessionData));
+        }
+        
+        const persistentData = localStorage.getItem("user-data");
+        const data = JSON.parse(persistentData);
         this.state = {
-            title: props.location.props.title,
-            sessionId: props.location.props.sessionId,
-            imageUrl: props.location.props.imageUrl, 
-            username: props.location.props.username, 
-            createdAt: props.location.props.createdAt,
+            title: data.title,
+            sessionId: data.sessionId,
+            imageUrl: data.imageUrl, 
+            username: data.username, 
+            createdAt: data.createdAt,
             show :false,
             showSearch : false,
             opacity:1,
@@ -57,7 +64,8 @@ export default class GroupSessionJoined extends React.Component{
             buttonMessage :"Open Song Queue",
             isPlaying: false,
         }
-        console.log(props);
+        console.log(this.state);
+
     }
     handleShow (event) {
         this.setState({

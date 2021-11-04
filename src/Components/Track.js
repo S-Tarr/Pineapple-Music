@@ -8,7 +8,7 @@ export default function Track({ track, chooseTrack }) {
   return (
     <div
       className="d-flex m-2 align-items-center"
-      style={{ cursor: "pointer" }}
+      style={{ cursor: "pointer", display:"flex", flexDirection:'row' }}
       onClick={handleRedirect}
     >
       <img src={track.albumUrl} style={{ height: "64px", width: "64px" }} />

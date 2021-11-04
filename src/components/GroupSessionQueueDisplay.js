@@ -3,7 +3,8 @@ import Overlay from 'react-bootstrap/Overlay';
 import Button from 'react-bootstrap/Button';
 import { useDrag, useDrop } from 'react-dnd';
 import app from "../firebase";
-import SearchBar from '../components/SearchBar';
+import GroupSessionSearchBar from '../components/GroupSessionSearchBar';
+import Track from './Track';
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
@@ -21,6 +22,28 @@ const db = getFirestore(app);
 let sessionId;
 let groupSessionQueueId;
 let groupSessionQueueDoc;
+
+const CLIENT_ID = "477666821b8941c4bd163b4ff55ed9af";
+const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
+
+const SPACE_DELIMITER = "%20";
+const REDIRECT_URL_AFTER_LOGIN = "http://localhost:3000/groupsessionhome"; //CHANGE LATER
+const SCOPES = ["user-read-currently-playing", "user-read-playback-state"];
+const SCOPES_URL_PARAM = SCOPES.join(SPACE_DELIMITER);
+
+const getParamsFromSpotifyAuth = (hash) => {
+  const paramsUrl = hash.substring(1).split("&");
+  const params = paramsUrl.reduce((accumulator, currentValue) => {
+    const [key, value] = currentValue.split("=");
+    accumulator[key] = value;
+    return accumulator;
+  }, {});
+  return params;
+};
+
+const handleSpotifyLogin = () => {
+    window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
+  };
 
 function ExampleDrag(props) {
     //implement function for onDROP
@@ -40,7 +63,9 @@ function ExampleDrag(props) {
     })
 
     return (
-        <div ref={drag}>{props.item}</div>
+        <div ref={drag}>
+            <Track track={props.item}></Track>
+        </div>
     )
 }
 
@@ -105,22 +130,20 @@ function GetSongs(props) {
 
 const inputRef = createRef();
 
-const handleDelete = (items, setItems, index2) => {
-    var cloneArray = items.filter((item, index) => index !== index2)
-    //set new docs in the firebase
-    ChangeDoc(cloneArray, setItems);
-}
-
-async function ChangeDoc (cloneArray, setItems) {
-    const docRef = await setDoc(doc(db, "groupSessionQueue", groupSessionQueueId), {
-        createdAt: groupSessionQueueDoc.createdAt, sessionId: groupSessionQueueDoc.sessionId, queueId: groupSessionQueueDoc.queueId, songs: cloneArray
-    });
-    setItems([...cloneArray]);
-    window.location.reload(false);
-}
-
 function GroupSessionQueueDisplay(props) {
     const cars = ["Island - Seven Lions", "Heat Check - Flight", "Sunday Morning - Maroon 5" , "Hotline Bling - Drake"];
+    
+    const [authorized, setAuthorized] = useState(true);
+    const [token, setToken] = useState({})
+
+
+    useEffect(() => {
+        if (window.location.hash) {
+        setToken(getParamsFromSpotifyAuth(window.location.hash).access_token);
+        console.log(token);
+        setAuthorized(false);
+        }
+    }, [authorized]);
 
     sessionId = props.sessionId;
 
@@ -143,9 +166,25 @@ function GroupSessionQueueDisplay(props) {
         setShowDelete(!showDelete);
     }
 
+    const handleDelete = (items, setItems, index2) => {
+        var cloneArray = items.filter((item, index) => index !== index2)
+        //set new docs in the firebase
+        ChangeDoc(cloneArray, setItems, "delete");
+    }
+    
+    async function ChangeDoc (cloneArray, setItems, type) {
+        const docRef = await setDoc(doc(db, "groupSessionQueue", groupSessionQueueId), {
+            createdAt: groupSessionQueueDoc.createdAt, sessionId: groupSessionQueueDoc.sessionId, queueId: groupSessionQueueDoc.queueId, songs: cloneArray
+        });
+        setItems([...cloneArray]);
+        if (type == "delete") {
+            window.location.reload(false);
+        }
+        // window.location.reload(false);
+    }
+    
     const handleDrop = (array, index, item) => {
         if (array) {
-            // setItems(array.filter((value, currIndex)=> currIndex != index));
             if (droppedIndex < index) {
                 var temp = array[droppedIndex];
                 array[droppedIndex] = item;
@@ -164,7 +203,7 @@ function GroupSessionQueueDisplay(props) {
             else {
                 //do nothing
             }
-            setItems([...array]);
+            ChangeDoc(array,setItems, "");
         }
     };
 
@@ -176,13 +215,18 @@ function GroupSessionQueueDisplay(props) {
 
                     <div {...props}>
                         <div style={{backgroundColor: "whitesmoke"}}>
-                            <SearchBar placeholder="Enter a song name..." spotifyData={""} authorized={true} />
+                        
+                            <GroupSessionSearchBar placeholder="Enter a song name..." spotifyData={token} authorized={authorized} groupSessionQueueDoc={groupSessionQueueDoc} groupSessionQueueId={groupSessionQueueId}/>
+                            
                             <Button
                                 variant="outlined"
                                 color="primary"
+                                onClick={handleSpotifyLogin}
                             >
                                 Login to Spotify
-                            </Button>   
+                            </Button>
+                        
+                        
                         </div>
                     </div>
                 )}
@@ -194,6 +238,7 @@ function GroupSessionQueueDisplay(props) {
                     <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
                         <Drop item={number} index={index} type={'BOX'} setDroppedIndex={setDroppedIndex} handleDrop={handleDrop} items={items}></Drop>
                         {showDelete == true && <Button variant="danger" onClick={() => handleDelete(items, setItems, index)}>X</Button>}
+    
                     </div>
                 )   
             })}
