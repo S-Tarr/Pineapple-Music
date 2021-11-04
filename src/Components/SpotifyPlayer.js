@@ -49,6 +49,7 @@ export default function Player({getTime}) {
     var promise = getAccessToken();
     promise.then((ret) => {
       setAccessToken(ret.SpotifyToken);
+      spotifyApi.setAccessToken(ret.SpotifyToken);
     });
     console.log(accessToken);
   }, [isLoaded])
@@ -65,7 +66,7 @@ export default function Player({getTime}) {
 
 
   if (!accessToken) return null;
-  spotifyApi.setAccessToken(accessToken);
+  //spotifyApi.setAccessToken(accessToken);
   return (
     <SpotifyPlayer
       token={accessToken}
@@ -75,7 +76,7 @@ export default function Player({getTime}) {
         if (!state.isPlaying) play2 = false;
         else play2 = true;
         console.log("Track id" + state.track.id);
-        if (state.track.id != undefined) {
+        if (state.track.id != undefined && state.track.id != null) {
           spotifyApi.getAudioAnalysisForTrack(state.track.id)
           .then(function(data) {
             console.log("Beats Info: " + data.body.beats);

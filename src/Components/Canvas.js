@@ -147,7 +147,7 @@ class Canvas extends Component {
             this.toStart = true;
         }
     }
-
+    
     render() {
         return <>
             <button onClick={this.toggleStart}>Start/Stop Visualizer</button>
