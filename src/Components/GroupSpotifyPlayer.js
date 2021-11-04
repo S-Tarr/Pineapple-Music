@@ -6,6 +6,8 @@ import { getFirestore, collection, query, orderBy, limit, getDoc, getDocs, updat
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import FastRewindRoundedIcon from '@mui/icons-material/FastRewindRounded';
 import FastForwardRoundedIcon from '@mui/icons-material/FastForwardRounded';
+import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
+
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
@@ -221,7 +223,9 @@ export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sess
             
             <div className="Player-Div">
                 <button className="forward-rewind" onClick={() => handleReverse()}><FastRewindRoundedIcon style={{ fontSize: 50 }} /></button>
-                <button className="playPauseButton" onClick={() => handlePlayPause()}><PlayArrowRoundedIcon style={{ fontSize: 50 }} /></button>
+                <button className="playPauseButton" onClick={() => handlePlayPause()}>
+                  {play ? <PauseRoundedIcon style={{ fontSize: 50 }}/> : <PlayArrowRoundedIcon style={{ fontSize: 50 }}/>}
+                </button>
                 <button className="forward-rewind" onClick={() => handleSkip()}><FastForwardRoundedIcon style={{ fontSize: 50 }} /></button>
             </div>
     </>

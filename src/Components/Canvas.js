@@ -31,7 +31,7 @@ class Canvas extends Component {
         this.y = 0;
         this.barBump = 200;
         this.colors = '#2032CD';
-        this.epilepsy = true;
+        this.epilepsy = false;
 
         this.state = {
             visColor: '#2032CD',
@@ -118,14 +118,14 @@ class Canvas extends Component {
                 }
             }
             if (this.elapsedTime >= this.context.segments[this.y].start) {
-                //console.log("PITCHES: " + this.context.segments[this.y].pitches[0]);
+                console.log("PITCHES: " + this.context.segments[this.y].pitches[0]);
                 this.colors = this.state.visColor;
                 this.colors = this.colors.substring(1);
                 var temp = parseInt(this.colors, 16);
                 console.log("TEMP: " + temp);
                 temp = parseInt(temp * (1 - this.context.segments[this.y].pitches[0]));
                 this.colors = "#" + temp.toString(16);
-                //console.log("HEX: " + this.colors);
+                console.log("HEX: " + this.colors);
                 this.y++;
             }
             //console.log("BarBump: " + this.barBump);
