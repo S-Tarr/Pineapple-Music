@@ -164,7 +164,7 @@ export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sess
                     state.play = true//setPlay(false)
             } }
             play={play}
-            autoPlay={true}
+            //autoPlay={true}
             uris={queue} />
             <div className="Player-Div">
                 <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }} /></button>

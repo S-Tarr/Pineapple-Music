@@ -13,7 +13,27 @@ const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
 
 const SPACE_DELIMITER = "%20";
 const REDIRECT_URL_AFTER_LOGIN = "http://localhost:3000/Pineapple-Music"; //CHANGE LATER
-const SCOPES = ["user-read-currently-playing", "user-read-playback-state", "user-read-recently-played", "user-top-read", "user-modify-playback-state"];
+const SCOPES = [
+  'ugc-image-upload',
+  'user-read-playback-state',
+  'user-modify-playback-state',
+  'user-read-currently-playing',
+  'streaming',
+  'app-remote-control',
+  'user-read-email',
+  'user-read-private',
+  'playlist-read-collaborative',
+  'playlist-modify-public',
+  'playlist-read-private',
+  'playlist-modify-private',
+  'user-library-modify',
+  'user-library-read',
+  'user-top-read',
+  'user-read-playback-position',
+  'user-read-recently-played',
+  'user-follow-read',
+  'user-follow-modify'
+];
 const SCOPES_URL_PARAM = SCOPES.join(SPACE_DELIMITER);
 
 const getParamsFromSpotifyAuth = (hash) => {
@@ -40,6 +60,41 @@ async function handleSubmitToken(access_token) {
       SpotifyToken: access_token,
   });
 }
+
+var request = require('request'); // "Request" library
+
+var client_id = '0fbe30c6e814404e8324aa3838a7f322'; // Your client id
+var client_secret = 'e414b612d1ff45dd9ba6643e3161bdff'; // Your secret
+
+// your application requests authorization
+var authOptions = {
+  url: 'https://accounts.spotify.com/api/token',
+  headers: {
+    'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+  },
+  form: {
+    grant_type: 'client_credentials'
+  },
+  json: true
+};
+
+request.post(authOptions, function(error, response, body) {
+  if (!error && response.statusCode === 200) {
+
+    // use the access token to access the Spotify Web API
+    var token = body.access_token;
+    var options = {
+      url: 'https://api.spotify.com/v1/users/jmperezperez',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      },
+      json: true
+    };
+    request.get(options, function(error, response, body) {
+      console.log(body);
+    });
+  }
+});
   
 function SearchPage() {
     const [authorized, setAuthorized] = useState(true);
