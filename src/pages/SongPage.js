@@ -1,10 +1,14 @@
 import { useLocation } from "react-router-dom"
-import React from 'react';
+import React, { useState } from 'react';
 import Player from '../components/Player';
 import Pineapple from '../assets/pineapple-supply-co-KvbCXEllJss-unsplash.jpg'
+import Canvas from "../components/Canvas"
+import Button from "@mui/material/Button"
 import "./Pages.css"
 
 const SongPage = props => {
+    const [visuals, setVisuals] = useState(false);
+    const [text, setText] = useState("Visuals")
     const track = useLocation();
     var image = Pineapple;
     var name = 'example name';
@@ -12,14 +16,38 @@ const SongPage = props => {
         image = track.state.picture;
         name = track.state.name;
     }
+    const toggleVisuals = () => {
+        if (visuals) {
+            setVisuals(false);
+        }
+        else {
+            setVisuals(true);
+        }
+    }
+    const toggleText = () => {
+        if (visuals) {
+            setText("Visuals");
+        }
+        else {
+            setText("Song");
+        }
+    }
     
     return (
     <div className="Page">
-        <div className="Song-Div">
-            <img className="Visual-Img" src={image} style={{ height: "512px", width: "512px" }} />
-            <text>{name}</text>
-            <Player/>
-        </div>
+        <Button variant="text"
+        onClick={() => {toggleVisuals(); toggleText()}}>
+            {text}
+        </Button>
+            <div className="Song-Div">
+                {visuals ?
+                    <Canvas/>
+                :
+                    <><img className="Visual-Img" src={image} style={{ height: "512px", width: "512px" }} />
+                    <text>{name}</text></>
+                }
+                <Player/>
+            </div>
     </div>
     );
 }

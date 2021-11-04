@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useRef, useState, useEffect, useContext } from 'react';
+import React, { useRef, useState, useEffect, useContext, createContext } from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import MyAccount from './pages/MyAccount';
 import Home from './pages/Home';
@@ -16,11 +16,11 @@ import PrivateRoute from "./components/PrivateRoute";
 import SongPage from "./pages/SongPage";
 import SearchPage from "./pages/SearchPage";
 import AddProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
-import Visualizer from "./pages/Visualizer";
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 
 const auth = getAuth();
+export const NavBarContext = createContext();
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -54,12 +54,10 @@ function App() {
                     <Route path="/myaccount" component={MyAccount} />
                     <Route path="/profilepicture" component={AddProfilePicture} />
                     <Route path="/song" component={SongPage}/>
-                    <Route path="/visual" component={Visualizer}/>
                     <Route path="/groupsessionhome" component={GroupSessionJoined}/>
                   </Switch>
                 </div>
               </div>
-
             : null
             // : <Redirect to="/login" />
           }

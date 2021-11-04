@@ -42,11 +42,5 @@ export const NavbarData = [
         title: "Song",
         icon: <AlbumIcon />,
         link: "/song"
-    },
-
-    {
-        title: "Visualizer",
-        icon: <GraphicEqIcon />,
-        link: "/visual"
     }
 ];
