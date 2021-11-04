@@ -214,7 +214,10 @@ export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sess
             play={play}
             //autoPlay={true}
             uris={songQueue}
-            offset={offset} />
+            offset={offset} 
+            styles={{
+              color: '#FFFFFF',
+            }}/>
             
             <div className="Player-Div">
                 <button className="forward-rewind" onClick={() => handleReverse()}><FastRewindRoundedIcon style={{ fontSize: 50 }} /></button>
