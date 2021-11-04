@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
 import SpotifyPlayer from "react-spotify-web-playback"
 import app from "../firebase";
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection, query, orderBy, limit, getDoc, doc, onSnapshot} from "firebase/firestore";
+import { TimeContext } from '../contexts/TimeContext';
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
@@ -32,9 +33,10 @@ async function getAccessToken() {
   return docSnap.data();
 }
 
-export default function Player() {
+export default function Player({getTime}) {
   const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("")
+  const {setTime} = useContext(TimeContext);
   useEffect(() => {
     var promise = getAccessToken();
     promise.then((ret) => {
@@ -48,8 +50,7 @@ export default function Player() {
   }
   console.log(isLoaded)
 
-  
-  const [play, setPlay] = useState(false)
+  var play2 = true;
   let queue = GetQueue();
   console.log(queue);
  
@@ -58,9 +59,11 @@ export default function Player() {
     <SpotifyPlayer
       token={accessToken}
       callback={state => {
-        if (!state.isPlaying) console.log("shit")//setPlay(false)
+        if (!state.isPlaying) play2 = false;
+        else play2 = true;
+        setTime({timeStamp: new Date(), elapsed: state.progressMs, isPlaying: play2});
       }}
-      play={play}
+      play={play2}
       autoPlay={true}
       uris={queue}
     />
