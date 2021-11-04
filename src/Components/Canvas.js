@@ -3,6 +3,7 @@ import songFile from './rocketMan.wav';
 import Overlay from 'react-bootstrap/Overlay';
 import Button from 'react-bootstrap/Button';
 import { SketchPicker } from 'react-color';
+import { TimeContext } from '../contexts/TimeContext';
 
 // Changing Variables
 let ctx, x_end, y_end, bar_height;
@@ -17,17 +18,21 @@ const center_x = width / 2;
 const center_y = height / 2;
 
 class Canvas extends Component {
+    static contextType = TimeContext;
     constructor(props) {
         super(props)
         this.audio = new Audio(songFile);
         this.canvas = createRef();
         this.target = createRef();
+        this.elapsedTime = 0;
+        this.endTime = new Date();
+        this.toStart = true;
 
         this.state = {
             visColor: '#2032CD',
             show: false,
             opacity: 1,
-            buttonMessage: "Settings"
+            buttonMessage: "Settings",
         }
     }
 
@@ -42,7 +47,7 @@ class Canvas extends Component {
             const rads = Math.PI * 2 / bars;
 
             // Math is magical
-            bar_height = this.frequency_array[i] * 2;
+            bar_height = 130 /*this.frequency_array[i]*/ * 2;
 
             const x = center_x + Math.cos(rads * i) * (radius);
             const y = center_y + Math.sin(rads * i) * (radius);
@@ -50,35 +55,23 @@ class Canvas extends Component {
             y_end = center_y + Math.sin(rads * i) * (radius + bar_height);
 
             //draw a bar
-            this.drawBar(x, y, x_end, y_end, this.frequency_array[i], ctx, canvas);
+            this.drawBar(x, y, x_end, y_end, ctx, canvas);
         }
     }
 
-    drawBar(x1=0, y1=0, x2=0, y2=0, frequency, ctx, canvas) {
+    drawBar(x1=0, y1=0, x2=0, y2=0, ctx, canvas) {
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, "rgba(35, 7, 77, 1)");
         gradient.addColorStop(1, "rgba(204, 83, 51, 1)");
         ctx.fillStyle = gradient;
         
-        const lineColor = this.state.visColor;//"rgb(" + 20 + ", " + 50 + ", " + 205 + ")";
+        const lineColor = this.state.visColor;
         ctx.strokeStyle = lineColor;
         ctx.lineWidth = bar_width;
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
         ctx.stroke();
-    }
-
-    componentDidMount() {
-        this.context = new (window.AudioContext || window.webkitAudioContext)();
-        this.source = this.context.createMediaElementSource(this.audio);
-
-        this.analyser = this.context.createAnalyser();
-        this.source.connect(this.analyser);
-        this.analyser.connect(this.context.destination);
-        this.frequency_array = new Uint8Array(this.analyser.frequencyBinCount);
-
-
     }
 
     togglePlay = () => {
@@ -94,15 +87,16 @@ class Canvas extends Component {
     }
 
     tick = () => {
-        this.animationLooper(this.canvas.current);
-        this.analyser.getByteTimeDomainData(this.frequency_array);
-        this.rafId = requestAnimationFrame(this.tick);
-    }
-
-    componentWillUnmount() {
-        cancelAnimationFrame(this.rafId);
-        this.analyser.disconnect();
-        this.source.disconnect();
+        if (!this.context.isPlaying) {
+            cancelAnimationFrame(this.rafId);
+        }
+        else {
+            this.endTime = new Date();
+            this.elapsedTime = (this.endTime - this.context.timeStamp) + this.context.elapsed;
+            console.log("Time: " + this.elapsedTime);
+            this.animationLooper(this.canvas.current);
+            this.rafId = requestAnimationFrame(this.tick);
+        }
     }
 
     handleShow (event) {
@@ -128,10 +122,20 @@ class Canvas extends Component {
             visColor: color.hex
         })
     }
+    
+    toggleStart = () => {
+        if(this.toStart) {
+            this.rafId = requestAnimationFrame(this.tick);
+            this.toStart = false;
+        } else {
+            cancelAnimationFrame(this.rafId);
+            this.toStart = true;
+        }
+    }
 
     render() {
         return <>
-            <button onClick={this.togglePlay}>Play/Pause</button>
+            <button onClick={this.toggleStart}>Play/Pause</button>
             <Button variant="danger" ref={this.target} onClick={this.handleShow.bind(this)}>
                 {this.state.buttonMessage}
             </Button>
