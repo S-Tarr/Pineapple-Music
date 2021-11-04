@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom"
 import React, { useState } from 'react';
-import Player from '../components/Player';
+import Player from '../components/SpotifyPlayer';
 import Pineapple from '../assets/pineapple-supply-co-KvbCXEllJss-unsplash.jpg'
 import Canvas from "../components/Canvas"
 import Button from "@mui/material/Button"
@@ -12,9 +12,11 @@ const SongPage = props => {
     const track = useLocation();
     var image = Pineapple;
     var name = 'example name';
+    var uri = null;
     if (track.state) {
         image = track.state.picture;
         name = track.state.name;
+        uri = track.state.trackUri;
     }
     const toggleVisuals = () => {
         if (visuals) {
