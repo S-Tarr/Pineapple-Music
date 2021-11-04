@@ -29,6 +29,7 @@ function GetQueue() {
 async function getAccessToken() {
   const docRef = doc(db, "users", auth.currentUser.uid);
   const docSnap = await getDoc(docRef);
+  console.log(docSnap.data())
   return docSnap.data();
 }
 
@@ -40,9 +41,13 @@ export default function Player({getTime}) {
     var promise = getAccessToken();
     promise.then((ret) => {
       setAccessToken(ret.SpotifyToken);
+      console.log(ret.SpotifyToken)
+      console.log(accessToken)
     });
     console.log(accessToken);
   }, [isLoaded])
+
+  console.log(accessToken)
 
   if (accessToken == undefined) {
     setIsLoaded(false)
