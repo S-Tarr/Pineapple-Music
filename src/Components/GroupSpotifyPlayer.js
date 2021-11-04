@@ -93,6 +93,7 @@ export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sess
                 }
                 // console.log(doc.data().queueOffset);
                 setOffset(doc.data().queueOffset);
+                // console.log(doc.data().queueOffset, offset);
             })
         });
         return () => unsubscribe; 
@@ -176,9 +177,11 @@ export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sess
   async function handleSkip() {
     // setQueue(queue.slice(queue.indexOf(uri)));
     if (offset == songQueue.length - 1) {
+      // setOffset(songQueue.len - 1);
       return;
     }
 
+    // console.log("skip: " + offset);
     await updateDoc(doc(db, 'groupSessions', docId), {
         queueOffset: offset + 1,
     });
@@ -186,9 +189,11 @@ export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sess
 
   async function handleReverse() {
     if (offset == 0) {
+      // setOffset(0);
       return;
     }
 
+    // console.log("reverse: " + offset);
     await updateDoc(doc(db, 'groupSessions', docId), {
       queueOffset: offset - 1,
     });
