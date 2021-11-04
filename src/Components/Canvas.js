@@ -28,7 +28,9 @@ class Canvas extends Component {
         this.endTime = new Date();
         this.toStart = true;
         this.i = 0;
+        this.y = 0;
         this.barBump = 200;
+        this.colors = '#2032CD';
 
         this.state = {
             visColor: '#2032CD',
@@ -67,7 +69,7 @@ class Canvas extends Component {
         gradient.addColorStop(1, "rgba(204, 83, 51, 1)");
         ctx.fillStyle = gradient;
         
-        const lineColor = this.state.visColor;
+        const lineColor = this.colors;//this.state.visColor;
         ctx.strokeStyle = lineColor;
         ctx.lineWidth = bar_width;
         ctx.beginPath();
@@ -95,8 +97,8 @@ class Canvas extends Component {
         else {
             this.endTime = new Date();
             this.elapsedTime = ((this.endTime - this.context.timeStamp) + this.context.elapsed) / 1000;
-            console.log("TIME: " + this.elapsedTime);
-            console.log("START: " + this.context.beats[this.i].start);
+            //console.log("TIME: " + this.elapsedTime);
+            //console.log("START: " + this.context.beats[this.i].start);
             if (this.elapsedTime >= this.context.beats[this.i].start) {
                 if (this.barBump < 260) {
                     this.barBump = this.barBump + 60;
@@ -108,7 +110,18 @@ class Canvas extends Component {
                     this.barBump = this.barBump - 3;
                 }
             }
-            console.log("BarBump: " + this.barBump);
+            if (this.elapsedTime >= this.context.segments[this.y].start) {
+                console.log("PITCHES: " + this.context.segments[this.y].pitches[0]);
+                this.colors = this.state.visColor;
+                this.colors = this.colors.substring(1);
+                var temp = parseInt(this.colors, 16);
+                console.log("TEMP: " + temp);
+                temp = parseInt(temp * (1 - this.context.segments[this.y].pitches[0]));
+                this.colors = "#" + temp.toString(16);
+                console.log("HEX: " + this.colors);
+                this.y++;
+            }
+            //console.log("BarBump: " + this.barBump);
             this.animationLooper(this.canvas.current);
             this.rafId = requestAnimationFrame(this.tick);
         }
@@ -147,7 +160,7 @@ class Canvas extends Component {
             this.toStart = true;
         }
     }
-
+    
     render() {
         return <>
             <button onClick={this.toggleStart}>Start/Stop Visualizer</button>
