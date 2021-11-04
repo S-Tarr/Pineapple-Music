@@ -35,6 +35,7 @@ function SearchBar({ placeholder, spotifyData, authorized }) {
   useEffect(() => {
     if (!access_token) return
     spotifyApi.setAccessToken(access_token);
+    console.log(access_token)
     handleSubmitToken();
   }, [access_token])
 
