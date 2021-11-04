@@ -43,6 +43,7 @@ async function getAccessToken() {
 export default function Player({getTime}) {
   const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("")
+  const [trackId, setTrackId] = useState();
   const {setTime} = useContext(TimeContext);
   useEffect(() => {
     var promise = getAccessToken();
@@ -60,7 +61,9 @@ export default function Player({getTime}) {
   var play2 = true;
   let queue = GetQueue();
   console.log(queue);
- 
+  
+
+
   if (!accessToken) return null;
   spotifyApi.setAccessToken(accessToken);
   return (
@@ -73,10 +76,10 @@ export default function Player({getTime}) {
         else play2 = true;
         console.log("Track id" + state.track.id);
         if (state.track.id != undefined) {
-        spotifyApi.getAudioAnalysisForTrack(state.track.id)
+          spotifyApi.getAudioAnalysisForTrack(state.track.id)
           .then(function(data) {
             console.log("Beats Info: " + data.body.beats);
-          setTime({timeStamp: new Date(), elapsed: state.progressMs,
+            setTime({timeStamp: new Date(), elapsed: state.progressMs,
             isPlaying: play2, beats: data.body.beats});
           }, 
           function(err) {
