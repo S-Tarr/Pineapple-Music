@@ -43,26 +43,42 @@ export default class GroupSessionJoined extends React.Component{
         super(props);
         this.inputRef = createRef();
         this.inputRef2 = createRef();
-
-        if (localStorage.getItem("user-data") == null) {
+        
+        console.log(props.location.props);
+        if (props.location.props == undefined) {
+            const persistentData = localStorage.getItem("user-data");
+            const data = JSON.parse(persistentData);
+            this.state = {
+                title: data.title,
+                sessionId: data.sessionId,
+                imageUrl: persistentData.imageUrl, 
+                username: persistentData.username, 
+                createdAt: persistentData.createdAt,
+                show :false,
+                showSearch : false,
+                opacity:1,
+                color : "rgba(" +40 + "," + 40 + "," + 40 + "," + 0.2 + ")",
+                buttonMessage :"Open Song Queue",
+                isPlaying: false,
+            }
+        }
+        else {
+            this.state = {
+                title: props.location.props.title,
+                sessionId: props.location.props.sessionId,
+                imageUrl: props.location.props.imageUrl, 
+                username: props.location.props.userName, 
+                createdAt: props.location.props.createdAt,
+                show :false,
+                showSearch : false,
+                opacity:1,
+                color : "rgba(" +40 + "," + 40 + "," + 40 + "," + 0.2 + ")",
+                buttonMessage :"Open Song Queue",
+                isPlaying: false,
+            }
+            localStorage.clear();
             const groupSessionData = {title: props.location.props.title, sessionId: props.location.props.sessionId, imageUrl: props.location.props.imageUrl, username: props.location.props.userName, createdAt: props.location.props.createdAt}
             localStorage.setItem("user-data", JSON.stringify(groupSessionData));
-        }
-        
-        const persistentData = localStorage.getItem("user-data");
-        const data = JSON.parse(persistentData);
-        this.state = {
-            title: data.title,
-            sessionId: data.sessionId,
-            imageUrl: persistentData.imageUrl, 
-            username: persistentData.username, 
-            createdAt: persistentData.createdAt,
-            show :false,
-            showSearch : false,
-            opacity:1,
-            color : "rgba(" +40 + "," + 40 + "," + 40 + "," + 0.2 + ")",
-            buttonMessage :"Open Song Queue",
-            isPlaying: false,
         }
         console.log(this.state);
 
@@ -142,11 +158,11 @@ export default class GroupSessionJoined extends React.Component{
                         </div>
                         )}
                     </Overlay>
-                    <div className="Player-Div">
+                    {/* <div className="Player-Div">
                         <button className="forward-rewind"><FastRewindRoundedIcon style={{ fontSize: 50 }}/></button>
                         <button className="playPauseButton"><PlayArrowRoundedIcon style={{ fontSize: 50 }}/></button>
                         <button className="forward-rewind"><FastForwardRoundedIcon style={{ fontSize: 50 }}/></button>
-                    </div>
+                    </div> */}
 			<UserList sessionId={this.state.sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
                 </div>
                 <div className="chat-section" style={chatStyle}>
