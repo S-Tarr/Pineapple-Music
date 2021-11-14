@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import app from "../firebase";
+import app from "../../firebase";
 import {
   collection,
   getDocs,
@@ -90,7 +90,7 @@ function GetUsers(sessionId) {
           });
       });
     });
-  }, []);
+  }, [sessionId]);
   return users;
 }
 

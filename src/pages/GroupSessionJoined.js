@@ -6,7 +6,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 import { Typography } from "@mui/material";
 import ChatRoom from "../components/Chat/ChatRoom";
-import UserList from "../components/UserList";
+import UserList from "../components/GroupSession/UserList";
 
 import app from "../firebase";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
@@ -23,7 +23,7 @@ import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import FastRewindRoundedIcon from '@mui/icons-material/FastRewindRounded';
 import FastForwardRoundedIcon from '@mui/icons-material/FastForwardRounded';
 import { useDrag } from 'react-dnd';
-import GroupSessionQueueDisplay from "../components/GroupSessionQueueDisplay";
+import GroupSessionQueueDisplay from "../components/GroupSession/GroupSessionQueueDisplay";
 
 const pgStyle = {
     "display": "flex",

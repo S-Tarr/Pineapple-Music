@@ -31,7 +31,6 @@ import {
   query,
   orderBy,
   onSnapshot,
-  where,
 } from "firebase/firestore";
 
 // Firebase configuration
@@ -129,7 +128,6 @@ export function AuthProvider({ children }) {
         if (currDoc.data().sessionId === sessionId) {
           const sessionRef = doc(db, "groupSessions", currDoc.id);
           console.log("sessionRef", sessionRef);
-          const userId = currentUser.uid;
           updateDoc(sessionRef, {
             [`users.${currentUser.uid}`]: "active",
           });

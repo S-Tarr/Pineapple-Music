@@ -6,6 +6,7 @@ import {
   IconButton,
   InputBase,
   LinearProgress,
+  CircularProgress,
   Modal,
   Typography,
 } from "@mui/material";
@@ -23,8 +24,8 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 
-import GroupSessionCard from "../components/GroupSessionCard";
-import GroupSessionForm from "../components/GroupSessionForm";
+import GroupSessionCard from "../components/GroupSession/GroupSessionCard";
+import GroupSessionForm from "../components/GroupSession/GroupSessionForm";
 import { useAuth } from "../contexts/AuthContext";
 
 const style = {
@@ -84,9 +85,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const db = getFirestore(app); // Firestore database
 
 function GroupSession() {
+  const [pageLoading, setPageLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  useEffect(() => {
+    setPageLoading(false);
+  }, [])
 
   const { searchGroupSessions, getFormattedDate } = useAuth();
   const auth = getAuth();
@@ -206,6 +212,7 @@ function GroupSession() {
           inputProps={{ "aria-label": "search" }}
         />
       </Search>
+{pageLoading ? (<CircularProgress />) : (
       <Container maxWidth="md" sx={{ marginTop: 2, paddingBottom: 4 }}>
         <Grid container alignItems="center" justifyContent="center" spacing={9}>
           <Grid
@@ -247,6 +254,7 @@ function GroupSession() {
           </Grid>
         )}
       </Container>
+)}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Alert, Button, TextField, Typography } from "@mui/material";
-import app from "../firebase";
+import app from "../../firebase";
 import {
   collection,
   getDocs,
@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database

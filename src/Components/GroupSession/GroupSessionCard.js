@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 import { useHistory } from "react-router";
 
-import { useAuth } from "../contexts/AuthContext";
-import app from "../firebase";
+import { useAuth } from "../../contexts/AuthContext";
+import app from "../../firebase";
 import { getAuth } from "firebase/auth";
 import {
   getFirestore,

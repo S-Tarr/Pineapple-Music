@@ -2,6 +2,7 @@ import React from 'react'
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import PersonIcon from '@mui/icons-material/Person';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import ImageIcon from '@mui/icons-material/Image';
 import SearchIcon from '@mui/icons-material/Search';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
@@ -22,7 +23,7 @@ export const NavbarData = [
 
     {
         title: "Group Session",
-        icon: <AddRoundedIcon />,
+        icon: <GroupAddIcon />,
         link: "/creategroup"
     },
 
