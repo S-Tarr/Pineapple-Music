@@ -124,6 +124,8 @@ function GroupSession() {
     }
   };
 
+  
+
   useEffect(() => {
     if (sessionIdRef.current.value === "") {
       let currGroupSessions = new Set();

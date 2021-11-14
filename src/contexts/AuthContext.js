@@ -31,6 +31,7 @@ import {
   query,
   orderBy,
   onSnapshot,
+  where,
 } from "firebase/firestore";
 
 // Firebase configuration
@@ -100,15 +101,37 @@ export function AuthProvider({ children }) {
     return a < b ? 1 : a > b ? -1 : 0;
   }
 
+  async function updateUserState() {
+    let groupSessions = new Set();
+    const docSnap = await getDocs(collection(db, "users"));
+    docSnap.forEach((doc) => {
+      if (doc.data().uid === currentUser.uid) {
+        doc.data().groupSessions.forEach((item) => groupSessions.add(item));
+      }
+    });
+
+    const docSnapSessions = await getDocs(collection(db, "groupSessions"));
+    docSnapSessions.forEach((currDoc) => {
+      if (groupSessions.has(currDoc.data().sessionId)) {
+        const sessionRef = doc(db, "groupSessions", currDoc.id);
+        updateDoc(sessionRef, {
+          [`users.${currentUser.uid}`]: "inactive",
+        });
+      }
+    });
+  }
+
   async function joinGroupSession(sessionId) {
     try {
+      console.log("clicked join");
       const docSnapSessions = await getDocs(collection(db, "groupSessions"));
       docSnapSessions.forEach((currDoc) => {
         if (currDoc.data().sessionId === sessionId) {
           const sessionRef = doc(db, "groupSessions", currDoc.id);
           console.log("sessionRef", sessionRef);
+          const userId = currentUser.uid;
           updateDoc(sessionRef, {
-            users: arrayUnion(currentUser.uid),
+            [`users.${currentUser.uid}`]: "active",
           });
         }
       });
@@ -347,6 +370,7 @@ export function AuthProvider({ children }) {
     getGroupSessions,
     joinGroupSession,
     getFormattedDate,
+    updateUserState,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
