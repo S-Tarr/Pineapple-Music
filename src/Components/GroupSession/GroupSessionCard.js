@@ -22,15 +22,8 @@ import { getAuth } from "firebase/auth";
 import {
   getFirestore,
   collection,
-  setDoc,
-  addDoc,
   updateDoc,
-  query,
-  orderBy,
-  limit,
-  getDoc,
   doc,
-  onSnapshot,
 } from "firebase/firestore";
 
 const auth = getAuth(); // Authorization component
@@ -54,7 +47,6 @@ function SwitchesGroup() {
       ...state,
       [event.target.name]: event.target.checked,
     });
-    console.log(event.target.name, "state: ", event.target.checked);
   };
 
   return (
