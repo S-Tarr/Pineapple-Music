@@ -7,6 +7,12 @@ import {
   CardMedia,
   Typography,
   Popover,
+  Switch,
+  FormControl,
+  FormLabel,
+  FormGroup,
+  FormControlLabel,
+  FormHelperText
 } from "@mui/material";
 import { useHistory } from "react-router";
 
@@ -35,6 +41,42 @@ async function handleSubmitGroup(groupID) {
   await updateDoc(doc(userRef, auth.currentUser.uid), {
     currentGroup: groupID,
   });
+}
+
+function SwitchesGroup() {
+  const [state, setState] = React.useState({
+    queueing: false,
+    pps: false,
+  });
+
+  const handleChange = (event) => {
+    setState({
+      ...state,
+      [event.target.name]: event.target.checked,
+    });
+    console.log(event.target.name, "state: ", event.target.checked);
+  };
+
+  return (
+    <FormControl component="fieldset" variant="standard">
+      <FormLabel component="legend">Assign Permissions</FormLabel>
+      <FormGroup>
+        <FormControlLabel
+          control={
+            <Switch checked={state.gilad} onChange={handleChange} name="queueing" />
+          }
+          label="Queueing"
+        />
+        <FormControlLabel
+          control={
+            <Switch checked={state.jason} onChange={handleChange} name="pps" />
+          }
+          label="Play/Pause"
+        />
+      </FormGroup>
+      <FormHelperText>All permissions can be adjusted after room creation</FormHelperText>
+    </FormControl>
+  );
 }
 
 function GroupSessionCard({
@@ -126,6 +168,9 @@ function GroupSessionCard({
         >
           <Typography sx={{ p: 2 }}>Session ID copied.</Typography>
         </Popover>
+      </CardActions>
+      <CardActions>
+        <SwitchesGroup />
       </CardActions>
     </Card>
   );
