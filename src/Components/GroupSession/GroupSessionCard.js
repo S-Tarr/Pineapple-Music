@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Card,
@@ -10,18 +10,30 @@ import {
 } from "@mui/material";
 import { useHistory } from "react-router";
 
-import { useAuth } from "../contexts/AuthContext";
-import app from "../firebase";
+import { useAuth } from "../../contexts/AuthContext";
+import app from "../../firebase";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, setDoc, addDoc, updateDoc, query, orderBy, limit, getDoc, doc, onSnapshot} from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  setDoc,
+  addDoc,
+  updateDoc,
+  query,
+  orderBy,
+  limit,
+  getDoc,
+  doc,
+  onSnapshot,
+} from "firebase/firestore";
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
 async function handleSubmitGroup(groupID) {
-  const userRef = collection(db, 'users');
+  const userRef = collection(db, "users");
   await updateDoc(doc(userRef, auth.currentUser.uid), {
-      currentGroup: groupID,
+    currentGroup: groupID,
   });
 }
 
@@ -29,7 +41,7 @@ function GroupSessionCard({
   props: { title, imageUrl, username, createdAt, sessionId },
 }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const { joinGroupSession } = useAuth();
+  const { joinGroupSession, updateUserState } = useAuth();
 
   const history = useHistory();
   async function handleJoin() {
@@ -46,6 +58,14 @@ function GroupSessionCard({
       },
     });
   }
+
+  let path = window.location.pathname;
+  /* potentially changes navbar on page change */
+  useEffect(() => {
+    if (window.location.pathname !== "/groupsessionhome") {
+      updateUserState();
+    }
+  }, [path]);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);

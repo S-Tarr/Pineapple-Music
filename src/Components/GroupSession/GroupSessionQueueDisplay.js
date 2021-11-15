@@ -2,9 +2,9 @@ import { useState, useEffect, createRef} from 'react';
 import Overlay from 'react-bootstrap/Overlay';
 import Button from 'react-bootstrap/Button';
 import { useDrag, useDrop } from 'react-dnd';
-import app from "../firebase";
-import GroupSessionSearchBar from '../components/GroupSessionSearchBar';
-import Track from './Track';
+import app from "../../firebase";
+import GroupSessionSearchBar from './GroupSessionSearchBar';
+import Track from '../Track';
 import Player from './GroupSpotifyPlayer'
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";

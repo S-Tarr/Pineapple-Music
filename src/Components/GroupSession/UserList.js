@@ -5,12 +5,14 @@ import {
   List,
   ListItem,
   ListItemAvatar,
+  ListItemIcon,
   ListItemText,
   SwipeableDrawer,
   Typography,
 } from "@mui/material";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import app from "../firebase";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import app from "../../firebase";
 import {
   collection,
   getDocs,
@@ -23,8 +25,9 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 const storage = getStorage(); //Firebase Storage
 const db = getFirestore(app); // Firestore database
 
-function ListInDrawer({sessionId}) {
-  const users = GetUsers(sessionId)
+function ListInDrawer({ sessionId }) {
+  const users = GetUsers(sessionId);
+  console.log(users);
   let key = 0;
   return (
     <>
@@ -45,7 +48,14 @@ function ListInDrawer({sessionId}) {
             <ListItemAvatar>
               <Avatar alt={user.uid} src={user.imageUrl} />
             </ListItemAvatar>
-            <ListItemText primary={user.uid} />
+            <ListItemText primary={user.uid.substring(0, 20)} />
+            <ListItemIcon>
+              {user.active === "active" ? (
+                <FiberManualRecordIcon color="success" />
+              ) : (
+                <FiberManualRecordIcon color="disabled" />
+              )}
+            </ListItemIcon>
           </ListItem>
         ))}
       </List>
@@ -68,8 +78,8 @@ function GetUsers(sessionId) {
       querySnapshot.forEach((doc) => {
         usersInSession = doc.data().users;
       });
-      usersInSession.forEach((uid) => {
-        const props = { uid: uid, imageUrl: "" };
+      Object.keys(usersInSession).forEach((uid) => {
+        const props = { uid: uid, imageUrl: "", active: usersInSession[uid] };
         getDownloadURL(ref(storage, uid))
           .then((url) => {
             props.imageUrl = url;
@@ -80,7 +90,7 @@ function GetUsers(sessionId) {
           });
       });
     });
-  }, []);
+  }, [sessionId]);
   return users;
 }
 
@@ -117,7 +127,7 @@ function UserList({ sessionId }) {
           onClose={toggleDrawer(anchor, false)}
           onOpen={toggleDrawer(anchor, true)}
         >
-          <ListInDrawer sessionId={sessionId}/>
+          <ListInDrawer sessionId={sessionId} />
         </SwipeableDrawer>
       </Fragment>
     </div>

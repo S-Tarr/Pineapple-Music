@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import SpotifyPlayer from "react-spotify-web-playback"
-import app from "../firebase";
+import app from "../../firebase";
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection, query, orderBy, limit, getDoc, getDocs, updateDoc, where, doc, onSnapshot} from "firebase/firestore";
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
