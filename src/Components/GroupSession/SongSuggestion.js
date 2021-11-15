@@ -54,7 +54,7 @@ function GetRecommendation(sessionId) {
       );
 
       spotifyApi.setAccessToken(
-        "BQDSfOFyQ6ZCM4j2lF3fV2V46JAWjTswRj8q78kvzt3OFPJsBz_W2y94wYmIyYWK5VA8Exc2-ic7BKJ3Bf-TQl0RFhQtzCRqOXrt_NYfm-7aklvRG4vkEn0nekqYhr4wnkgVbxgtlr_OkAyBthnMigXOPeOCguju4kjRFNFkmFo8-L7aO7ncSQihqpzsUbBvNsmHw_WV9s-zzQgggVDLo-6RE5vpEYNS56VvXXzBWQg_jYTcYBGEKyopMU6sYtbzPeKPHdZ_jMNDzwTOZknaK-4zqN7ehYzAjrjURZacxsLnJw"
+        "BQB8wJaYTq9wo2O-q42cArYft3FkML8sKW9XipTb8JJ-5FAzqMLcEml3POIDku68hAbBD0u2RsmsjN6V5CSjwDJyVJ03S9_lemyviRzqP__wMkKchfV2c0_FeUNiMHkDaXtjoyqypxteeqRGRLhIK9qASM_nplKpKoUzWumprKvrNcsHNKvSomahMNtYvutlkuk6mqWwEzcEwIYsa4rQbHYVUaq_IGa6gurgespvXiccU42FxjnbR6ODwLfbWkNk0wUBd64G4VvEcQ3dWjUqqMW9-bRmTXl36Q4Ah_ZVkDT0og"
       );
       //TODO: change this access token later currently just for testing
 
@@ -89,14 +89,14 @@ function SongSuggestion({ sessionId }) {
     <Card
       elevation={5}
       style={{
-        backgroundColor: "rgba(255, 255, 255, 0.1)",
+        backgroundColor: "rgba(255, 255, 255, 0.2)",
         backdropFilter: "blur(10px)",
       }}
     >
       <Paper
         align="center"
         style={{
-          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          backgroundColor: "rgba(255, 255, 255, 0.2)",
           backdropFilter: "blur(10px)",
         }}
       >
@@ -132,10 +132,18 @@ function SongSuggestion({ sessionId }) {
             }
             direction="row"
           >
-            <Button variant="text" disabled={(recommendation === undefined)} endIcon={<ThumbUpIcon />}>
+            <Button
+              variant="text"
+              disabled={recommendation === undefined}
+              endIcon={<ThumbUpIcon />}
+            >
               &nbsp;&nbsp;Upvote&nbsp;
             </Button>
-            <Button variant="text" disabled={(recommendation === undefined)} endIcon={<ThumbDownIcon />}>
+            <Button
+              variant="text"
+              disabled={recommendation === undefined}
+              endIcon={<ThumbDownIcon />}
+            >
               Downvote
             </Button>
           </Stack>

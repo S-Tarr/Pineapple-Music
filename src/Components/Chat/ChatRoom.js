@@ -31,11 +31,11 @@ const msgLstStyle = {
 };
 
 const suggestionStyle = {
-  paddingRight: '20px',
-  paddingTop: '100px',
-  backgroundAttachment: 'fixed',
-  width: '100%',
-  height: '100%',
+  paddingRight: "20px",
+  paddingTop: "100px",
+  backgroundAttachment: "fixed",
+  width: "100%",
+  height: "100%",
 };
 
 const userListStyle = {
@@ -114,25 +114,25 @@ const ChatRoom = ({ groupSessionID }) => {
       <div className="messages-container-page">
         <Grid container spacing={10}>
           <Grid item xs={8}>
-              <MessageList
-                groupSessionID={groupSessionID}
-                muted={muted}
-                setMuted={setMuted}
-                messagesWaiting={messagesWaiting}
-                setMessagesWaiting={setMessagesWaiting}
-              />
+            <MessageList
+              groupSessionID={groupSessionID}
+              muted={muted}
+              setMuted={setMuted}
+              messagesWaiting={messagesWaiting}
+              setMessagesWaiting={setMessagesWaiting}
+            />
           </Grid>
-          <Grid item xs={4} style={suggestionStyle}  sx={{ zIndex: 'modal' }}>
-            <SongSuggestion sessionId={groupSessionID}/>
+          <Grid item xs={4} style={suggestionStyle} sx={{ zIndex: "app bar" }}>
+            <SongSuggestion sessionId={groupSessionID} />
           </Grid>
           <Grid item xs={12}>
-              <MessageForm
-                groupSessionID={groupSessionID}
-                muted={muted}
-                setMuted={setMuted}
-                messagesWaiting={messagesWaiting}
-                setMessagesWaiting={setMessagesWaiting}
-              />
+            <MessageForm
+              groupSessionID={groupSessionID}
+              muted={muted}
+              setMuted={setMuted}
+              messagesWaiting={messagesWaiting}
+              setMessagesWaiting={setMessagesWaiting}
+            />
           </Grid>
         </Grid>
       </div>

@@ -10,6 +10,7 @@ import {
   SwipeableDrawer,
   Typography,
 } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import app from "../../firebase";
@@ -22,6 +23,13 @@ import {
 } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
+const useStyles = makeStyles({
+  paper: {
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    backdropFilter: "blur(10px)",
+  },
+});
+
 const storage = getStorage(); //Firebase Storage
 const db = getFirestore(app); // Firestore database
 
@@ -30,7 +38,7 @@ function ListInDrawer({ sessionId }) {
   console.log(users);
   let key = 0;
   return (
-    <>
+    <div>
       <br />
       <div align="center">
         <Typography
@@ -42,7 +50,7 @@ function ListInDrawer({ sessionId }) {
           Group Members
         </Typography>{" "}
       </div>
-      <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
+      <List>
         {users.map((user) => (
           <ListItem key={key++} alignItems="center">
             <ListItemAvatar>
@@ -59,7 +67,7 @@ function ListInDrawer({ sessionId }) {
           </ListItem>
         ))}
       </List>
-    </>
+    </div>
   );
 }
 
@@ -95,6 +103,7 @@ function GetUsers(sessionId) {
 }
 
 function UserList({ sessionId }) {
+  const classes = useStyles();
   const [state, setState] = useState({
     top: false,
     left: false,
@@ -122,6 +131,7 @@ function UserList({ sessionId }) {
           <PeopleAltIcon fontSize="large" />
         </IconButton>
         <SwipeableDrawer
+          classes={{ paper: classes.paper }}
           anchor={anchor}
           open={state[anchor]}
           onClose={toggleDrawer(anchor, false)}
