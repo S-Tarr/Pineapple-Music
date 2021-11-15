@@ -59,6 +59,7 @@ async function handleSubmitToken(access_token) {
   await updateDoc(doc(userRef, auth.currentUser.uid), {
       SpotifyToken: access_token,
   });
+  console.log(`submitted token` + access_token)
 }
 
 var request = require('request'); // "Request" library

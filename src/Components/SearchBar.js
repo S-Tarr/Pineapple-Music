@@ -36,12 +36,41 @@ async function GetSessionUID(groupID) {
   });
 }
 
+async function getAccessToken() {
+  const docRef = doc(db, "users", auth.currentUser.uid);
+  const docSnap = await getDoc(docRef);
+  console.log(docSnap.data())
+  return docSnap.data();
+}
+
 
 function SearchBar({ placeholder, spotifyData }) {
 
   const [curSession, setCurSession] = useState();
   const [curSessionID, setCurSessionID] = useState();
+
+  //-------Token Handling------------
   const [isLoaded, setIsLoaded] = useState(true);
+  const [access_token, setAccessToken] = useState("");
+  useEffect(() => {
+    var promise = getAccessToken();
+    promise.then((ret) => {
+      setAccessToken(ret.SpotifyToken);
+      console.log(ret.SpotifyToken)
+      console.log(access_token)
+      spotifyApi.setAccessToken(ret.SpotifyToken);
+    });
+    console.log(access_token);
+  }, [isLoaded])
+
+  console.log(access_token)
+
+  if (access_token == undefined) {
+    setIsLoaded(false)
+  }
+  console.log(isLoaded)
+//--------End Token Handling-----------------
+
 
   useEffect(() => {
     const promise = getCurrentSession();
@@ -58,13 +87,15 @@ function SearchBar({ placeholder, spotifyData }) {
   const [wordEntered, setWordEntered] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [playingTrack, setPlayingTrack] = useState();
-  const access_token = spotifyData;
-  useEffect(() => {
+  
+  /*useEffect(() => {
     if (!access_token) return
     spotifyApi.setAccessToken(access_token);
     console.log(access_token)
     handleSubmitToken();
-  }, [access_token])
+  }, [access_token])*/
+
+
 
   useEffect(() => {
     if (!wordEntered) return setSearchResults([])
@@ -81,7 +112,7 @@ function SearchBar({ placeholder, spotifyData }) {
             })
         )
     });
-  }, [wordEntered, access_token])
+  }, [wordEntered])
 
   const handleFilter = (event) => {
     const searchWord = event.target.value;
