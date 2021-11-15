@@ -124,7 +124,7 @@ function SongSuggestion({ sessionId }) {
             justifyContent="center"
             divider={
               <Divider
-                color="dark"
+                color="primary"
                 variant="middle"
                 orientation="vertical"
                 flexItem

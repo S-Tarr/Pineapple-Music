@@ -20,6 +20,7 @@ import {
   getFirestore,
   query,
   where,
+  onSnapshot,
 } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
@@ -81,23 +82,44 @@ function GetUsers(sessionId) {
       groupSessionRef,
       where("sessionId", "==", sessionId)
     );
-    getDocs(groupSession).then((querySnapshot) => {
+    const unsubscribe = onSnapshot(groupSession, (querySnapshot) => {
       let usersInSession = [];
       querySnapshot.forEach((doc) => {
         usersInSession = doc.data().users;
+        setUsers([]);
+        Object.keys(usersInSession).forEach((uid) => {
+          const props = { uid: uid, imageUrl: "", active: usersInSession[uid] };
+          getDownloadURL(ref(storage, uid))
+            .then((url) => {
+              props.imageUrl = url;
+              setUsers((users) => [...users, props]);
+            })
+            .catch(() => {
+              setUsers((users) => [...users, props]);
+            });
+        });
       });
-      Object.keys(usersInSession).forEach((uid) => {
-        const props = { uid: uid, imageUrl: "", active: usersInSession[uid] };
-        getDownloadURL(ref(storage, uid))
-          .then((url) => {
-            props.imageUrl = url;
-            setUsers((users) => [...users, props]);
-          })
-          .catch(() => {
-            setUsers((users) => [...users, props]);
-          });
-      });
-    });
+
+    })
+    return () => unsubscribe;
+
+    // getDocs(groupSession).then((querySnapshot) => {
+    //   let usersInSession = [];
+    //   querySnapshot.forEach((doc) => {
+    //     usersInSession = doc.data().users;
+    //   });
+    //   Object.keys(usersInSession).forEach((uid) => {
+    //     const props = { uid: uid, imageUrl: "", active: usersInSession[uid] };
+    //     getDownloadURL(ref(storage, uid))
+    //       .then((url) => {
+    //         props.imageUrl = url;
+    //         setUsers((users) => [...users, props]);
+    //       })
+    //       .catch(() => {
+    //         setUsers((users) => [...users, props]);
+    //       });
+    //   });
+    // });
   }, [sessionId]);
   return users;
 }
