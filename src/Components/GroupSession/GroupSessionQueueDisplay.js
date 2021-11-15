@@ -66,7 +66,17 @@ function ExampleDrag(props) {
 
     return (
         <div ref={drag}>
-            <Track track={props.item}></Track>
+            {/* <Track track={props.item}></Track> */}
+            <div
+                className="d-flex m-2 align-items-center"
+                style={{ cursor: "pointer", display:"flex", flexDirection:'row' }}
+                >
+                <img src={props.item.albumUrl} style={{ height: "64px", width: "64px" }} />
+                <div className="ml-3">
+                    <div>{props.item.title}</div>
+                    <div className="text-muted">{props.item.artist}</div>
+                </div>
+            </div>
         </div>
     )
 }
