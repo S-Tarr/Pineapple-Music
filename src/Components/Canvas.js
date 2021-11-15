@@ -32,6 +32,7 @@ class Canvas extends Component {
         this.barBump = 200;
         this.colors = '#2032CD';
         this.epilepsy = false;
+        this.mode = 0;
 
         this.state = {
             visColor: '#2032CD',
@@ -41,7 +42,7 @@ class Canvas extends Component {
         }
     }
 
-    animationLooper(canvas) {
+    animationLooper0(canvas) {
         canvas.width = width;
         canvas.height = height;
 
@@ -64,7 +65,7 @@ class Canvas extends Component {
         }
     }
 
-    drawBar(x1=0, y1=0, x2=0, y2=0, ctx, canvas) {
+    drawBar(x1, y1, x2, y2, ctx, canvas) {
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, "rgba(35, 7, 77, 1)");
         gradient.addColorStop(1, "rgba(204, 83, 51, 1)");
@@ -129,7 +130,16 @@ class Canvas extends Component {
                 this.y++;
             }
             //console.log("BarBump: " + this.barBump);
-            this.animationLooper(this.canvas.current);
+            switch (this.mode) {
+                case 1:
+                    this.animationLooper0(this.canvas.current);
+                    break;
+                case 2:
+                    console.log("HAHA");
+                    break;
+                default:
+                    this.animationLooper0(this.canvas.current);
+            }
             this.rafId = requestAnimationFrame(this.tick);
         }
     }
