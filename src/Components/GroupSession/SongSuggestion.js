@@ -56,7 +56,7 @@ function GetRecommendation(sessionId) {
       spotifyApi.setAccessToken(
         "BQDSfOFyQ6ZCM4j2lF3fV2V46JAWjTswRj8q78kvzt3OFPJsBz_W2y94wYmIyYWK5VA8Exc2-ic7BKJ3Bf-TQl0RFhQtzCRqOXrt_NYfm-7aklvRG4vkEn0nekqYhr4wnkgVbxgtlr_OkAyBthnMigXOPeOCguju4kjRFNFkmFo8-L7aO7ncSQihqpzsUbBvNsmHw_WV9s-zzQgggVDLo-6RE5vpEYNS56VvXXzBWQg_jYTcYBGEKyopMU6sYtbzPeKPHdZ_jMNDzwTOZknaK-4zqN7ehYzAjrjURZacxsLnJw"
       );
-      //change this access token later currently just for testing
+      //TODO: change this access token later currently just for testing
 
       console.log(songUris);
       spotifyApi
@@ -132,10 +132,10 @@ function SongSuggestion({ sessionId }) {
             }
             direction="row"
           >
-            <Button variant="text" endIcon={<ThumbUpIcon />}>
+            <Button variant="text" disabled={(recommendation === undefined)} endIcon={<ThumbUpIcon />}>
               &nbsp;&nbsp;Upvote&nbsp;
             </Button>
-            <Button variant="text" endIcon={<ThumbDownIcon />}>
+            <Button variant="text" disabled={(recommendation === undefined)} endIcon={<ThumbDownIcon />}>
               Downvote
             </Button>
           </Stack>
