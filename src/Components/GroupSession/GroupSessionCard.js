@@ -97,6 +97,7 @@ function GroupSessionCard({
   /* potentially changes navbar on page change */
   useEffect(() => {
     if (window.location.pathname !== "/groupsessionhome") {
+      console.log("updating userState");
       updateUserState();
     }
   }, [path]);

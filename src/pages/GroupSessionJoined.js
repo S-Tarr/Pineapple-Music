@@ -165,9 +165,9 @@ export default class GroupSessionJoined extends React.Component{
                     </div> */}
 			<UserList sessionId={this.state.sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
                 </div>
-                <div className="chat-section" style={chatStyle}>
+                {/* <div className="chat-section" style={chatStyle}> */}
                     <ChatRoom groupSessionID={this.state.sessionId} groupSessionTitle={this.state.title}/>
-                </div>
+                {/* </div> */}
             </div>
       );
     }
