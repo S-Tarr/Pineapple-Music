@@ -262,7 +262,7 @@ export function AuthProvider({ children }) {
     return cards;
   }
 
-  async function addGroupSession(name, sessionId) {
+  async function addGroupSession(name, sessionId, queueing, pps) {
     try {
       const songs = [];
       const docRef = await addDoc(collection(db, "groupSessions"), {
@@ -272,6 +272,8 @@ export function AuthProvider({ children }) {
         sessionId: sessionId,
         users: [currentUser.uid],
         playState: false,
+        queueing: queueing,
+        pps: pps,
       });
       const docRef2 = await addDoc(collection(db, "groupSessionQueue"), {
         createdAt: Timestamp.now(),

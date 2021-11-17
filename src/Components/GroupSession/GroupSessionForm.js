@@ -27,9 +27,9 @@ function GroupSessionForm(props) {
 
   const { addGroupSession } = useAuth();
   const [error, setError] = useState(""); // Error represents the current message we want displayed, no error message by default
-  const [state, setState] = useState({
-    queueing: false,
-    pps: false,
+  const [permissions, setPermissions] = useState({
+    queueing: true,
+    pps: true,
   });
 
   async function handleSubmit(e) {
@@ -72,7 +72,7 @@ function GroupSessionForm(props) {
 
     //Add session to the page and to the database
     props.onSubmit(nameRef.current.value, idRef.current.value);
-    addGroupSession(nameRef.current.value, idRef.current.value);
+    addGroupSession(nameRef.current.value, idRef.current.value, permissions.queueing, permissions.pps);
   }
 
   return (
@@ -106,7 +106,7 @@ function GroupSessionForm(props) {
         />
         <br />
         <br />
-        <SwitchesGroup state={state} setState={setState}/>
+        <SwitchesGroup permissions={permissions} setPermissions={setPermissions}/>
         <br />
         <br />
         <Button

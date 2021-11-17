@@ -7,10 +7,10 @@ import {
     FormHelperText
 } from "@mui/material";
 
-function SwitchesGroup({state, setState}) {
+function SwitchesGroup({permissions, setPermissions}) {
     const handleChange = (event) => {
-        setState({
-        ...state,
+        setPermissions({
+        ...permissions,
         [event.target.name]: event.target.checked,
         });
         console.log(event.target.checked)
@@ -22,13 +22,13 @@ function SwitchesGroup({state, setState}) {
         <FormGroup>
             <FormControlLabel
             control={
-                <Switch checked={state.queueing} onChange={handleChange} name="queueing" />
+                <Switch checked={permissions.queueing} onChange={handleChange} name="queueing" />
             }
             label="Queueing"
             />
             <FormControlLabel
             control={
-                <Switch checked={state.pps} onChange={handleChange} name="pps" />
+                <Switch checked={permissions.pps} onChange={handleChange} name="pps" />
             }
             label="Play/Pause"
             />
