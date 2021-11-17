@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, Button, TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Button,
+  TextField,
+  Typography
+} from "@mui/material";
 import app from "../../firebase";
 import {
   collection,
@@ -10,6 +15,7 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
+import SwitchesGroup from "./PermissionSwitches";
 import { useAuth } from "../../contexts/AuthContext";
 
 const auth = getAuth(); // Authorization component
@@ -21,6 +27,10 @@ function GroupSessionForm(props) {
 
   const { addGroupSession } = useAuth();
   const [error, setError] = useState(""); // Error represents the current message we want displayed, no error message by default
+  const [state, setState] = useState({
+    queueing: false,
+    pps: false,
+  });
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -94,6 +104,9 @@ function GroupSessionForm(props) {
           inputRef={idRef}
           fullWidth
         />
+        <br />
+        <br />
+        <SwitchesGroup state={state} setState={setState}/>
         <br />
         <br />
         <Button
