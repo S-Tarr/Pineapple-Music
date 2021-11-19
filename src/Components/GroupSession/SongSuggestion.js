@@ -8,6 +8,9 @@ import {
   CardMedia,
   Divider,
   LinearProgress,
+  Slide,
+  Snackbar,
+  SnackbarContent,
   Stack,
   Paper,
   Typography,
@@ -106,8 +109,20 @@ function GetVoteStatus(
   return sessionId;
 }
 
-function VotingResult({ votes, totalUsersInSession }) {
+function VotingResult({
+  votes,
+  totalUsersInSession,
+  addedSongState,
+  handleAddedSongClose,
+}) {
   const percentage = (votes / totalUsersInSession) * 100;
+
+  const addedMessage =
+    "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" +
+    "Added song to the queue";
+  const skippedMessage =
+    "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" +
+    "Skipped song";
 
   return (
     <>
@@ -125,6 +140,22 @@ function VotingResult({ votes, totalUsersInSession }) {
           >{`${votes}/${totalUsersInSession}`}</Typography>
         </Box>
       </Box>
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={addedSongState.open}
+        autoHideDuration={3000}
+        onClose={handleAddedSongClose}
+        TransitionComponent={Slide}
+      >
+        <SnackbarContent
+          style={{
+            color: "black",
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
+            backdropFilter: "blur(10px)",
+          }}
+          message={addedSongState.added ? addedMessage : skippedMessage}
+        />
+      </Snackbar>
     </>
   );
 }
@@ -135,6 +166,18 @@ function SongSuggestion({ sessionId }) {
   const [totalVoteCount, setTotalVoteCount] = useState(0);
   const [totalUsersInSession, setTotalUsersInSession] = useState(0);
   const [recommendation, setRecommendation] = useState();
+
+  const [addedSongState, setAddedSongState] = useState({
+    open: false,
+    added: false,
+  });
+
+  const handleAddedSongClose = () => {
+    setAddedSongState({
+      ...addedSongState,
+      open: false,
+    });
+  };
 
   GetVoteStatus(
     sessionId,
@@ -204,6 +247,22 @@ function SongSuggestion({ sessionId }) {
             }
 
             //TODO:Add the recommended song to the queue if upvote percentage is greater than 50%
+            if (((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50) {
+              console.log(
+                "upvote greater than 50%",
+                ((upvoteCount * 1.0) / totalUsersInSession) * 100
+              );
+              setAddedSongState({
+                open: true,
+                added: true,
+              });
+              console.log(currentSuggestion);
+            } else if (totalVoteCount === totalUsersInSession) {
+              setAddedSongState({
+                open: true,
+                added: false,
+              });
+            }
 
             //Get recommendation song using Spotify API by fetching current songs
             const groupSessionQueueRef = collection(db, "groupSessionQueue");
@@ -222,7 +281,7 @@ function SongSuggestion({ sessionId }) {
                 );
 
                 spotifyApi.setAccessToken(
-                  "BQBZ6XO9kkN5G9Ca48UshjfX-SSsHi7i-5_lS9k0lkgIMJMjLTV3rpR6dU8F3v8smkqA9C4I4TYrBPvWmJZhO90A_gN5aUDQhySTIjlTUCC2ilocTZxSSj9ooJoQNVpevjysgt0sUJa4mf8B39TDq9081s03O-I2Kqu0E_KrCnMfDbmmOQENvoQj_odbdjrPfVW4l9SML4FoDdluSF4wG9ChbM9-jEGkfQbN0IVVjkirnTptHf28X0UEsflBhKMpopmXtB1RX98-BojcbfnIvW4pNt0g4toTrjB-fgt8u6u9dQ"
+                  "BQAu2_-VdA9cjWdAimlPVbycBLW6WXV6BawviGoX3irjSJ8caOFJlbtSYhScDH7a0Q6Vb55xtKs3jNb0CeOLUH7XRVzPa7Bm9O5RgT0Gf7wslefVlz4rTzL8pdAgoAVS8KQb-ZkT_t9L7YGtuNhdov971PU091bWUkhNZoLlWAyvr3k7trDQixNaQc8EJDH0pWYzpqmqpJBimPnKY32wm4mYP4bFei5AiN3TfWsRqRxfqrZ2QdzbtbXLmjwgsVW1Nu_pfOwzqfuyAUKnvd-IaeMGGiJXCR5-khVtE2xnhq7N4w"
                 );
                 //TODO: change this access token later. currently just for testing
 
@@ -262,7 +321,7 @@ function SongSuggestion({ sessionId }) {
         }
       });
     });
-  }, [totalVoteCount, totalUsersInSession, upvoteCount]);
+  }, [totalVoteCount, upvoteCount]);
 
   const handleVote = (event) => {
     event.preventDefault();
@@ -365,6 +424,8 @@ function SongSuggestion({ sessionId }) {
           <VotingResult
             votes={upvoteCount}
             totalUsersInSession={totalUsersInSession}
+            addedSongState={addedSongState}
+            handleAddedSongClose={handleAddedSongClose}
           />
         </CardContent>
       </Paper>
