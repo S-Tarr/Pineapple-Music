@@ -1,33 +1,39 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Box,
   Button,
   Card,
   CardContent,
   CardHeader,
   CardMedia,
+  Chip,
   Divider,
   LinearProgress,
   Slide,
   Snackbar,
-  SnackbarContent,
   Stack,
   Paper,
   Typography,
 } from "@mui/material/";
+import { styled } from "@mui/material/styles";
+import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import app from "../../firebase";
 import {
-  getFirestore,
-  getDocs,
+  arrayRemove,
   collection,
   deleteField,
   doc,
-  query,
-  where,
+  getFirestore,
+  getDocs,
   onSnapshot,
+  query,
+  setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
@@ -114,32 +120,58 @@ function VotingResult({
   totalUsersInSession,
   addedSongState,
   handleAddedSongClose,
+  totalVotes,
 }) {
   const percentage = (votes / totalUsersInSession) * 100;
 
   const addedMessage =
-    "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" +
-    "Added song to the queue";
+    // "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" +
+    "Added song";
   const skippedMessage =
-    "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" +
+    // "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" +
     "Skipped song";
+
+  const LightTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: "rgba(255, 255, 255, 0.3)",
+      backdropFilter: "blur(10px)",
+      boxShadow: theme.shadows[1],
+      fontSize: 11,
+    },
+  }));
 
   return (
     <>
-      <Box sx={{ width: "100%", mr: 1 }}>
-        <Typography>Current Voting Result</Typography>
-      </Box>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Box sx={{ width: "100%", mr: 1 }}>
-          <LinearProgress variant="determinate" value={percentage} />
-        </Box>
-        <Box sx={{ minWidth: 35 }}>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-          >{`${votes}/${totalUsersInSession}`}</Typography>
-        </Box>
-      </Box>
+      <LightTooltip
+        title={
+          <React.Fragment>
+            <Stack direction="row" spacing={1}>
+              <Chip icon={<ThumbUpIcon />} label={votes} />
+              <Chip icon={<ThumbDownIcon />} label={totalVotes - votes} />
+              <Chip icon={<PeopleAltIcon />} label={totalUsersInSession} />
+            </Stack>
+          </React.Fragment>
+        }
+      >
+        <div>
+          <Box sx={{ width: "100%", mr: 1 }}>
+            <Typography>Current Voting Result</Typography>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ width: "100%", mr: 1 }}>
+              <LinearProgress variant="determinate" value={percentage} />
+            </Box>
+            <Box sx={{ minWidth: 35 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >{`${votes}/${totalUsersInSession}`}</Typography>
+            </Box>
+          </Box>
+        </div>
+      </LightTooltip>
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         open={addedSongState.open}
@@ -147,14 +179,23 @@ function VotingResult({
         onClose={handleAddedSongClose}
         TransitionComponent={Slide}
       >
-        <SnackbarContent
+        {/* <SnackbarContent
           style={{
             color: "black",
-            backgroundColor: "rgba(255, 255, 255, 0.7)",
+            backgroundColor: "rgba(255, 255, 255, 0.3)",
             backdropFilter: "blur(10px)",
           }}
           message={addedSongState.added ? addedMessage : skippedMessage}
-        />
+        /> */}
+        {addedSongState.added ? (
+          <Alert severity="success" sx={{ width: "100%" }}>
+            {addedMessage}
+          </Alert>
+        ) : (
+          <Alert severity="error" sx={{ width: "100%" }}>
+            {skippedMessage}
+          </Alert>
+        )}
       </Snackbar>
     </>
   );
@@ -247,6 +288,12 @@ function SongSuggestion({ sessionId }) {
             }
 
             //TODO:Add the recommended song to the queue if upvote percentage is greater than 50%
+            const groupSessionQueueRef = collection(db, "groupSessionQueue");
+            const groupSessionQueueQuery = query(
+              groupSessionQueueRef,
+              where("sessionId", "==", sessionId)
+            );
+
             if (((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50) {
               console.log(
                 "upvote greater than 50%",
@@ -257,6 +304,25 @@ function SongSuggestion({ sessionId }) {
                 added: true,
               });
               console.log(currentSuggestion);
+              getDocs(groupSessionQueueQuery).then(
+                (groupSessionQueueQuerySnapshot) => {
+                  groupSessionQueueQuerySnapshot.forEach((queueDoc) => {
+                    setDoc(doc(db, "groupSessionQueue", queueDoc.id), {
+                      createdAt: queueDoc.data().createdAt,
+                      sessionId: queueDoc.data().sessionId,
+                      queueId: queueDoc.data().queueId,
+                      //songs: [...queueDoc.data().songs, currentSuggestion],
+                      songs: arrayRemove(currentSuggestion),
+                    });
+                    setDoc(doc(db, "groupSessionQueue", queueDoc.id), {
+                      createdAt: queueDoc.data().createdAt,
+                      sessionId: queueDoc.data().sessionId,
+                      queueId: queueDoc.data().queueId,
+                      songs: [...queueDoc.data().songs, currentSuggestion],
+                    });
+                  });
+                }
+              );
             } else if (totalVoteCount === totalUsersInSession) {
               setAddedSongState({
                 open: true,
@@ -265,11 +331,6 @@ function SongSuggestion({ sessionId }) {
             }
 
             //Get recommendation song using Spotify API by fetching current songs
-            const groupSessionQueueRef = collection(db, "groupSessionQueue");
-            const groupSessionQueueQuery = query(
-              groupSessionQueueRef,
-              where("sessionId", "==", sessionId)
-            );
             getDocs(groupSessionQueueQuery).then(
               (groupSessionQueueQuerySnapshot) => {
                 let songs = [];
@@ -281,35 +342,47 @@ function SongSuggestion({ sessionId }) {
                 );
 
                 spotifyApi.setAccessToken(
-                  "BQAu2_-VdA9cjWdAimlPVbycBLW6WXV6BawviGoX3irjSJ8caOFJlbtSYhScDH7a0Q6Vb55xtKs3jNb0CeOLUH7XRVzPa7Bm9O5RgT0Gf7wslefVlz4rTzL8pdAgoAVS8KQb-ZkT_t9L7YGtuNhdov971PU091bWUkhNZoLlWAyvr3k7trDQixNaQc8EJDH0pWYzpqmqpJBimPnKY32wm4mYP4bFei5AiN3TfWsRqRxfqrZ2QdzbtbXLmjwgsVW1Nu_pfOwzqfuyAUKnvd-IaeMGGiJXCR5-khVtE2xnhq7N4w"
+                  "BQDGSWrThtpTXehH9N9VNS86P4RqJCLknPtF_SkAn5ZCSnmmApfQUDt2cO3UFI_umd0yVkz39JlSkNejBlAfePYub0AcHl50LLZa3iMmmvQiFjPw_tHl32C4cmYWu0Ma82dJOGrbTlnghvp7v4j8CXPObWpD5Etlt_I2JiZ3_a8GVjb_FMWA8gIjT2nET1HFZUQPo2ZPUSmYXzUvtWQGXdDtcGRuxUpv0KrEAfiQS3Oj9b1Yt88T6Td7t3NAmY-4Pg0nFrXrK9toVq9_LgQRGTInErh18nwoiS3lCu1rWITZhg"
                 );
                 //TODO: change this access token later. currently just for testing
 
-                spotifyApi
-                  .getRecommendations({
-                    limit: 1,
-                    seed_tracks: songUris.slice(0, 5),
-                  })
-                  .then(
-                    function (data) {
-                      const trackData = data.body.tracks[0];
-                      const docData = {
-                        albumUrl: trackData.album.images[0].url,
-                        artist: trackData.album.artists[0].name,
-                        title: trackData.album.name,
-                        uri: trackData.album.uri,
-                      };
+                if (songUris.length > 2) {
+                  spotifyApi
+                    .getRecommendations({
+                      limit: 1,
+                      seed_tracks: songUris.slice(0, 5),
+                    })
+                    .then(
+                      function (data) {
+                        const trackData = data.body.tracks[0];
+                        console.log(trackData);
+                        if (
+                          trackData == null ||
+                          trackData === "undefined" ||
+                          trackData === undefined
+                        ) {
+                          throw new Error("queue is possibly empty");
+                        }
+                        const docData = {
+                          albumUrl: trackData.album.images[0].url,
+                          artist: trackData.album.artists[0].name,
+                          title: trackData.album.name,
+                          uri: trackData.album.uri,
+                        };
 
-                      const sessionRef = doc(db, "groupSessions", currDoc.id);
-                      updateDoc(sessionRef, {
-                        currentSuggestion: docData,
-                      });
-                      setRecommendation(docData);
-                    },
-                    function (err) {
-                      console.log("Something went wrong!", err);
-                    }
-                  );
+                        const sessionRef = doc(db, "groupSessions", currDoc.id);
+                        updateDoc(sessionRef, {
+                          currentSuggestion: docData,
+                        });
+                        setRecommendation(docData);
+                      },
+                      function (err) {
+                        console.log("Something went wrong!", err);
+                      }
+                    );
+                } else {
+                  setRecommendation("undefined");
+                }
               }
             );
           } else {
@@ -325,6 +398,7 @@ function SongSuggestion({ sessionId }) {
 
   const handleVote = (event) => {
     event.preventDefault();
+    console.log("vote clicked", event.target.name);
     setVoted(true);
     const groupSessionRef = collection(db, "groupSessions");
     const groupSessionQuery = query(
@@ -375,7 +449,7 @@ function SongSuggestion({ sessionId }) {
             {recommendation == null ||
             recommendation === undefined ||
             recommendation == "undefined"
-              ? "Suggestion is based on the songs in the queue. Queue up a song to see your suggestion."
+              ? "Suggestion is based on the songs in the queue. Queue up at least 3 songs to see your suggestion."
               : recommendation.title}
           </Typography>
           <br />
@@ -426,6 +500,7 @@ function SongSuggestion({ sessionId }) {
             totalUsersInSession={totalUsersInSession}
             addedSongState={addedSongState}
             handleAddedSongClose={handleAddedSongClose}
+            totalVotes={totalVoteCount}
           />
         </CardContent>
       </Paper>
