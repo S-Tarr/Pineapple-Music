@@ -105,7 +105,13 @@ export function AuthProvider({ children }) {
     const docSnap = await getDocs(collection(db, "users"));
     docSnap.forEach((doc) => {
       if (doc.data().uid === currentUser.uid) {
-        doc.data().groupSessions.forEach((item) => groupSessions.add(item));
+        if (
+          doc.data().groupSessions !== undefined &&
+          doc.data().groupSessions != null &&
+          doc.data().groupSessions !== "undefined"
+        ) {
+          doc.data().groupSessions.forEach((item) => groupSessions.add(item));
+        }
       }
     });
 
@@ -335,6 +341,7 @@ export function AuthProvider({ children }) {
           const docRef = await addDoc(collection(db, "users"), {
             uid: currentUser.uid,
             SpotifyToken: params,
+            SpotifyCode: params,
             createdAt: Timestamp.now(),
           });
           console.log("Doc written w/ ID in addToken: ", docRef.id);

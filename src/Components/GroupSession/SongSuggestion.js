@@ -1,27 +1,45 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
+  Box,
   Button,
   Card,
   CardContent,
   CardHeader,
   CardMedia,
+  Chip,
   Divider,
+  LinearProgress,
+  Slide,
+  Snackbar,
   Stack,
   Paper,
   Typography,
 } from "@mui/material/";
+import { styled } from "@mui/material/styles";
+import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import app from "../../firebase";
 import {
-  getFirestore,
+  arrayRemove,
   collection,
-  query,
-  where,
+  deleteField,
+  doc,
+  getFirestore,
+  getDocs,
   onSnapshot,
+  query,
+  setDoc,
+  updateDoc,
+  where,
 } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 import albumCover from "../../assets/groupSessionAlbumCover.jpg";
+
+const auth = getAuth(); // Authorization component
 
 var SpotifyWebApi = require("spotify-web-api-node");
 
@@ -33,57 +51,376 @@ var spotifyApi = new SpotifyWebApi({
 
 const db = getFirestore(app); // Firestore database
 
-function GetRecommendation(sessionId) {
-  const [songs, setSongs] = useState([]);
-  const [recommendation, setRecommendation] = useState();
+const getParamsFromSpotifyAuth = (hash) => {
+  console.log("trying to get the token", hash);
+  const paramsUrl = hash.substring(1).split("&");
+  const params = paramsUrl.reduce((accumulator, currentValue) => {
+    const [key, value] = currentValue.split("=");
+    accumulator[key] = value;
+    return accumulator;
+  }, {});
+  console.log(params);
+  return params;
+};
+
+function GetVoteStatus(
+  sessionId,
+  setVoted,
+  setUpvoteCount,
+  setTotalVoteCount,
+  setTotalUsersInSession,
+  setRecommendation
+) {
+  useEffect(() => {
+    if (window.location.hash) {
+      const params = getParamsFromSpotifyAuth(window.location.hash);
+      spotifyApi.setAccessToken(params.access_token);
+
+      console.log("getting token", params);
+    }
+  }, [window.location.search]);
 
   useEffect(() => {
-    const groupSessionQueueRef = collection(db, "groupSessionQueue");
-    const groupSessionQueueQuery = query(
-      groupSessionQueueRef,
+    const groupSessionRef = collection(db, "groupSessions");
+    const groupSessionQuery = query(
+      groupSessionRef,
       where("sessionId", "==", sessionId)
     );
-    const unsubscribe = onSnapshot(groupSessionQueueQuery, (querySnapshot) => {
-      let songs = [];
-      querySnapshot.forEach((doc) => {
-        songs = doc.data().songs;
+    const unsubscribe = onSnapshot(groupSessionQuery, (querySnapshot) => {
+      let currentSuggestion = null;
+      querySnapshot.forEach((currDoc) => {
+        //Check if the current user voted or not
+        currentSuggestion = currDoc.data().currentSuggestion;
+        setRecommendation(currentSuggestion);
+
+        //Update total active user count
+        const size = Object.values(currDoc.data().users).filter(
+          (state) => state === "active"
+        ).length;
+        setTotalUsersInSession(size);
+
+        let voteSet = new Set();
+        if (
+          currDoc.data().votes != null &&
+          currDoc.data().votes !== "undefined" &&
+          currDoc.data().votes !== null &&
+          currDoc.data().votes != undefined
+        ) {
+          voteSet = new Set(Object.keys(currDoc.data().votes));
+
+          //Update upvoteCount and totalVoteCount
+          const upvoteCountTemp = Object.values(currDoc.data().votes).reduce(
+            (a, v) => (v === "upvote" ? a + 1 : a),
+            0
+          );
+          const totalVoteCountTemp = voteSet.size;
+
+          setTotalVoteCount(totalVoteCountTemp);
+          setUpvoteCount(upvoteCountTemp);
+        } else {
+          setTotalVoteCount(0);
+          setUpvoteCount(0);
+          setVoted(false);
+        }
+
+        if (voteSet.has(auth.currentUser.uid)) {
+          setVoted(true);
+        } else {
+          setVoted(false);
+        }
       });
-      setSongs(songs);
-      let songUris = songs.map((track) =>
-        track.uri.substring(track.uri.lastIndexOf(":") + 1)
-      );
-
-      spotifyApi.setAccessToken(
-        "BQB8wJaYTq9wo2O-q42cArYft3FkML8sKW9XipTb8JJ-5FAzqMLcEml3POIDku68hAbBD0u2RsmsjN6V5CSjwDJyVJ03S9_lemyviRzqP__wMkKchfV2c0_FeUNiMHkDaXtjoyqypxteeqRGRLhIK9qASM_nplKpKoUzWumprKvrNcsHNKvSomahMNtYvutlkuk6mqWwEzcEwIYsa4rQbHYVUaq_IGa6gurgespvXiccU42FxjnbR6ODwLfbWkNk0wUBd64G4VvEcQ3dWjUqqMW9-bRmTXl36Q4Ah_ZVkDT0og"
-      );
-      //TODO: change this access token later currently just for testing
-
-      console.log(songUris);
-      spotifyApi
-        .getRecommendations({
-          limit: 1,
-          seed_tracks: songUris.slice(0, 5),
-        })
-        .then(
-          function (data) {
-            let recommendation = data.body;
-            setRecommendation(recommendation.tracks[0]);
-          },
-          function (err) {
-            console.log("Something went wrong!", err);
-          }
-        );
     });
-
     return () => unsubscribe;
   }, []);
 
-  return recommendation;
+  return sessionId;
+}
+
+function VotingResult({
+  votes,
+  totalUsersInSession,
+  addedSongState,
+  handleAddedSongClose,
+  totalVotes,
+}) {
+  const percentage = (votes / totalUsersInSession) * 100;
+
+  const addedMessage =
+    // "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" +
+    "Added song";
+  const skippedMessage =
+    // "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" +
+    "Skipped song";
+
+  const LightTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: "rgba(255, 255, 255, 0.3)",
+      backdropFilter: "blur(10px)",
+      boxShadow: theme.shadows[1],
+      fontSize: 11,
+    },
+  }));
+
+  return (
+    <>
+      <LightTooltip
+        title={
+          <React.Fragment>
+            <Stack direction="row" spacing={1}>
+              <Chip icon={<ThumbUpIcon />} label={votes} />
+              <Chip icon={<ThumbDownIcon />} label={totalVotes - votes} />
+              <Chip icon={<PeopleAltIcon />} label={totalUsersInSession} />
+            </Stack>
+          </React.Fragment>
+        }
+      >
+        <div>
+          <Box sx={{ width: "100%", mr: 1 }}>
+            <Typography>Current Voting Result</Typography>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ width: "100%", mr: 1 }}>
+              <LinearProgress variant="determinate" value={percentage} />
+            </Box>
+            <Box sx={{ minWidth: 35 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >{`${votes}/${totalUsersInSession}`}</Typography>
+            </Box>
+          </Box>
+        </div>
+      </LightTooltip>
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={addedSongState.open}
+        autoHideDuration={3000}
+        onClose={handleAddedSongClose}
+        TransitionComponent={Slide}
+      >
+        {/* <SnackbarContent
+          style={{
+            color: "black",
+            backgroundColor: "rgba(255, 255, 255, 0.3)",
+            backdropFilter: "blur(10px)",
+          }}
+          message={addedSongState.added ? addedMessage : skippedMessage}
+        /> */}
+        {addedSongState.added ? (
+          <Alert severity="success" sx={{ width: "100%" }}>
+            {addedMessage}
+          </Alert>
+        ) : (
+          <Alert severity="error" sx={{ width: "100%" }}>
+            {skippedMessage}
+          </Alert>
+        )}
+      </Snackbar>
+    </>
+  );
 }
 
 function SongSuggestion({ sessionId }) {
-  let recommendation = GetRecommendation(sessionId);
-  console.log(recommendation);
+  const [voted, setVoted] = useState(0);
+  const [upvoteCount, setUpvoteCount] = useState(0);
+  const [totalVoteCount, setTotalVoteCount] = useState(0);
+  const [totalUsersInSession, setTotalUsersInSession] = useState(0);
+  const [recommendation, setRecommendation] = useState();
+
+  const [addedSongState, setAddedSongState] = useState({
+    open: false,
+    added: false,
+  });
+
+  const handleAddedSongClose = () => {
+    setAddedSongState({
+      ...addedSongState,
+      open: false,
+    });
+  };
+
+  GetVoteStatus(
+    sessionId,
+    setVoted,
+    setUpvoteCount,
+    setTotalVoteCount,
+    setTotalUsersInSession,
+    setRecommendation
+  );
+
+  useEffect(() => {
+    const groupSessionRef = collection(db, "groupSessions");
+    const groupSessionQuery = query(
+      groupSessionRef,
+      where("sessionId", "==", sessionId)
+    );
+    getDocs(groupSessionQuery).then((groupSessionQuerySnapshot) => {
+      let currentSuggestion = null;
+      groupSessionQuerySnapshot.forEach((currDoc) => {
+        try {
+          //Check if song suggestion already exists
+          currentSuggestion = currDoc.data().currentSuggestion;
+          if (
+            currentSuggestion == null ||
+            currentSuggestion === undefined ||
+            currentSuggestion == "undefined" ||
+            (totalVoteCount !== 0 && totalVoteCount === totalUsersInSession) ||
+            (totalVoteCount !== 0 &&
+              ((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50)
+          ) {
+            //Song suggestion does not already exist (First song recommendation)
+            // or upvote percentage greater than 50%
+            // or every active user in the session has voted
+            // therefore, get a new song to recommend
+
+            console.log(
+              "currentSuggestion is undefined or voting is over",
+              currentSuggestion
+            );
+
+            //Refresh the votes value for the new song suggestion
+            const sessionRef = doc(db, "groupSessions", currDoc.id);
+            updateDoc(sessionRef, {
+              votes: deleteField(),
+            });
+
+            //Reset voted to false if voting has ended
+            if (
+              totalVoteCount === totalUsersInSession ||
+              ((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50
+            ) {
+              setVoted(false);
+            }
+
+            //TODO:Add the recommended song to the queue if upvote percentage is greater than 50%
+            const groupSessionQueueRef = collection(db, "groupSessionQueue");
+            const groupSessionQueueQuery = query(
+              groupSessionQueueRef,
+              where("sessionId", "==", sessionId)
+            );
+
+            if (((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50) {
+              console.log(
+                "upvote greater than 50%",
+                ((upvoteCount * 1.0) / totalUsersInSession) * 100
+              );
+              setAddedSongState({
+                open: true,
+                added: true,
+              });
+              console.log(currentSuggestion);
+              getDocs(groupSessionQueueQuery).then(
+                (groupSessionQueueQuerySnapshot) => {
+                  groupSessionQueueQuerySnapshot.forEach((queueDoc) => {
+                    setDoc(doc(db, "groupSessionQueue", queueDoc.id), {
+                      createdAt: queueDoc.data().createdAt,
+                      sessionId: queueDoc.data().sessionId,
+                      queueId: queueDoc.data().queueId,
+                      //songs: [...queueDoc.data().songs, currentSuggestion],
+                      songs: arrayRemove(currentSuggestion),
+                    });
+                    setDoc(doc(db, "groupSessionQueue", queueDoc.id), {
+                      createdAt: queueDoc.data().createdAt,
+                      sessionId: queueDoc.data().sessionId,
+                      queueId: queueDoc.data().queueId,
+                      songs: [...queueDoc.data().songs, currentSuggestion],
+                    });
+                  });
+                }
+              );
+            } else if (totalVoteCount === totalUsersInSession) {
+              setAddedSongState({
+                open: true,
+                added: false,
+              });
+            }
+
+            //Get recommendation song using Spotify API by fetching current songs
+            getDocs(groupSessionQueueQuery).then(
+              (groupSessionQueueQuerySnapshot) => {
+                let songs = [];
+                groupSessionQueueQuerySnapshot.forEach((doc) => {
+                  songs = doc.data().songs;
+                });
+                let songUris = songs.map((track) =>
+                  track.uri.substring(track.uri.lastIndexOf(":") + 1)
+                );
+
+                // spotifyApi.setAccessToken(
+                //   "BQDGSWrThtpTXehH9N9VNS86P4RqJCLknPtF_SkAn5ZCSnmmApfQUDt2cO3UFI_umd0yVkz39JlSkNejBlAfePYub0AcHl50LLZa3iMmmvQiFjPw_tHl32C4cmYWu0Ma82dJOGrbTlnghvp7v4j8CXPObWpD5Etlt_I2JiZ3_a8GVjb_FMWA8gIjT2nET1HFZUQPo2ZPUSmYXzUvtWQGXdDtcGRuxUpv0KrEAfiQS3Oj9b1Yt88T6Td7t3NAmY-4Pg0nFrXrK9toVq9_LgQRGTInErh18nwoiS3lCu1rWITZhg"
+                // );
+                //TODO: change this access token later. currently just for testing
+
+                if (songUris.length > 2) {
+                  spotifyApi
+                    .getRecommendations({
+                      limit: 1,
+                      seed_tracks: songUris.slice(0, 5),
+                    })
+                    .then(
+                      function (data) {
+                        const trackData = data.body.tracks[0];
+                        if (
+                          trackData == null ||
+                          trackData === "undefined" ||
+                          trackData === undefined
+                        ) {
+                          throw new Error("queue is possibly empty");
+                        }
+                        const docData = {
+                          albumUrl: trackData.album.images[0].url,
+                          artist: trackData.album.artists[0].name,
+                          title: trackData.album.name,
+                          uri: trackData.album.uri,
+                        };
+
+                        const sessionRef = doc(db, "groupSessions", currDoc.id);
+                        updateDoc(sessionRef, {
+                          currentSuggestion: docData,
+                        });
+                        setRecommendation(docData);
+                      },
+                      function (err) {
+                        console.log("Something went wrong!", err);
+                      }
+                    );
+                } else {
+                  setRecommendation("undefined");
+                }
+              }
+            );
+          } else {
+            console.log("currentSuggestion is not undefined");
+            setRecommendation(currentSuggestion);
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      });
+    });
+  }, [totalVoteCount, upvoteCount]);
+
+  const handleVote = (event) => {
+    event.preventDefault();
+    console.log("vote clicked", event.target.name);
+    console.log(event)
+    setVoted(true);
+    const groupSessionRef = collection(db, "groupSessions");
+    const groupSessionQuery = query(
+      groupSessionRef,
+      where("sessionId", "==", sessionId)
+    );
+    getDocs(groupSessionQuery).then((groupSessionQuerySnapshot) => {
+      groupSessionQuerySnapshot.forEach((currDoc) => {
+        const sessionRef = doc(db, "groupSessions", currDoc.id);
+        updateDoc(sessionRef, {
+          [`votes.${auth.currentUser.uid}`]: `${event.target.name}`,
+        });
+      });
+    });
+  };
 
   return (
     <Card
@@ -104,49 +441,82 @@ function SongSuggestion({ sessionId }) {
         <CardMedia
           align="center"
           component="img"
-          sx={{ width: 365 }}
+          sx={{ width: 255 }}
           image={
-            recommendation === undefined
+            recommendation == null ||
+            recommendation === undefined ||
+            recommendation == "undefined"
               ? albumCover
-              : recommendation.album.images[0].url
+              : recommendation.albumUrl
           }
           alt="album cover"
         />
         <CardContent>
-          <Typography>
-            {recommendation === undefined
-              ? "Suggestion is based on the songs in the queue. Queue up a song to see your suggestion."
-              : recommendation.album.name}
+          <Typography variant="h6">
+            {recommendation == null ||
+            recommendation === undefined ||
+            recommendation == "undefined"
+              ? "Suggestion is based on the songs in the queue. Queue up at least 3 songs to see your suggestion."
+              : recommendation.title}
           </Typography>
+          <Typography variant="h7">
+            {recommendation == null ||
+            recommendation === undefined ||
+            recommendation == "undefined"
+              ? ""
+              : recommendation.artist}
+          </Typography>
+          <br />
+          <br />
+          <Divider />
           <br />
           <Stack
             spacing={4}
             justifyContent="center"
             divider={
-              <Divider
-                color="primary"
-                variant="middle"
-                orientation="vertical"
-                flexItem
-              />
+              <Divider variant="middle" orientation="vertical" flexItem />
             }
             direction="row"
           >
             <Button
               variant="text"
-              disabled={recommendation === undefined}
+              disabled={
+                voted ||
+                recommendation == null ||
+                recommendation === undefined ||
+                recommendation == "undefined"
+              }
               endIcon={<ThumbUpIcon />}
+              name="upvote"
+              onClick={(event) => handleVote(event)}
             >
               &nbsp;&nbsp;Upvote&nbsp;
             </Button>
             <Button
               variant="text"
-              disabled={recommendation === undefined}
+              disabled={
+                voted ||
+                recommendation == null ||
+                recommendation === undefined ||
+                recommendation == "undefined"
+              }
               endIcon={<ThumbDownIcon />}
+              name="downvote"
+              onClick={(event) => handleVote(event)}
             >
               Downvote
             </Button>
           </Stack>
+          <br />
+          <Divider />
+          <br />
+          <VotingResult
+            votes={upvoteCount}
+            totalUsersInSession={totalUsersInSession}
+            addedSongState={addedSongState}
+            handleAddedSongClose={handleAddedSongClose}
+            totalVotes={totalVoteCount}
+          />
         </CardContent>
       </Paper>
     </Card>
