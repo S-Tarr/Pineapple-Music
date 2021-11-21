@@ -192,7 +192,6 @@ function GroupSessionQueueDisplay(props) {
         if (type == "delete") {
             window.location.reload(false);
         }
-        // window.location.reload(false);
     }
     
     const handleDrop = (array, index, item) => {

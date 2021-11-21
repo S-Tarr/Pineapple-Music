@@ -73,9 +73,15 @@ function GetQueue(sessionId, groupSessionQueueId, groupSessionQueueDoc) {
 }
 
 async function getAccessToken() {
-  const docRef = doc(db, "users", auth.currentUser.uid);
-  const docSnap = await getDoc(docRef);
-  return docSnap.data();
+  console.log(auth.currentUser.uid);
+  const newDocRef = collection(db, "users");
+  const docRef = query(newDocRef, where("uid", "==", auth.currentUser.uid));
+  getDocs(docRef).then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+        console.log(doc.data());
+        return doc.data();
+    });
+  });
 }
 
 export default function Player({ groupSessionQueueID, groupSessionQueueDoc, sessionId, docId}) {

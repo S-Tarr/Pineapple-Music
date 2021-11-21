@@ -106,6 +106,7 @@ function MessageList({
 }
 
 const ChatRoom = ({ groupSessionID }) => {
+  console.log(groupSessionID);
   const [muted, setMuted] = useState(false);
   const [messagesWaiting, setMessagesWaiting] = useState(false);
 
