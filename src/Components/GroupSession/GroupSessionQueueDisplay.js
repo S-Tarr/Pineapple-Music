@@ -254,7 +254,7 @@ function GroupSessionQueueDisplay(props) {
                 )   
             })}
             <div>
-                <Player groupSessionQueueId={groupSessionQueueId} groupSessionQueueDoc={groupSessionQueueDoc} sessionId={sessionId} docId={groupSessionId}/>
+                {/* <Player groupSessionQueueId={groupSessionQueueId} groupSessionQueueDoc={groupSessionQueueDoc} sessionId={sessionId} docId={groupSessionId}/> */}
             </div>
         </div>
         

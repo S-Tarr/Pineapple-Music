@@ -46,7 +46,7 @@ function GroupSessionJoined (props) {
     const history = useHistory();
 
     const [title, setTitle] = useState("");
-    const [sessionId, setSessionId] = useState("");
+    const [sessionId, setSessionId] = useState();
     const [imageUrl, setImage] = useState("");
     const [username, setUsername] = useState("");
     const [createdAt, setCreatedAt] = useState("");
@@ -58,6 +58,7 @@ function GroupSessionJoined (props) {
     const [buttonMessage, setButtonMessage] = useState("Open Song Queue");
 
     useEffect(() => {
+        console.log("MADE IT HERE");
         if (props.location.props == undefined) {
             const persistentData = localStorage.getItem("user-data");
             const data = JSON.parse(persistentData);
@@ -79,7 +80,7 @@ function GroupSessionJoined (props) {
             const groupSessionData = {title: props.location.props.title, sessionId: props.location.props.sessionId, imageUrl: props.location.props.imageUrl, username: props.location.props.userName, createdAt: props.location.props.createdAt}
             localStorage.setItem("user-data", JSON.stringify(groupSessionData));
         }
-    });
+    }, [title]);
 
     HandleUpdate();
 
@@ -123,8 +124,6 @@ function GroupSessionJoined (props) {
         // })
     }  
     console.log("BRUHHH");
-    console.log(sessionId);
-
     
     return (
         <div style={{backgroundColor: color, opacity: opacity}}>
@@ -195,9 +194,10 @@ function GroupSessionJoined (props) {
                 </Overlay> */}
                 <UserList sessionId={sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
             </div>
-            <div className="chat-section" style={chatStyle}>
-                {/* <ChatRoom groupSessionID={sessionId} groupSessionTitle={title}/> */}
-            </div>
+            {sessionId ? <div className="chat-section" style={chatStyle}>
+                <ChatRoom groupSessionID={sessionId} groupSessionTitle={title}/>
+            </div> : <div></div>
+            }
         </div>
     );
     

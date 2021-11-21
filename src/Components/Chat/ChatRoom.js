@@ -11,6 +11,7 @@ import {
   orderBy,
   limit,
   onSnapshot,
+  where,
 } from "firebase/firestore";
 import "../../pages/Pages.css";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
@@ -47,7 +48,10 @@ function GetChatMessages(groupSessionID, setMessagesWaiting) {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
+    console.log("HELLO THERE");
+    console.log(groupSessionID);
     const messagesRef = collection(db, "messages", groupSessionID, "chat");
+
     const messagesQuery = query(messagesRef, orderBy("createdAt"), limit(25));
     const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
       let messages = [];
@@ -106,7 +110,6 @@ function MessageList({
 }
 
 const ChatRoom = ({ groupSessionID }) => {
-  console.log(groupSessionID);
   const [muted, setMuted] = useState(false);
   const [messagesWaiting, setMessagesWaiting] = useState(false);
 
