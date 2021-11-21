@@ -48,8 +48,6 @@ function GetChatMessages(groupSessionID, setMessagesWaiting) {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    console.log("HELLO THERE");
-    console.log(groupSessionID);
     const messagesRef = collection(db, "messages", groupSessionID, "chat");
 
     const messagesQuery = query(messagesRef, orderBy("createdAt"), limit(25));
