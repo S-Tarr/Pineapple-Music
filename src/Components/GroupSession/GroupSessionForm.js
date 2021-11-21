@@ -3,7 +3,7 @@ import {
   Alert,
   Button,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 import app from "../../firebase";
 import {

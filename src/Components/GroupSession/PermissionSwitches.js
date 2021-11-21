@@ -1,10 +1,10 @@
 import {
     Switch,
     FormControl,
-    FormLabel,
     FormGroup,
     FormControlLabel,
-    FormHelperText
+    FormHelperText,
+    FormLabel,
 } from "@mui/material";
 
 function SwitchesGroup({permissions, setPermissions}) {
@@ -18,22 +18,22 @@ function SwitchesGroup({permissions, setPermissions}) {
 
     return (
         <FormControl component="fieldset" variant="standard">
-        <FormLabel component="legend">Assign Permissions</FormLabel>
-        <FormGroup>
-            <FormControlLabel
-            control={
-                <Switch checked={permissions.queueing} onChange={handleChange} name="queueing" />
-            }
-            label="Queueing"
-            />
-            <FormControlLabel
-            control={
-                <Switch checked={permissions.pps} onChange={handleChange} name="pps" />
-            }
-            label="Play/Pause"
-            />
-        </FormGroup>
-        <FormHelperText>All permissions can be adjusted after room creation</FormHelperText>
+            <FormLabel component="legend">Assign Permissions</FormLabel>
+            <FormGroup>
+                <FormControlLabel
+                control={
+                    <Switch checked={permissions.queueing} onChange={handleChange} name="queueing" />
+                }
+                label="Queueing"
+                />
+                <FormControlLabel
+                control={
+                    <Switch checked={permissions.pps} onChange={handleChange} name="pps" />
+                }
+                label="Play/Pause"
+                />
+            </FormGroup>
+            <FormHelperText>All permissions can be adjusted after room creation</FormHelperText>
         </FormControl>
     );
 }

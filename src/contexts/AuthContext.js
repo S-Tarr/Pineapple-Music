@@ -120,6 +120,24 @@ export function AuthProvider({ children }) {
     });
   }
 
+  async function updatePermissions(sessionId, toUpdate, value) {
+    const docSnapSessions = await getDocs(collection(db, "groupSessions"));
+    docSnapSessions.forEach((currDoc) => {
+      if (currDoc.data().sessionId == sessionId) {
+        const sessionRef = doc(db, "groupSessions", currDoc.id);
+        if (toUpdate == "queueing") {
+          updateDoc(sessionRef, {
+            "queueing": value,
+          });
+        } else {
+          updateDoc(sessionRef, {
+            "pps": value,
+          });
+        }
+      }
+    });
+  }
+
   async function joinGroupSession(sessionId) {
     try {
       console.log("clicked join");
@@ -371,6 +389,7 @@ export function AuthProvider({ children }) {
     joinGroupSession,
     getFormattedDate,
     updateUserState,
+    updatePermissions,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

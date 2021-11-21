@@ -7,6 +7,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Typography } from "@mui/material";
 import ChatRoom from "../components/Chat/ChatRoom";
 import UserList from "../components/GroupSession/UserList";
+import GroupSessionSettings from "../components/GroupSession/GroupSessionSettings";
 
 import app from "../firebase";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
@@ -164,6 +165,7 @@ export default class GroupSessionJoined extends React.Component{
                         <button className="forward-rewind"><FastForwardRoundedIcon style={{ fontSize: 50 }}/></button>
                     </div> */}
 			<UserList sessionId={this.state.sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
+            <GroupSessionSettings sessionId={this.state.sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
                 </div>
                 {/* <div className="chat-section" style={chatStyle}> */}
                     <ChatRoom groupSessionID={this.state.sessionId} groupSessionTitle={this.state.title}/>
