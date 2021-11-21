@@ -20,17 +20,38 @@ const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
 
 const SPACE_DELIMITER = "%20";
 const REDIRECT_URL_AFTER_LOGIN = "http://localhost:3000/signup"; //TODO CHANGE LATER
-const SCOPES = ["user-read-currently-playing", "user-read-playback-state"]; //TODO CHANGE LATER IF NECESSARY
+const SCOPES = [
+  "ugc-image-upload",
+  "user-read-playback-state",
+  "user-modify-playback-state",
+  "user-read-currently-playing",
+  "streaming",
+  "app-remote-control",
+  "user-read-email",
+  "user-read-private",
+  "playlist-read-collaborative",
+  "playlist-modify-public",
+  "playlist-read-private",
+  "playlist-modify-private",
+  "user-library-modify",
+  "user-library-read",
+  "user-top-read",
+  "user-read-playback-position",
+  "user-read-recently-played",
+  "user-follow-read",
+  "user-follow-modify",
+]; //TODO CHANGE LATER IF NECESSARY
 const SCOPES_URL_PARAM = SCOPES.join(SPACE_DELIMITER);
 
 const getParamsFromSpotifyAuth = (hash) => {
-  console.log("trying to get the token");
+  console.log("trying to get the token", hash);
   const paramsUrl = hash.substring(1).split("&");
   const params = paramsUrl.reduce((accumulator, currentValue) => {
     const [key, value] = currentValue.split("=");
     accumulator[key] = value;
     return accumulator;
   }, {});
+  console.log(params);
   return params;
 };
 
@@ -45,14 +66,14 @@ function Signup() {
   const history = useHistory();
 
   useEffect(() => {
-    if (window.location.hash) {
-      const params = getParamsFromSpotifyAuth(window.location.hash);
+    if (window.location.search.length > 0) {
+      const params = getParamsFromSpotifyAuth(window.location.search);
 
       localStorage.clear();
-      localStorage.setItem("spotifyToken", params.access_token);
+      localStorage.setItem("params", params);
 
       console.log("getting token", params);
-      addSpotifyToken(params.access_token);
+      addSpotifyToken(params.code);
       console.log("got the access token: ");
     }
   });
@@ -81,7 +102,8 @@ function Signup() {
 
       await signup(emailRef.current.value, passwordRef.current.value);
 
-      window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
+      //response type token to code
+      window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=code&show_dialog=true`;
 
       //history.push("/"); // redirect user to main page
     } catch {

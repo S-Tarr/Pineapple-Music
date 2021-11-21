@@ -92,7 +92,7 @@ function GroupSession() {
 
   useEffect(() => {
     setPageLoading(false);
-  }, [])
+  }, []);
 
   const { searchGroupSessions, getFormattedDate } = useAuth();
   const auth = getAuth();
@@ -118,7 +118,6 @@ function GroupSession() {
     if (sessionIdRef.current.value !== "") {
       setLoading(true);
       searchGroupSessions(sessionIdRef.current.value).then((session) => {
-        console.log("in handleSearch");
         addCard([]);
         addCard(session);
         if (session.length > 0) {
@@ -130,8 +129,6 @@ function GroupSession() {
     }
   };
 
-  
-
   useEffect(() => {
     if (sessionIdRef.current.value === "") {
       let currGroupSessions = new Set();
@@ -139,9 +136,15 @@ function GroupSession() {
         .then((docSnap) => {
           docSnap.forEach((doc) => {
             if (doc.data().uid === auth.currentUser.uid) {
-              doc
-                .data()
-                .groupSessions.forEach((item) => currGroupSessions.add(item));
+              if (
+                doc.data().groupSessions !== undefined &&
+                doc.data().groupSessions != null &&
+                doc.data().groupSessions !== "undefined"
+              ) {
+                doc
+                  .data()
+                  .groupSessions.forEach((item) => currGroupSessions.add(item));
+              }
             }
           });
         })
@@ -212,49 +215,56 @@ function GroupSession() {
           inputProps={{ "aria-label": "search" }}
         />
       </Search>
-{pageLoading ? (<CircularProgress />) : (
-      <Container maxWidth="md" sx={{ marginTop: 2, paddingBottom: 4 }}>
-        <Grid container alignItems="center" justifyContent="center" spacing={9}>
+      {pageLoading ? (
+        <CircularProgress />
+      ) : (
+        <Container maxWidth="md" sx={{ marginTop: 2, paddingBottom: 4 }}>
           <Grid
+            container
+            alignItems="center"
             justifyContent="center"
-            align="center"
-            item
-            xs={12}
-            sm={6}
-            md={4}
+            spacing={9}
           >
-            <IconButton color="primary" onClick={handleOpen}>
-              <AddCircleIcon sx={{ fontSize: 80 }} />
-            </IconButton>
-            <Modal
-              open={open}
-              onClose={handleClose}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-              onSubmit={handleClose}
+            <Grid
+              justifyContent="center"
+              align="center"
+              item
+              xs={12}
+              sm={6}
+              md={4}
             >
-              <Box sx={style}>
-                <GroupSessionForm onSubmit={handleCreate} />
-              </Box>
-            </Modal>
-            <br />
-            Create a new session
+              <IconButton color="primary" onClick={handleOpen}>
+                <AddCircleIcon sx={{ fontSize: 80 }} />
+              </IconButton>
+              <Modal
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+                onSubmit={handleClose}
+              >
+                <Box sx={style}>
+                  <GroupSessionForm onSubmit={handleCreate} />
+                </Box>
+              </Modal>
+              <br />
+              Create a new session
+            </Grid>
           </Grid>
-        </Grid>
-        <br />
-        {loading ? (
-          <LinearProgress />
-        ) : (
-          <Grid container alignItems="center" spacing={9}>
-            {cards.map((card) => (
-              <Grid item key={key++} xs={12} sm={6} md={4}>
-                <GroupSessionCard props={card} />
-              </Grid>
-            ))}
-          </Grid>
-        )}
-      </Container>
-)}
+          <br />
+          {loading ? (
+            <LinearProgress />
+          ) : (
+            <Grid container alignItems="center" spacing={9}>
+              {cards.map((card) => (
+                <Grid item key={key++} xs={12} sm={6} md={4}>
+                  <GroupSessionCard props={card} />
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </Container>
+      )}
     </div>
   );
 }

@@ -51,6 +51,18 @@ var spotifyApi = new SpotifyWebApi({
 
 const db = getFirestore(app); // Firestore database
 
+const getParamsFromSpotifyAuth = (hash) => {
+  console.log("trying to get the token", hash);
+  const paramsUrl = hash.substring(1).split("&");
+  const params = paramsUrl.reduce((accumulator, currentValue) => {
+    const [key, value] = currentValue.split("=");
+    accumulator[key] = value;
+    return accumulator;
+  }, {});
+  console.log(params);
+  return params;
+};
+
 function GetVoteStatus(
   sessionId,
   setVoted,
@@ -59,6 +71,15 @@ function GetVoteStatus(
   setTotalUsersInSession,
   setRecommendation
 ) {
+  useEffect(() => {
+    if (window.location.hash) {
+      const params = getParamsFromSpotifyAuth(window.location.hash);
+      spotifyApi.setAccessToken(params.access_token);
+
+      console.log("getting token", params);
+    }
+  }, [window.location.search]);
+
   useEffect(() => {
     const groupSessionRef = collection(db, "groupSessions");
     const groupSessionQuery = query(
@@ -238,23 +259,9 @@ function SongSuggestion({ sessionId }) {
     getDocs(groupSessionQuery).then((groupSessionQuerySnapshot) => {
       let currentSuggestion = null;
       groupSessionQuerySnapshot.forEach((currDoc) => {
-        console.log(
-          "voted",
-          voted,
-          "totalVoteCount",
-          totalVoteCount,
-          "totalUsersInSession",
-          totalUsersInSession,
-          "upvoteCount",
-          upvoteCount
-        );
         try {
           //Check if song suggestion already exists
           currentSuggestion = currDoc.data().currentSuggestion;
-          console.log(
-            "percentage rn:",
-            ((upvoteCount * 1.0) / totalUsersInSession) * 100
-          );
           if (
             currentSuggestion == null ||
             currentSuggestion === undefined ||
@@ -341,9 +348,9 @@ function SongSuggestion({ sessionId }) {
                   track.uri.substring(track.uri.lastIndexOf(":") + 1)
                 );
 
-                spotifyApi.setAccessToken(
-                  "BQDGSWrThtpTXehH9N9VNS86P4RqJCLknPtF_SkAn5ZCSnmmApfQUDt2cO3UFI_umd0yVkz39JlSkNejBlAfePYub0AcHl50LLZa3iMmmvQiFjPw_tHl32C4cmYWu0Ma82dJOGrbTlnghvp7v4j8CXPObWpD5Etlt_I2JiZ3_a8GVjb_FMWA8gIjT2nET1HFZUQPo2ZPUSmYXzUvtWQGXdDtcGRuxUpv0KrEAfiQS3Oj9b1Yt88T6Td7t3NAmY-4Pg0nFrXrK9toVq9_LgQRGTInErh18nwoiS3lCu1rWITZhg"
-                );
+                // spotifyApi.setAccessToken(
+                //   "BQDGSWrThtpTXehH9N9VNS86P4RqJCLknPtF_SkAn5ZCSnmmApfQUDt2cO3UFI_umd0yVkz39JlSkNejBlAfePYub0AcHl50LLZa3iMmmvQiFjPw_tHl32C4cmYWu0Ma82dJOGrbTlnghvp7v4j8CXPObWpD5Etlt_I2JiZ3_a8GVjb_FMWA8gIjT2nET1HFZUQPo2ZPUSmYXzUvtWQGXdDtcGRuxUpv0KrEAfiQS3Oj9b1Yt88T6Td7t3NAmY-4Pg0nFrXrK9toVq9_LgQRGTInErh18nwoiS3lCu1rWITZhg"
+                // );
                 //TODO: change this access token later. currently just for testing
 
                 if (songUris.length > 2) {
@@ -355,7 +362,6 @@ function SongSuggestion({ sessionId }) {
                     .then(
                       function (data) {
                         const trackData = data.body.tracks[0];
-                        console.log(trackData);
                         if (
                           trackData == null ||
                           trackData === "undefined" ||
@@ -399,6 +405,7 @@ function SongSuggestion({ sessionId }) {
   const handleVote = (event) => {
     event.preventDefault();
     console.log("vote clicked", event.target.name);
+    console.log(event)
     setVoted(true);
     const groupSessionRef = collection(db, "groupSessions");
     const groupSessionQuery = query(
@@ -434,7 +441,7 @@ function SongSuggestion({ sessionId }) {
         <CardMedia
           align="center"
           component="img"
-          sx={{ width: 285 }}
+          sx={{ width: 255 }}
           image={
             recommendation == null ||
             recommendation === undefined ||
@@ -452,6 +459,14 @@ function SongSuggestion({ sessionId }) {
               ? "Suggestion is based on the songs in the queue. Queue up at least 3 songs to see your suggestion."
               : recommendation.title}
           </Typography>
+          <Typography variant="h7">
+            {recommendation == null ||
+            recommendation === undefined ||
+            recommendation == "undefined"
+              ? ""
+              : recommendation.artist}
+          </Typography>
+          <br />
           <br />
           <Divider />
           <br />
@@ -473,7 +488,7 @@ function SongSuggestion({ sessionId }) {
               }
               endIcon={<ThumbUpIcon />}
               name="upvote"
-              onClick={handleVote}
+              onClick={(event) => handleVote(event)}
             >
               &nbsp;&nbsp;Upvote&nbsp;
             </Button>
@@ -487,7 +502,7 @@ function SongSuggestion({ sessionId }) {
               }
               endIcon={<ThumbDownIcon />}
               name="downvote"
-              onClick={handleVote}
+              onClick={(event) => handleVote(event)}
             >
               Downvote
             </Button>
