@@ -20,11 +20,6 @@ var spotifyApi = new SpotifyWebApi({
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
-async function getCurrentSession() {
-  const docRef = doc(db, "users", auth.currentUser.uid);
-  const docSnap = await getDoc(docRef);
-  return docSnap.data();
-}
 async function GetSessionUID(groupID) {
   //const [sessionID, setSessionID] = useState();
   const q = query(collection(db, 'groupSessions'), where('sessionId', '==',  groupID));
@@ -46,7 +41,8 @@ async function getAccessToken() {
     console.log(thing.data().uid)
     if (thing.data().uid == auth.currentUser.uid) {
       temp = thing.data();
-      userDocId = thing.uid;
+      userDocId = thing.id;
+      console.log("uid: " + userDocId)
       console.log(temp)
     }
   });
@@ -67,27 +63,21 @@ function SearchBar({ placeholder, spotifyData }) {
     var promise = getAccessToken();
     promise.then((ret) => {
       setAccessToken(ret.SpotifyToken);
-      console.log(ret.SpotifyToken)
-      console.log(access_token)
+      console.log(ret.SpotifyToken);
+      console.log(access_token);
       spotifyApi.setAccessToken(ret.SpotifyToken);
+      //handleSubmitToken(ret.SpotifyToken);
     });
     console.log(access_token);
   }, [isLoaded])
 
-  console.log(access_token)
+  console.log(access_token);
 
   if (access_token == undefined) {
     setIsLoaded(false)
   }
   console.log(isLoaded)
 //--------End Token Handling-----------------
-
-
-  useEffect(() => {
-    const promise = getCurrentSession();
-    promise.then((ret) => setCurSession(ret));
-    console.log(curSession);
-  }, [])
   
   const currentUser = auth.currentUser;
   console.log(currentUser.uid);
@@ -146,10 +136,10 @@ function SearchBar({ placeholder, spotifyData }) {
     });
   }
 
-  async function handleSubmitToken() {
+  async function handleSubmitToken(accessToken) {
     const userRef = collection(db, 'users');
     await updateDoc(doc(userRef, userDocId), {
-        SpotifyToken: access_token,
+        SpotifyToken: accessToken,
     });
   }
 
