@@ -36,6 +36,8 @@ async function GetSessionUID(groupID) {
   });
 }
 
+var userDocId = null;
+
 async function getAccessToken() {
   const docSnap = await getDocs(collection(db, "users"));
   console.log(auth.currentUser.uid)
@@ -44,6 +46,7 @@ async function getAccessToken() {
     console.log(thing.data().uid)
     if (thing.data().uid == auth.currentUser.uid) {
       temp = thing.data();
+      userDocId = thing.uid;
       console.log(temp)
     }
   });
@@ -145,7 +148,7 @@ function SearchBar({ placeholder, spotifyData }) {
 
   async function handleSubmitToken() {
     const userRef = collection(db, 'users');
-    await updateDoc(doc(userRef, currentUser.uid), {
+    await updateDoc(doc(userRef, userDocId), {
         SpotifyToken: access_token,
     });
   }
