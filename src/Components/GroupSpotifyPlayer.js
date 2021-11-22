@@ -75,6 +75,7 @@ function GetQueue(sessionId, groupSessionQueueId, groupSessionQueueDoc) {
 async function getAccessToken() {
   const docRef = doc(db, "users", auth.currentUser.uid);
   const docSnap = await getDoc(docRef);
+  console.log(docSnap.data)
   return docSnap.data();
 }
 
