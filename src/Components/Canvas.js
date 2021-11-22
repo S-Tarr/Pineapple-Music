@@ -65,6 +65,29 @@ class Canvas extends Component {
         }
     }
 
+    animationLooper1(canvas) {
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx = canvas.getContext("2d");
+
+        for (var i = 0; i < bars; i++) {
+            //divide a circle into equal part
+            const rads = Math.PI * 2 / bars;
+
+            // Math is magical
+            bar_height = this.barBump /*this.frequency_array[i]*/;
+
+            const x = center_x + Math.cos(rads * i) * (radius);
+            const y = center_y + Math.sin(rads * i) * (radius);
+            x_end = center_x + Math.cos(rads * i) * (radius + bar_height);
+            y_end = center_y + Math.sin(rads * i) * (radius + bar_height);
+
+            //draw a bar
+            this.drawBar(x, y, x_end, y_end, ctx, canvas);
+        }
+    }
+
     drawBar(x1, y1, x2, y2, ctx, canvas) {
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, "rgba(35, 7, 77, 1)");
@@ -135,7 +158,7 @@ class Canvas extends Component {
                     this.animationLooper0(this.canvas.current);
                     break;
                 case 2:
-                    console.log("HAHA");
+                    this.animationLooper1(this.canvas.current);
                     break;
                 default:
                     this.animationLooper0(this.canvas.current);
