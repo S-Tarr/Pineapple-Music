@@ -18,6 +18,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import SongPage from "./pages/SongPage";
+import Bookmarks from "./pages/Bookmarks";
 import SearchPage from "./pages/SearchPage";
 import AddProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -62,6 +63,7 @@ function App() {
                         component={AddProfilePicture}
                       />
                       <Route path="/song" component={SongPage} />
+                      <Route path="/bookmarks" component={Bookmarks} />
                       <Route
                         path="/groupsessionhome"
                         component={GroupSessionJoined}
