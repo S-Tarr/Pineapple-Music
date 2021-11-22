@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from 'react-router';
-import "./SearchBar.css";
+import "../SearchBar.css";
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from "@material-ui/icons/Close";
-import Track from './Track';
-import app from "../firebase";
+import Track from '../Track';
+import app from "../../firebase";
 import {
     getFirestore,
     collection,

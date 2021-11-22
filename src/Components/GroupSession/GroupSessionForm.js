@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, Button, TextField, Typography } from "@mui/material";
-import app from "../firebase";
+import {
+  Alert,
+  Button,
+  TextField,
+  Typography,
+} from "@mui/material";
+import app from "../../firebase";
 import {
   collection,
   getDocs,
@@ -10,7 +15,8 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
-import { useAuth } from "../contexts/AuthContext";
+import SwitchesGroup from "./PermissionSwitches";
+import { useAuth } from "../../contexts/AuthContext";
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
@@ -21,6 +27,10 @@ function GroupSessionForm(props) {
 
   const { addGroupSession } = useAuth();
   const [error, setError] = useState(""); // Error represents the current message we want displayed, no error message by default
+  const [permissions, setPermissions] = useState({
+    queueing: true,
+    pps: true,
+  });
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -62,7 +72,7 @@ function GroupSessionForm(props) {
 
     //Add session to the page and to the database
     props.onSubmit(nameRef.current.value, idRef.current.value);
-    addGroupSession(nameRef.current.value, idRef.current.value);
+    addGroupSession(nameRef.current.value, idRef.current.value, permissions.queueing, permissions.pps);
   }
 
   return (
@@ -94,6 +104,9 @@ function GroupSessionForm(props) {
           inputRef={idRef}
           fullWidth
         />
+        <br />
+        <br />
+        <SwitchesGroup permissions={permissions} setPermissions={setPermissions}/>
         <br />
         <br />
         <Button
