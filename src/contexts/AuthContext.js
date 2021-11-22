@@ -144,6 +144,28 @@ export function AuthProvider({ children }) {
     });
   }
 
+  async function checkCreator(sessionId) {
+    let ownerId = "";
+    let isOwner = true;
+    const docSnapSessions = await getDocs(collection(db, "groupSessions"));
+    docSnapSessions.forEach((currDoc) => {
+      if (currDoc.data().sessionId == sessionId) {
+        ownerId = currDoc.data().ownerUid;
+        if (ownerId == currentUser.uid) {
+          ownerId = true;
+        } else {
+          isOwner = false;
+        }
+      }
+      // if (currDoc.data().sessionId == sessionId) {
+      //   setIsCreator(true);
+      // } else {
+      //   setIsCreator(false);
+      // }
+    });
+    return isOwner;
+  }
+
   async function joinGroupSession(sessionId) {
     try {
       console.log("clicked join");
@@ -397,6 +419,7 @@ export function AuthProvider({ children }) {
     getFormattedDate,
     updateUserState,
     updatePermissions,
+    checkCreator,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
