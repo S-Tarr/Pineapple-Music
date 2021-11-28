@@ -7,6 +7,7 @@ import GroupSessionSearchBar from './GroupSessionSearchBar';
 import Track from '../Track';
 import Player from './GroupSpotifyPlayer'
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
+import { useAuth } from "../../contexts/AuthContext";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
   getFirestore,
@@ -14,6 +15,7 @@ import {
   doc,
   query,
   where,
+  onSnapshot,
   getDocs,
   setDoc,
 } from "firebase/firestore";
@@ -142,12 +144,52 @@ function GetSongs(props) {
 
 const inputRef = createRef();
 
+// ADDED
+function GetPermissions(sessionId, setQueueing, setPps) {
+    useEffect(() => {
+      const groupSessionRef = collection(db, "groupSessions");
+      const groupSession = query(
+        groupSessionRef,
+        where("sessionId", "==", sessionId)
+      );
+      const unsubscribe = onSnapshot(groupSession, (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          setQueueing(doc.data().queueing);
+          setPps(doc.data().pps);
+        });
+      })
+      return () => unsubscribe;
+    }, [sessionId]);
+}
+//
+
 function GroupSessionQueueDisplay(props) {
     const cars = ["Island - Seven Lions", "Heat Check - Flight", "Sunday Morning - Maroon 5" , "Hotline Bling - Drake"];
     
     const [authorized, setAuthorized] = useState(true);
     const [token, setToken] = useState({})
 
+    // ADDED
+    const { checkCreator } = useAuth();
+    const [queueing, setQueueing] = useState();
+    const [pps, setPps] = useState();
+    const [isOwner, setIsOwner] = useState(false);
+    const isOwnerPromise = checkCreator(sessionId)
+        .then((result) => {
+            return result;
+        });
+    const useOwnerPromise = () => {
+        isOwnerPromise.then((result) => {
+        if (result) {
+            setIsOwner(true);
+        } else {
+            setIsOwner(false);
+        }
+        });
+    };
+    useOwnerPromise();
+    GetPermissions(sessionId, setQueueing, setPps);
+    //
 
     useEffect(() => {
         if (window.location.hash) {
@@ -221,7 +263,7 @@ function GroupSessionQueueDisplay(props) {
 
     return (
         <div>
-            <Button variant="danger" ref={inputRef} onClick={handleFilter}>ADD SONG</Button>
+            <Button variant="danger" ref={inputRef} onClick={handleFilter} disabled={!isOwner & !queueing}>ADD SONG</Button>
             <Overlay target={inputRef.current} show={showSearch} placement="bottom">
                 {({ placement, arrowProps, show: _show, popper, ...props }) => (
 
@@ -244,7 +286,7 @@ function GroupSessionQueueDisplay(props) {
                 )}
             </Overlay>
             
-            <Button variant="danger" onClick={handleDeleteButton}>DELETE SONG</Button>
+            <Button variant="danger" onClick={handleDeleteButton} disabled={!isOwner & !queueing}>DELETE SONG</Button>
             {items.map((number, index) => {
                 return (
                     <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>

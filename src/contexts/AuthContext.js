@@ -152,16 +152,11 @@ export function AuthProvider({ children }) {
       if (currDoc.data().sessionId == sessionId) {
         ownerId = currDoc.data().ownerUid;
         if (ownerId == currentUser.uid) {
-          ownerId = true;
+          isOwner = true;
         } else {
           isOwner = false;
         }
       }
-      // if (currDoc.data().sessionId == sessionId) {
-      //   setIsCreator(true);
-      // } else {
-      //   setIsCreator(false);
-      // }
     });
     return isOwner;
   }

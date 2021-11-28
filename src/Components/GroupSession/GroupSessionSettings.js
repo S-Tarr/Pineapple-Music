@@ -103,7 +103,6 @@ function GroupSessionSettings({ sessionId }) {
   const [queueing, setQueueing] = useState();
   const [pps, setPps] = useState();
   const [disableSettings, setDisableSettings] = useState(true);
-  console.log("disableSettingsPre: ", disableSettings);
   const isOwnerPromise = checkCreator(sessionId)
     .then((result) => {
       return result;
@@ -118,11 +117,7 @@ function GroupSessionSettings({ sessionId }) {
     });
   };
   useOwnerPromise();
-  console.log("isOwnerPromise: ", isOwnerPromise);
-  console.log("disableSettingsPost: ", disableSettings);
   GetPermissions(sessionId, queueing, setQueueing, pps, setPps);
-  console.log("Queueing: ", queueing);
-  console.log("Pps: ", pps);
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
