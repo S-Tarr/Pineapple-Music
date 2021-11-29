@@ -33,6 +33,7 @@ class Canvas extends Component {
         this.colors = '#2032CD';
         this.epilepsy = false;
         this.mode = 0;
+        this.countMode1 = 0;
 
         this.state = {
             visColor: '#2032CD',
@@ -74,14 +75,14 @@ class Canvas extends Component {
         for (var i = 0; i < bars; i++) {
             //divide a circle into equal part
             const rads = Math.PI * 2 / bars;
-
+            const radCoef = .1047;
             // Math is magical
             bar_height = this.barBump /*this.frequency_array[i]*/;
 
             const x = center_x + Math.cos(rads * i) * (radius);
             const y = center_y + Math.sin(rads * i) * (radius);
-            x_end = center_x + Math.cos(rads * i) * (radius + bar_height);
-            y_end = center_y + Math.sin(rads * i) * (radius + bar_height);
+            x_end = center_x + Math.cos(rads * i) * (radius + Math.sin(i * radCoef + this.countMode1) + bar_height);
+            y_end = center_y + Math.sin(rads * i) * (radius + Math.sin(i * radCoef + this.countMode1) + bar_height);
 
             //draw a bar
             this.drawBar(x, y, x_end, y_end, ctx, canvas);
@@ -126,6 +127,7 @@ class Canvas extends Component {
             cancelAnimationFrame(this.rafId);
         }
         else {
+            //bump start
             this.endTime = new Date();
             this.elapsedTime = ((this.endTime - this.context.timeStamp) + this.context.elapsed) / 1000;
             //console.log("TIME: " + this.elapsedTime);
@@ -141,6 +143,13 @@ class Canvas extends Component {
                     this.barBump = this.barBump - 3;
                 }
             }
+            if (this.countMode1 > 60) {
+                this.countMode1 = 0;
+            }
+            else {
+                this.countMode+= 2;
+            }
+            //color start
             if (this.elapsedTime >= this.context.segments[this.y].start) {
                 console.log("PITCHES: " + this.context.segments[this.y].pitches[0]);
                 this.colors = this.state.visColor;
@@ -154,10 +163,10 @@ class Canvas extends Component {
             }
             //console.log("BarBump: " + this.barBump);
             switch (this.mode) {
-                case 1:
+                case 0:
                     this.animationLooper0(this.canvas.current);
                     break;
-                case 2:
+                case 1:
                     this.animationLooper1(this.canvas.current);
                     break;
                 default:
