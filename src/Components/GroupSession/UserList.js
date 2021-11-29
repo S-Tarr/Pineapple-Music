@@ -36,7 +36,7 @@ const db = getFirestore(app); // Firestore database
 
 function ListInDrawer({ sessionId }) {
   const users = GetUsers(sessionId);
-  console.log(users);
+  users.sort((a, b) => a.active.localeCompare(b.active));
   let key = 0;
   return (
     <div>
