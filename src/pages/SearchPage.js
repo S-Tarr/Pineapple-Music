@@ -3,8 +3,8 @@ import "./SearchPage.css";
 import SearchBar from '../components/SearchBar'
 import { Button } from "@mui/material";
 import app from '../firebase';
-import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
-import { getFirestore, collection, where, doc, addDoc, updateDoc, query, orderBy, limit, getDocs, setDoc, onSnapshot, Timestamp } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getFirestore, collection, doc, updateDoc } from "firebase/firestore";
 
 
 

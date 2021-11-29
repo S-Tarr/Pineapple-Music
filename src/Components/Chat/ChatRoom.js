@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ChatMessage from "./ChatMessage";
 import MessageForm from "./MessageForm";
+import SongSuggestion from "../GroupSession/SongSuggestion";
 import app from "../../firebase";
 import { getAuth } from "firebase/auth";
 import {
@@ -12,19 +13,29 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import "../../pages/Pages.css";
-import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import Grid from "@mui/material/Grid";
+import { ContactSupportTwoTone } from "@material-ui/icons";
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
 const msgLstStyle = {
   "padding-bottom": "200px",
-  "position": "fixed",
-  "height": "100%",
-  "width": "100%",
+  position: "fixed",
+  height: "100%",
+  width: "100%",
   "overflow-y": "scroll",
   "background-image": "linear-gradient(90deg, #3a9c, #4f7a)",
+};
+
+const suggestionStyle = {
+  paddingRight: "20px",
+  paddingTop: "100px",
+  backgroundAttachment: "fixed",
+  width: "100%",
+  height: "100%",
 };
 
 const userListStyle = {
@@ -53,7 +64,12 @@ function GetChatMessages(groupSessionID, setMessagesWaiting) {
   return messages;
 }
 
-function MessageList({ groupSessionID, muted, messagesWaiting, setMessagesWaiting}) {
+function MessageList({
+  groupSessionID,
+  muted,
+  messagesWaiting,
+  setMessagesWaiting,
+}) {
   const messages = GetChatMessages(groupSessionID, setMessagesWaiting);
 
   if (muted === false) {
@@ -71,9 +87,21 @@ function MessageList({ groupSessionID, muted, messagesWaiting, setMessagesWaitin
       </div>
     );
   } else {
-    return <div className="muted-page">
-            {(messagesWaiting && muted) ? <NotificationsActiveIcon color="primary" sx={{ fontSize: 300, marginRight: 25}} /> : <NotificationsOffIcon color="disabled" sx={{ fontSize: 300, marginRight: 25}} />}
-          </div>
+    return (
+      <div className="muted-page">
+        {messagesWaiting && muted ? (
+          <NotificationsActiveIcon
+            color="primary"
+            sx={{ fontSize: 300, marginRight: 25 }}
+          />
+        ) : (
+          <NotificationsOffIcon
+            color="disabled"
+            sx={{ fontSize: 300, marginRight: 25 }}
+          />
+        )}
+      </div>
+    );
   }
 }
 
@@ -84,12 +112,29 @@ const ChatRoom = ({ groupSessionID }) => {
   return (
     <>
       <div className="messages-container-page">
-        <div>
-          <MessageList groupSessionID={groupSessionID} muted={muted} setMuted={setMuted} messagesWaiting={messagesWaiting} setMessagesWaiting={setMessagesWaiting}/>
-        </div>
-        <div>
-          <MessageForm groupSessionID={groupSessionID} muted={muted} setMuted={setMuted} messagesWaiting={messagesWaiting} setMessagesWaiting={setMessagesWaiting}/>
-        </div>
+        <Grid container spacing={10}>
+          <Grid item xs={8}>
+            <MessageList
+              groupSessionID={groupSessionID}
+              muted={muted}
+              setMuted={setMuted}
+              messagesWaiting={messagesWaiting}
+              setMessagesWaiting={setMessagesWaiting}
+            />
+          </Grid>
+          <Grid item xs={4} style={suggestionStyle} sx={{ zIndex: "app bar" }}>
+            <SongSuggestion sessionId={groupSessionID} />
+          </Grid>
+          <Grid item xs={12}>
+            <MessageForm
+              groupSessionID={groupSessionID}
+              muted={muted}
+              setMuted={setMuted}
+              messagesWaiting={messagesWaiting}
+              setMessagesWaiting={setMessagesWaiting}
+            />
+          </Grid>
+        </Grid>
       </div>
     </>
   );
