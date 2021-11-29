@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react"
 import SpotifyPlayer from "react-spotify-web-playback"
 import app from "../firebase";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, query, orderBy, limit, getDoc, doc, onSnapshot} from "firebase/firestore";
+import { getFirestore, collection, query, orderBy, limit, getDocs, doc, onSnapshot} from "firebase/firestore";
 import { TimeContext } from '../contexts/TimeContext';
 import { Done } from "@material-ui/icons";
 var SpotifyWebApi = require('spotify-web-api-node');
@@ -35,10 +35,18 @@ function GetQueue() {
 }
 
 async function getAccessToken() {
-  const docRef = doc(db, "users", auth.currentUser.uid);
-  const docSnap = await getDoc(docRef);
-  console.log(docSnap.data())
-  return docSnap.data();
+  const docSnap = await getDocs(collection(db, "users"));
+  console.log(auth.currentUser.uid)
+  let temp = null;
+  docSnap.forEach((thing) => {
+    console.log(thing.data().uid)
+    if (thing.data().uid == auth.currentUser.uid) {
+      temp = thing.data();
+      
+    }
+  });
+  console.log(temp)
+  return temp;
 }
 
 export default function Player() {

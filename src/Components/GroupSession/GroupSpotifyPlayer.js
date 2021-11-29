@@ -83,9 +83,18 @@ function GetQueue(sessionId, groupSessionQueueId, groupSessionQueueDoc) {
 }
 
 async function getAccessToken() {
-  const docRef = doc(db, "users", auth.currentUser.uid);
-  const docSnap = await getDoc(docRef);
-  return docSnap.data();
+  const docSnap = await getDocs(collection(db, "users"));
+  console.log(auth.currentUser.uid)
+  let temp = null;
+  docSnap.forEach((thing) => {
+    console.log(thing.data().uid)
+    if (thing.data().uid == auth.currentUser.uid) {
+      temp = thing.data();
+      console.log(temp)
+    }
+  });
+  console.log(temp)
+  return temp;
 }
 
 export default function Player({
