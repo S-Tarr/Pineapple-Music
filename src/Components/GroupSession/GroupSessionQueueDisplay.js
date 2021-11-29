@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import { useDrag, useDrop } from 'react-dnd';
 import app from "../../firebase";
 import GroupSessionSearchBar from './GroupSessionSearchBar';
+import GroupSessionPlaylistSearch from './GroupSessionPlaylistSearch';
 import Track from '../Track';
 import Player from './GroupSpotifyPlayer'
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
@@ -66,16 +67,28 @@ function ExampleDrag(props) {
 
     return (
         <div ref={drag}>
-            {/* <Track track={props.item}></Track> */}
             <div
                 className="d-flex m-2 align-items-center"
                 style={{ cursor: "pointer", display:"flex", flexDirection:'row' }}
                 >
-                <img src={props.item.albumUrl} style={{ height: "64px", width: "64px" }} />
-                <div className="ml-3">
-                    <div>{props.item.title}</div>
-                    <div className="text-muted">{props.item.artist}</div>
-                </div>
+                {props.item.tracks && props.index === 0 ? 
+                (<div style={{backgroundColor:"black", marginBottom: 20}}>
+                    <div style={{marginBottom:10}}>Playing From Playlist</div>
+                    <div style={{display:'flex', flexDirection: 'row'}}>
+                        <img src={props.item.albumUrl} style={{ height: "64px", width: "64px" }} />
+                        <div>
+                            {props.item.title}
+                            <div className="text-muted">{props.item.artist}</div>
+                        </div>
+                    </div>
+                </div>) : 
+                (<div>
+                    <img src={props.item.albumUrl} style={{ height: "64px", width: "64px" }} />
+                    <div className="ml-3">
+                        <div>{props.item.title}</div>
+                        <div className="text-muted">{props.item.artist}</div>
+                    </div>
+                </div>)}
             </div>
         </div>
     )
@@ -136,7 +149,6 @@ function GetSongs(props) {
           });
 
     }, []);
-    console.log(songs);
     return songs;
 }
 
@@ -226,8 +238,10 @@ function GroupSessionQueueDisplay(props) {
 
                     <div {...props}>
                         <div style={{backgroundColor: "whitesmoke"}}>
-                        
-                            <GroupSessionSearchBar placeholder="Enter a song name..." spotifyData={token} authorized={authorized} groupSessionQueueDoc={groupSessionQueueDoc} groupSessionQueueId={groupSessionQueueId}/>
+
+                            {/* <GroupSessionSearchBar placeholder="Enter a song name..." spotifyData={token} authorized={authorized} groupSessionQueueDoc={groupSessionQueueDoc} groupSessionQueueId={groupSessionQueueId}/> */}
+                            <GroupSessionPlaylistSearch placeholder="Enter a Playlist name..." spotifyData={token} authorized={authorized} groupSessionQueueDoc={groupSessionQueueDoc} groupSessionQueueId={groupSessionQueueId}/>
+
                             
                             <Button
                                 variant="outlined"
@@ -246,6 +260,7 @@ function GroupSessionQueueDisplay(props) {
             <Button variant="danger" onClick={handleDeleteButton}>DELETE SONG</Button>
             {items.map((number, index) => {
                 return (
+                    // USE THE BELOW INDEX TO JEGG AWAY YOUR RC
                     <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
                         <Drop item={number} index={index} type={'BOX'} setDroppedIndex={setDroppedIndex} handleDrop={handleDrop} items={items}></Drop>
                         {showDelete == true && <Button variant="danger" onClick={() => handleDelete(items, setItems, index)}>X</Button>}
