@@ -11,11 +11,11 @@
 }
 
 .Song-Div {
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     align-content: center;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-direction: column;
     text-align: center;
 }
@@ -106,6 +106,7 @@
 .bookmark-button {
     border: none;
     background-color: transparent;
+    float: right !important;
 }
 
 @media (prefers-reduced-motion: no-preference) {

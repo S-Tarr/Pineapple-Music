@@ -62,20 +62,22 @@ const SongPage = () => {
         onClick={() => {toggleVisuals(); toggleText()}}>
             {text}
         </Button>
-            <div className="Song-Div">
-                <button className="bookmark-button" onClick={() => handleBookmark()}>
-                    <BookmarkBorderIcon style={{ fontSize: 50 }} />
-                </button>
-                <TimeContextProvider>
+        <div className="Song-Div">
+            <TimeContextProvider>
+                {/* <div style={{display: "flex"}}> */}
+                    <button className="bookmark-button" onClick={() => handleBookmark()}>
+                        <BookmarkBorderIcon style={{ fontSize: 50 }} />
+                    </button>
                     {visuals ?
                         <Canvas/>
                     :
                         <><img className="Visual-Img" src={image} style={{ height: "512px", width: "512px" }} />
                         <text>{name}</text></>
-                    }
-                    <Player/>
-                </TimeContextProvider>
-            </div>
+                    }   
+                {/* </div> */}
+                <Player/>
+            </TimeContextProvider>
+        </div>
     </div>
     );
 }
