@@ -4,7 +4,7 @@ import SearchBar from '../components/SearchBar'
 import { Button } from "@mui/material";
 import app from '../firebase';
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, doc, updateDoc, getDocs } from "firebase/firestore";
+import { getFirestore, collection, doc, getDocs, updateDoc } from "firebase/firestore";
 
 
 
