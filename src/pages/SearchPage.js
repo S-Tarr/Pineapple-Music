@@ -55,9 +55,14 @@ const handleSpotifyLogin = () => {
 
 
 async function handleSubmitToken(access_token) {
-  const userRef = collection(db, 'users');
-  await updateDoc(doc(userRef, auth.currentUser.uid), {
-      SpotifyToken: access_token,
+  const docSnap = await getDocs(collection(db, "users"));
+  console.log(auth.currentUser.uid)
+  docSnap.forEach((data) => {
+    if (data.data().uid === auth.currentUser.uid) {
+      updateDoc(doc(db, "users", data.id), {
+        SpotifyToken: access_token
+      });
+    }
   });
   console.log(`submitted token` + access_token)
 }
