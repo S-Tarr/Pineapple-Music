@@ -20,11 +20,6 @@ var spotifyApi = new SpotifyWebApi({
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
-async function getCurrentSession() {
-  const docRef = doc(db, "users", auth.currentUser.uid);
-  const docSnap = await getDoc(docRef);
-  return docSnap.data();
-}
 async function GetSessionUID(groupID) {
   //const [sessionID, setSessionID] = useState();
   const q = query(collection(db, 'groupSessions'), where('sessionId', '==',  groupID));
@@ -36,18 +31,53 @@ async function GetSessionUID(groupID) {
   });
 }
 
+var userDocId = null;
+
+async function getAccessToken() {
+  const docSnap = await getDocs(collection(db, "users"));
+  console.log(auth.currentUser.uid)
+  let temp = null;
+  docSnap.forEach((thing) => {
+    console.log(thing.data().uid)
+    if (thing.data().uid == auth.currentUser.uid) {
+      temp = thing.data();
+      userDocId = thing.id;
+      console.log("uid: " + userDocId)
+      console.log(temp)
+    }
+  });
+  console.log(temp)
+  return temp;
+}
+
 
 function SearchBar({ placeholder, spotifyData }) {
 
   const [curSession, setCurSession] = useState();
   const [curSessionID, setCurSessionID] = useState();
-  const [isLoaded, setIsLoaded] = useState(true);
 
+  //-------Token Handling------------
+  const [isLoaded, setIsLoaded] = useState(true);
+  const [access_token, setAccessToken] = useState("");
   useEffect(() => {
-    const promise = getCurrentSession();
-    promise.then((ret) => setCurSession(ret));
-    console.log(curSession);
-  }, [])
+    var promise = getAccessToken();
+    promise.then((ret) => {
+      setAccessToken(ret.SpotifyToken);
+      console.log(ret.SpotifyToken);
+      console.log(access_token);
+      spotifyApi.setAccessToken(ret.SpotifyToken);
+      //handleSubmitToken(ret.SpotifyToken);
+    });
+    console.log(access_token);
+  }, [isLoaded])
+
+  console.log(access_token);
+
+  if (access_token == undefined) {
+    setIsLoaded(false)
+  }
+  console.log(isLoaded)
+//--------End Token Handling-----------------
   
   const currentUser = auth.currentUser;
   console.log(currentUser.uid);
@@ -58,13 +88,15 @@ function SearchBar({ placeholder, spotifyData }) {
   const [wordEntered, setWordEntered] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [playingTrack, setPlayingTrack] = useState();
-  const access_token = spotifyData;
-  useEffect(() => {
+  
+  /*useEffect(() => {
     if (!access_token) return
     spotifyApi.setAccessToken(access_token);
     console.log(access_token)
     handleSubmitToken();
-  }, [access_token])
+  }, [access_token])*/
+
+
 
   useEffect(() => {
     if (!wordEntered) return setSearchResults([])
@@ -81,7 +113,7 @@ function SearchBar({ placeholder, spotifyData }) {
             })
         )
     });
-  }, [wordEntered, access_token])
+  }, [wordEntered])
 
   const handleFilter = (event) => {
     const searchWord = event.target.value;
@@ -104,10 +136,10 @@ function SearchBar({ placeholder, spotifyData }) {
     });
   }
 
-  async function handleSubmitToken() {
+  async function handleSubmitToken(accessToken) {
     const userRef = collection(db, 'users');
-    await updateDoc(doc(userRef, currentUser.uid), {
-        SpotifyToken: access_token,
+    await updateDoc(doc(userRef, userDocId), {
+        SpotifyToken: accessToken,
     });
   }
 

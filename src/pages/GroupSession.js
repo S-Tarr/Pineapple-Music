@@ -6,6 +6,7 @@ import {
   IconButton,
   InputBase,
   LinearProgress,
+  CircularProgress,
   Modal,
   Typography,
 } from "@mui/material";
@@ -23,8 +24,9 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 
-import GroupSessionCard from "../components/GroupSessionCard";
-import GroupSessionForm from "../components/GroupSessionForm";
+import groupSessionCover from "../assets/groupSessionCover.jpeg";
+import GroupSessionCard from "../components/GroupSession/GroupSessionCard";
+import GroupSessionForm from "../components/GroupSession/GroupSessionForm";
 import { useAuth } from "../contexts/AuthContext";
 
 const style = {
@@ -84,9 +86,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const db = getFirestore(app); // Firestore database
 
 function GroupSession() {
+  const [pageLoading, setPageLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  useEffect(() => {
+    setPageLoading(false);
+  }, []);
 
   const { searchGroupSessions, getFormattedDate } = useAuth();
   const auth = getAuth();
@@ -96,8 +103,7 @@ function GroupSession() {
 
   const props = {
     title: "group session title",
-    imageUrl:
-      "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+    imageUrl: groupSessionCover,
     username: "username goes here",
     createdAt: dateTime,
     sessionId: 1234,
@@ -112,7 +118,6 @@ function GroupSession() {
     if (sessionIdRef.current.value !== "") {
       setLoading(true);
       searchGroupSessions(sessionIdRef.current.value).then((session) => {
-        console.log("in handleSearch");
         addCard([]);
         addCard(session);
         if (session.length > 0) {
@@ -131,9 +136,15 @@ function GroupSession() {
         .then((docSnap) => {
           docSnap.forEach((doc) => {
             if (doc.data().uid === auth.currentUser.uid) {
-              doc
-                .data()
-                .groupSessions.forEach((item) => currGroupSessions.add(item));
+              if (
+                doc.data().groupSessions !== undefined &&
+                doc.data().groupSessions != null &&
+                doc.data().groupSessions !== "undefined"
+              ) {
+                doc
+                  .data()
+                  .groupSessions.forEach((item) => currGroupSessions.add(item));
+              }
             }
           });
         })
@@ -145,8 +156,7 @@ function GroupSession() {
             querySnapshot.forEach((doc) => {
               const props = {
                 title: "group session1",
-                imageUrl:
-                  "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+                imageUrl: groupSessionCover,
                 username: "username goes here",
                 createdAt: "",
                 sessionId: 1234,
@@ -204,47 +214,56 @@ function GroupSession() {
           inputProps={{ "aria-label": "search" }}
         />
       </Search>
-      <Container maxWidth="md" sx={{ marginTop: 2, paddingBottom: 4 }}>
-        <Grid container alignItems="center" justifyContent="center" spacing={9}>
+      {pageLoading ? (
+        <CircularProgress />
+      ) : (
+        <Container maxWidth="md" sx={{ marginTop: 2, paddingBottom: 4 }}>
           <Grid
+            container
+            alignItems="center"
             justifyContent="center"
-            align="center"
-            item
-            xs={12}
-            sm={6}
-            md={4}
+            spacing={9}
           >
-            <IconButton color="primary" onClick={handleOpen}>
-              <AddCircleIcon sx={{ fontSize: 80 }} />
-            </IconButton>
-            <Modal
-              open={open}
-              onClose={handleClose}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-              onSubmit={handleClose}
+            <Grid
+              justifyContent="center"
+              align="center"
+              item
+              xs={12}
+              sm={6}
+              md={4}
             >
-              <Box sx={style}>
-                <GroupSessionForm onSubmit={handleCreate} />
-              </Box>
-            </Modal>
-            <br />
-            Create a new session
+              <IconButton color="primary" onClick={handleOpen}>
+                <AddCircleIcon sx={{ fontSize: 80 }} />
+              </IconButton>
+              <Modal
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+                onSubmit={handleClose}
+              >
+                <Box sx={style}>
+                  <GroupSessionForm onSubmit={handleCreate} />
+                </Box>
+              </Modal>
+              <br />
+              Create a new session
+            </Grid>
           </Grid>
-        </Grid>
-        <br />
-        {loading ? (
-          <LinearProgress />
-        ) : (
-          <Grid container alignItems="center" spacing={9}>
-            {cards.map((card) => (
-              <Grid item key={key++} xs={12} sm={6} md={4}>
-                <GroupSessionCard props={card} />
-              </Grid>
-            ))}
-          </Grid>
-        )}
-      </Container>
+          <br />
+          {loading ? (
+            <LinearProgress />
+          ) : (
+            <Grid container alignItems="center" spacing={9}>
+              {cards.map((card) => (
+                <Grid item key={key++} xs={12} sm={6} md={4}>
+                  <GroupSessionCard props={card} />
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </Container>
+      )}
     </div>
   );
 }

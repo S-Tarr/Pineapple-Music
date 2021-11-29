@@ -3,8 +3,8 @@ import "./SearchPage.css";
 import SearchBar from '../components/SearchBar'
 import { Button } from "@mui/material";
 import app from '../firebase';
-import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
-import { getFirestore, collection, where, doc, addDoc, updateDoc, query, orderBy, limit, getDocs, setDoc, onSnapshot, Timestamp } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getFirestore, collection, doc, getDocs, updateDoc } from "firebase/firestore";
 
 
 
@@ -55,10 +55,16 @@ const handleSpotifyLogin = () => {
 
 
 async function handleSubmitToken(access_token) {
-  const userRef = collection(db, 'users');
-  await updateDoc(doc(userRef, auth.currentUser.uid), {
-      SpotifyToken: access_token,
+  const docSnap = await getDocs(collection(db, "users"));
+  console.log(auth.currentUser.uid)
+  docSnap.forEach((data) => {
+    if (data.data().uid === auth.currentUser.uid) {
+      updateDoc(doc(db, "users", data.id), {
+        SpotifyToken: access_token
+      });
+    }
   });
+  console.log(`submitted token` + access_token)
 }
 
 var request = require('request'); // "Request" library

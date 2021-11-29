@@ -2,9 +2,9 @@ import { useState, useEffect, createRef} from 'react';
 import Overlay from 'react-bootstrap/Overlay';
 import Button from 'react-bootstrap/Button';
 import { useDrag, useDrop } from 'react-dnd';
-import app from "../firebase";
-import GroupSessionSearchBar from '../components/GroupSessionSearchBar';
-import Track from './Track';
+import app from "../../firebase";
+import GroupSessionSearchBar from './GroupSessionSearchBar';
+import Track from '../Track';
 import Player from './GroupSpotifyPlayer'
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -66,7 +66,17 @@ function ExampleDrag(props) {
 
     return (
         <div ref={drag}>
-            <Track track={props.item}></Track>
+            {/* <Track track={props.item}></Track> */}
+            <div
+                className="d-flex m-2 align-items-center"
+                style={{ cursor: "pointer", display:"flex", flexDirection:'row' }}
+                >
+                <img src={props.item.albumUrl} style={{ height: "64px", width: "64px" }} />
+                <div className="ml-3">
+                    <div>{props.item.title}</div>
+                    <div className="text-muted">{props.item.artist}</div>
+                </div>
+            </div>
         </div>
     )
 }

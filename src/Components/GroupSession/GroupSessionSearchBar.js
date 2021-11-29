@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from 'react-router';
-import "./SearchBar.css";
+import "../SearchBar.css";
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from "@material-ui/icons/Close";
-import Track from './Track';
-import app from "../firebase";
+import Track from '../Track';
+import app from "../../firebase";
+import { getAuth } from "firebase/auth";
+
 import {
     getFirestore,
     collection,
     doc,
     query,
     where,
+    getDoc,
     getDocs,
     setDoc,
     addDoc,
     Timestamp,
   } from "firebase/firestore";
-  
+
+const auth = getAuth(); // Authorization component
 const db = getFirestore(app);
 
 
@@ -33,6 +37,19 @@ var spotifyApi = new SpotifyWebApi({
 let groupSessionQueueDoc;
 let groupSessionQueueId;
 
+async function getAccessToken() {
+  const docSnap = await getDocs(collection(db, "users"));
+  console.log(auth.currentUser.uid)
+  docSnap.forEach((thing) => {
+    console.log(thing.data().uid)
+    if (thing.data().uid === auth.currentUser.uid) {
+      console.log(thing.data())
+      return thing.data()
+    }
+  });
+  return null;
+}
+
 function GroupSessionSearchBar({ placeholder, spotifyData, authorized, groupSessionQueueDoc, groupSessionQueueId }) {
 
   const history = useHistory()
@@ -44,11 +61,29 @@ function GroupSessionSearchBar({ placeholder, spotifyData, authorized, groupSess
   const [filteredData, setFilteredData] = useState([]);
   const [wordEntered, setWordEntered] = useState("");
   const [searchResults, setSearchResults] = useState([])
-  const access_token = spotifyData;
+  
+  //-------Token Handling------------
+  const [isLoaded, setIsLoaded] = useState(true);
+  const [access_token, setAccessToken] = useState("");
   useEffect(() => {
-    if (!access_token) return
-    spotifyApi.setAccessToken(access_token)
-  }, [access_token])
+    var promise = getAccessToken();
+    promise.then((ret) => {
+      setAccessToken(ret.SpotifyToken);
+      console.log(ret.SpotifyToken)
+      console.log(access_token)
+      spotifyApi.setAccessToken(ret.SpotifyToken);
+    });
+    console.log(access_token);
+  }, [isLoaded])
+
+  console.log(access_token)
+
+  if (access_token == undefined) {
+    setIsLoaded(false)
+  }
+  console.log(isLoaded)
+//--------End Token Handling-----------------
+
 
   useEffect(() => {
     if (!wordEntered) return setSearchResults([])

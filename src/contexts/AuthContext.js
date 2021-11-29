@@ -33,6 +33,8 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 
+import groupSessionCover from "../assets/groupSessionCover.jpeg";
+
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyB_IknUnLChJp9vG9kip0_Xu1YaqKed2Sk",
@@ -100,15 +102,60 @@ export function AuthProvider({ children }) {
     return a < b ? 1 : a > b ? -1 : 0;
   }
 
+  async function updateUserState() {
+    let groupSessions = new Set();
+    const docSnap = await getDocs(collection(db, "users"));
+    docSnap.forEach((doc) => {
+      if (doc.data().uid === currentUser.uid) {
+        if (
+          doc.data().groupSessions !== undefined &&
+          doc.data().groupSessions != null &&
+          doc.data().groupSessions !== "undefined"
+        ) {
+          doc.data().groupSessions.forEach((item) => groupSessions.add(item));
+        }
+      }
+    });
+
+    const docSnapSessions = await getDocs(collection(db, "groupSessions"));
+    docSnapSessions.forEach((currDoc) => {
+      if (groupSessions.has(currDoc.data().sessionId)) {
+        const sessionRef = doc(db, "groupSessions", currDoc.id);
+        updateDoc(sessionRef, {
+          [`users.${currentUser.uid}`]: "inactive",
+        });
+      }
+    });
+  }
+
+  async function updatePermissions(sessionId, toUpdate, value) {
+    const docSnapSessions = await getDocs(collection(db, "groupSessions"));
+    docSnapSessions.forEach((currDoc) => {
+      if (currDoc.data().sessionId == sessionId) {
+        const sessionRef = doc(db, "groupSessions", currDoc.id);
+        if (toUpdate == "queueing") {
+          updateDoc(sessionRef, {
+            "queueing": value,
+          });
+        } else {
+          updateDoc(sessionRef, {
+            "pps": value,
+          });
+        }
+      }
+    });
+  }
+
   async function joinGroupSession(sessionId) {
     try {
+      console.log("clicked join");
       const docSnapSessions = await getDocs(collection(db, "groupSessions"));
       docSnapSessions.forEach((currDoc) => {
         if (currDoc.data().sessionId === sessionId) {
           const sessionRef = doc(db, "groupSessions", currDoc.id);
           console.log("sessionRef", sessionRef);
           updateDoc(sessionRef, {
-            users: arrayUnion(currentUser.uid),
+            [`users.${currentUser.uid}`]: "active",
           });
         }
       });
@@ -134,8 +181,7 @@ export function AuthProvider({ children }) {
         docSnap.forEach((doc) => {
           const props = {
             title: "group session1",
-            imageUrl:
-              "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+            imageUrl: groupSessionCover,
             username: "username goes here",
             createdAt: "",
             sessionId: 1234,
@@ -169,8 +215,7 @@ export function AuthProvider({ children }) {
         docSnap.forEach((doc) => {
           const props = {
             title: "group session1",
-            imageUrl:
-              "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+            imageUrl: groupSessionCover,
             username: "username goes here",
             createdAt: "",
             sessionId: 1234,
@@ -214,8 +259,7 @@ export function AuthProvider({ children }) {
           querySnapshot.forEach((doc) => {
             const props = {
               title: "group session1",
-              imageUrl:
-                "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+              imageUrl: groupSessionCover,
               username: "username goes here",
               createdAt: "",
               sessionId: 1234,
@@ -241,7 +285,7 @@ export function AuthProvider({ children }) {
     return cards;
   }
 
-  async function addGroupSession(name, sessionId) {
+  async function addGroupSession(name, sessionId, queueing, pps) {
     try {
       const songs = [];
       const docRef = await addDoc(collection(db, "groupSessions"), {
@@ -251,6 +295,8 @@ export function AuthProvider({ children }) {
         sessionId: sessionId,
         users: [currentUser.uid],
         playState: false,
+        queueing: queueing,
+        pps: pps,
       });
       const docRef2 = await addDoc(collection(db, "groupSessionQueue"), {
         createdAt: Timestamp.now(),
@@ -294,6 +340,7 @@ export function AuthProvider({ children }) {
           const docRef = await addDoc(collection(db, "users"), {
             uid: currentUser.uid,
             SpotifyToken: params,
+            SpotifyCode: params,
             createdAt: Timestamp.now(),
           });
           console.log("Doc written w/ ID in addToken: ", docRef.id);
@@ -347,6 +394,8 @@ export function AuthProvider({ children }) {
     getGroupSessions,
     joinGroupSession,
     getFormattedDate,
+    updateUserState,
+    updatePermissions,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
