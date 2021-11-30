@@ -8,6 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import AlbumIcon from '@mui/icons-material/Album';
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
+import HistoryIcon from '@mui/icons-material/History';
 
 export const NavbarData = [
     {
@@ -51,4 +52,10 @@ export const NavbarData = [
         icon: <BookmarksIcon />,
         link: "/bookmarks",
     },
+
+    {
+        title: "History",
+        icon: <HistoryIcon />,
+        link: "/history"
+    }
 ];
