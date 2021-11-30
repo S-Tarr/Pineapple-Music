@@ -144,8 +144,8 @@ function GetSongs(props) {
 
 const inputRef = createRef();
 
-// ADDED
-function GetPermissions(sessionId, setQueueing, setPps) {
+// THOMAS
+function GetPermissions(sessionId, setQueueing, setPps, setShowSearch) {
     useEffect(() => {
       const groupSessionRef = collection(db, "groupSessions");
       const groupSession = query(
@@ -155,6 +155,9 @@ function GetPermissions(sessionId, setQueueing, setPps) {
       const unsubscribe = onSnapshot(groupSession, (querySnapshot) => {
         querySnapshot.forEach((doc) => {
           setQueueing(doc.data().queueing);
+          if (doc.data().queueing == false) {
+            setShowSearch(false);
+          }
           setPps(doc.data().pps);
         });
       })
@@ -166,10 +169,14 @@ function GetPermissions(sessionId, setQueueing, setPps) {
 function GroupSessionQueueDisplay(props) {
     const cars = ["Island - Seven Lions", "Heat Check - Flight", "Sunday Morning - Maroon 5" , "Hotline Bling - Drake"];
     
+    const [droppedIndex, setDroppedIndex] = useState();
+    const [showSearch, setShowSearch] = useState(false);
+    const [showDelete, setShowDelete] = useState(false);
+
     const [authorized, setAuthorized] = useState(true);
     const [token, setToken] = useState({})
 
-    // ADDED
+    // THOMAS
     const { checkCreator } = useAuth();
     const [queueing, setQueueing] = useState();
     const [pps, setPps] = useState();
@@ -188,7 +195,7 @@ function GroupSessionQueueDisplay(props) {
         });
     };
     useOwnerPromise();
-    GetPermissions(sessionId, setQueueing, setPps);
+    GetPermissions(sessionId, setQueueing, setPps, setShowSearch);
     //
 
     useEffect(() => {
@@ -207,10 +214,6 @@ function GroupSessionQueueDisplay(props) {
     useEffect(() =>{
         setItems(songs);
     })
-
-    const [droppedIndex, setDroppedIndex] = useState();
-    const [showSearch, setShowSearch] = useState(false);
-    const [showDelete, setShowDelete] = useState(false);
 
     const handleFilter = (event) => {
         setShowSearch(!showSearch);
