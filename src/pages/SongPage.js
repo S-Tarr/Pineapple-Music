@@ -6,6 +6,8 @@ import Canvas from "../components/Canvas";
 import Button from "@mui/material/Button";
 import TimeContextProvider from "../contexts/TimeContext";
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import app from "../firebase";
+import { getAuth } from "firebase/auth";
 import {
     getFirestore,
     collection,
@@ -50,8 +52,10 @@ const SongPage = () => {
         }
     }
     
+    const auth = getAuth(); // Authorization component
+    const db = getFirestore(app); // Firestore database
     async function handleBookmark() {
-        // await updateDoc(doc(db, "groupSessions", docId), {
+        // await addDoc(doc(db, "users", auth.currentUser.uid), {
         //   queueOffset: offset - 1,
         // });
     }
@@ -64,17 +68,15 @@ const SongPage = () => {
         </Button>
         <div className="Song-Div">
             <TimeContextProvider>
-                {/* <div style={{display: "flex"}}> */}
-                    <button className="bookmark-button" onClick={() => handleBookmark()}>
-                        <BookmarkBorderIcon style={{ fontSize: 50 }} />
-                    </button>
-                    {visuals ?
-                        <Canvas/>
-                    :
-                        <><img className="Visual-Img" src={image} style={{ height: "512px", width: "512px" }} />
-                        <text>{name}</text></>
-                    }   
-                {/* </div> */}
+                <button className="bookmark-button" onClick={() => handleBookmark()}>
+                    <BookmarkBorderIcon style={{ fontSize: 50 }} />
+                </button>
+                {visuals ?
+                    <Canvas/>
+                :
+                    <><img className="Visual-Img" src={image} style={{ height: "512px", width: "512px" }} />
+                    <text>{name}</text></>
+                }   
                 <Player/>
             </TimeContextProvider>
         </div>
