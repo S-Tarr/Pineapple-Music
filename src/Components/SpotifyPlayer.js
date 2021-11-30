@@ -81,6 +81,7 @@ export default function Player() {
   return (
     <SpotifyPlayer
       token={accessToken}
+      uris={queue}
       play={play2}
       autoPlay={true}
       callback={state => {
@@ -90,7 +91,6 @@ export default function Player() {
           console.log("Track id" + state.track.id);
           spotifyApi.getAudioAnalysisForTrack(state.track.id)
           .then(function(data) {
-            console.log("Beats Info: " + data.body.beats);
             setTime({timeStamp: new Date(), elapsed: state.progressMs,
             isPlaying: play2, beats: data.body.beats, segments: data.body.segments});
           }, 
@@ -99,7 +99,6 @@ export default function Player() {
           });
         }
       }}
-      uris={queue}
     />
   )
 }

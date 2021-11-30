@@ -29,11 +29,12 @@ class Canvas extends Component {
         this.toStart = true;
         this.i = 0;
         this.y = 0;
-        this.barBump = 200;
+        this.barBump = 120;
         this.colors = '#2032CD';
         this.epilepsy = false;
-        this.mode = 0;
+        this.mode = 1;
         this.countMode1 = 0;
+        this.bumpPos = -1;
 
         this.state = {
             visColor: '#2032CD',
@@ -54,7 +55,7 @@ class Canvas extends Component {
             const rads = Math.PI * 2 / bars;
 
             // Math is magical
-            bar_height = this.barBump /*this.frequency_array[i]*/;
+            bar_height = this.barBump;
 
             const x = center_x + Math.cos(rads * i) * (radius);
             const y = center_y + Math.sin(rads * i) * (radius);
@@ -81,9 +82,33 @@ class Canvas extends Component {
 
             const x = center_x + Math.cos(rads * i) * (radius);
             const y = center_y + Math.sin(rads * i) * (radius);
-            x_end = center_x + Math.cos(rads * i) * (radius + Math.sin(i * radCoef + this.countMode1) + bar_height);
-            y_end = center_y + Math.sin(rads * i) * (radius + Math.sin(i * radCoef + this.countMode1) + bar_height);
+            x_end = center_x + Math.cos(rads * i) * (radius +
+                (((bar_height - 150) / 6) * Math.sin((i + this.countMode1) * radCoef)) + 120);
+            y_end = center_y + Math.sin(rads * i) * (radius +
+                ((bar_height - 25) * Math.sin((i + this.countMode1) * radCoef)) + 120);
 
+            //draw a bar
+            this.drawBar(x, y, x_end, y_end, ctx, canvas);
+        }
+    }
+
+    animationLooper2(canvas) {
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx = canvas.getContext("2d");
+        var ripple = this.barBump - 120;
+        for (var i = 0; i < bars; i++) {
+            //divide a circle into equal part
+            const rads = Math.PI * 2 / bars;
+            // Math is magical
+            bar_height = this.barBump;
+
+            const x = center_x + Math.cos(rads * i) * (radius);
+            const y = center_y + Math.sin(rads * i) * (radius);
+            x_end = center_x + Math.cos(rads * i) * (radius + bar_height);
+            y_end = center_y + Math.sin(rads * i) * (radius + bar_height);
+            ripple -= 2;
             //draw a bar
             this.drawBar(x, y, x_end, y_end, ctx, canvas);
         }
@@ -110,21 +135,10 @@ class Canvas extends Component {
         ctx.stroke();
     }
 
-    togglePlay = () => {
-        const { audio } = this;
-        if(audio.paused) {
-            audio.play();
-            this.rafId = requestAnimationFrame(this.tick);
-
-         } else {
-            audio.pause();
-            cancelAnimationFrame(this.rafId);
-         }
-    }
-
     tick = () => {
         if (!this.context.isPlaying) {
             cancelAnimationFrame(this.rafId);
+            this.toStart = true;
         }
         else {
             //bump start
@@ -139,7 +153,7 @@ class Canvas extends Component {
                 this.i++;
             }
             else {
-                if (this.barBump >= 100) {
+                if (this.barBump >= 120) {
                     this.barBump = this.barBump - 3;
                 }
             }
@@ -147,7 +161,7 @@ class Canvas extends Component {
                 this.countMode1 = 0;
             }
             else {
-                this.countMode+= 2;
+                this.countMode1+= 2;
             }
             //color start
             if (this.elapsedTime >= this.context.segments[this.y].start) {
@@ -168,6 +182,9 @@ class Canvas extends Component {
                     break;
                 case 1:
                     this.animationLooper1(this.canvas.current);
+                    break;
+                case 2:
+                    this.animationLooper2(this.canvas.current);
                     break;
                 default:
                     this.animationLooper0(this.canvas.current);
