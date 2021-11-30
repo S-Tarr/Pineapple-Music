@@ -24,6 +24,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 
+import groupSessionCover from "../assets/groupSessionCover.jpeg";
 import GroupSessionCard from "../components/GroupSession/GroupSessionCard";
 import GroupSessionForm from "../components/GroupSession/GroupSessionForm";
 import { useAuth } from "../contexts/AuthContext";
@@ -102,8 +103,7 @@ function GroupSession() {
 
   const props = {
     title: "group session title",
-    imageUrl:
-      "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+    imageUrl: groupSessionCover,
     username: "username goes here",
     createdAt: dateTime,
     sessionId: 1234,
@@ -156,8 +156,7 @@ function GroupSession() {
             querySnapshot.forEach((doc) => {
               const props = {
                 title: "group session1",
-                imageUrl:
-                  "https://image.spreadshirtmedia.com/image-server/v1/mp/products/T1459A839MPA3861PT28D1023062364FS1458/views/1,width=378,height=378,appearanceId=839,backgroundColor=F2F2F2/pineapple-listening-to-music-cartoon-sticker.jpg",
+                imageUrl: groupSessionCover,
                 username: "username goes here",
                 createdAt: "",
                 sessionId: 1234,
