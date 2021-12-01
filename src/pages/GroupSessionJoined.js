@@ -223,7 +223,10 @@ function GroupSessionJoined (props) {
                     )}
                 </Overlay>
                 <UserList sessionId={sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
-                <GroupSessionSettings sessionId={this.state.sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
+                {sessionId ? <div>
+                    <GroupSessionSettings sessionId={sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
+                </div> : <div></div>
+                }
             </div>
             {sessionId ? <div>
                 <ChatRoom groupSessionID={sessionId} groupSessionTitle={title}/>
