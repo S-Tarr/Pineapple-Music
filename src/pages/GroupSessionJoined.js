@@ -22,6 +22,7 @@ import {
   where,
   getDocs,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 
 import GroupSessionQueueDisplay from "../components/GroupSession/GroupSessionQueueDisplay";
@@ -51,7 +52,6 @@ const HandleUpdate = () => {
 }
 
 function GetUser(currGroupSession, history) {
-
     currUser = auth.currentUser.uid;
     let userDocId = null;
     let docData = null;
@@ -61,6 +61,27 @@ function GetUser(currGroupSession, history) {
         userRef,
         where("uid", "==", currUser)
     );
+    
+    const groupSessionRef = collection(db, "groupSessions");
+    const groupSession = query(
+        groupSessionRef,
+        where("sessionId", "==", currGroupSession)
+    )
+    getDocs(groupSession).then((querySnapshot) => {
+        querySnapshot.forEach((data_doc) => {
+            docData = data_doc.data();
+            console.log(data_doc.id);
+            const newList = docData.users;
+
+            console.log(newList);
+            delete newList[currUser];
+        
+            updateDoc(doc(db, "groupSessions", data_doc.id), {
+                users: newList
+            });
+        });
+    });
+
     getDocs(user).then((querySnapshot) => {
         querySnapshot.forEach((data_doc) => {
             userDocId = data_doc.id;
@@ -68,12 +89,8 @@ function GetUser(currGroupSession, history) {
             
             const newList = docData.groupSessions.splice(docData.groupSessions.indexOf(currGroupSession), 1);
             
-            setDoc(doc(db, "users", userDocId), {
-                //SpotifyCode: docData.SpotifyCode,
-                SpotifyToken: docData.SpotifyToken,
-                createdAt: docData.createdAt,
+            updateDoc(doc(db, "users", userDocId), {
                 groupSessions: docData.groupSessions,
-                uid: currUser,
             });
         });
     });

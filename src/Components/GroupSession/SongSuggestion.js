@@ -350,14 +350,14 @@ function SongSuggestion({ sessionId }) {
               getDocs(groupSessionQueueQuery).then(
                 (groupSessionQueueQuerySnapshot) => {
                   groupSessionQueueQuerySnapshot.forEach((queueDoc) => {
-                    setDoc(doc(db, "groupSessionQueue", queueDoc.id), {
+                    updateDoc(doc(db, "groupSessionQueue", queueDoc.id), {
                       createdAt: queueDoc.data().createdAt,
                       sessionId: queueDoc.data().sessionId,
                       queueId: queueDoc.data().queueId,
                       //songs: [...queueDoc.data().songs, currentSuggestion],
                       songs: arrayRemove(currentSuggestion),
                     }).then(() => {
-                      setDoc(doc(db, "groupSessionQueue", queueDoc.id), {
+                      updateDoc(doc(db, "groupSessionQueue", queueDoc.id), {
                         createdAt: queueDoc.data().createdAt,
                         sessionId: queueDoc.data().sessionId,
                         queueId: queueDoc.data().queueId,
