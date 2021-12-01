@@ -69,7 +69,7 @@ function GetUser(currGroupSession, history) {
             const newList = docData.groupSessions.splice(docData.groupSessions.indexOf(currGroupSession), 1);
             
             setDoc(doc(db, "users", userDocId), {
-                SpotifyCode: docData.SpotifyCode,
+                //SpotifyCode: docData.SpotifyCode,
                 SpotifyToken: docData.SpotifyToken,
                 createdAt: docData.createdAt,
                 groupSessions: docData.groupSessions,
