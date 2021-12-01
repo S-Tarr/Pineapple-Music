@@ -103,11 +103,6 @@
     justify-content: center;
 }
 
-.bookmark-button {
-    border: none;
-    background-color: transparent;
-}
-
 @media (prefers-reduced-motion: no-preference) {
 .App-Logo {
     animation: App-logo-spin infinite 20s linear;
