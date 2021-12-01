@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import SpotifyPlayer from "react-spotify-web-playback";
 import app from "../../firebase";
 import { getAuth } from "firebase/auth";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   getFirestore,
   collection,
@@ -40,6 +41,7 @@ const db = getFirestore(app); // Firestore database
   }, [])
   return songQueue;
 }*/
+
 function GetQueue(sessionId, groupSessionQueueId, groupSessionQueueDoc) {
   const [songs, setSongs] = useState([]);
 
@@ -97,6 +99,25 @@ async function getAccessToken() {
   return temp;
 }
 
+// THOMAS
+function GetPermissions(sessionId, setQueueing, setPps) {
+  useEffect(() => {
+    const groupSessionRef = collection(db, "groupSessions");
+    const groupSession = query(
+      groupSessionRef,
+      where("sessionId", "==", sessionId)
+    );
+    const unsubscribe = onSnapshot(groupSession, (querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        setQueueing(doc.data().queueing);
+        setPps(doc.data().pps);
+      });
+    })
+    return () => unsubscribe;
+  }, [sessionId]);
+}
+//
+
 export default function Player({
   groupSessionQueueID,
   groupSessionQueueDoc,
@@ -105,6 +126,28 @@ export default function Player({
 }) {
   const [play, setPlay] = useState(false);
   const [offset, setOffset] = useState(0);
+
+  // THOMAS 
+  const { checkCreator } = useAuth();
+  const [queueing, setQueueing] = useState();
+  const [pps, setPps] = useState();
+  const [isOwner, setIsOwner] = useState(false);
+  const isOwnerPromise = checkCreator(sessionId)
+      .then((result) => {
+          return result;
+      });
+  const useOwnerPromise = () => {
+      isOwnerPromise.then((result) => {
+      if (result) {
+          setIsOwner(true);
+      } else {
+          setIsOwner(false);
+      }
+      });
+  };
+  useOwnerPromise();
+  GetPermissions(sessionId, setQueueing, setPps);
+  //
 
   useEffect(() => {
     const stateRef = collection(db, "groupSessions");
@@ -251,17 +294,17 @@ export default function Player({
       />
 
       <div className="Player-Div">
-        <button className="forward-rewind" onClick={() => handleReverse()}>
+        <button className="forward-rewind" disabled={!isOwner && !pps} onClick={() => handleReverse()}>
           <FastRewindRoundedIcon style={{ fontSize: 50 }} />
         </button>
-        <button className="playPauseButton" onClick={() => handlePlayPause()}>
+        <button className="playPauseButton" disabled={!isOwner && !pps} onClick={() => handlePlayPause()}>
           {play ? (
             <PauseRoundedIcon style={{ fontSize: 50 }} />
           ) : (
             <PlayArrowRoundedIcon style={{ fontSize: 50 }} />
           )}
         </button>
-        <button className="forward-rewind" onClick={() => handleSkip()}>
+        <button className="forward-rewind" disabled={!isOwner && !pps} onClick={() => handleSkip()}>
           <FastForwardRoundedIcon style={{ fontSize: 50 }} />
         </button>
       </div>

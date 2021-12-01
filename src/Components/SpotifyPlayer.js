@@ -88,15 +88,15 @@ export default function Player() {
         else play2 = true;
         console.log("Track id" + state.track.id);
         if (state.track.id != undefined && state.track.id != null) {
-          spotifyApi.getAudioAnalysisForTrack(state.track.id)
-          .then(function(data) {
-            console.log("Beats Info: " + data.body.beats);
-            setTime({timeStamp: new Date(), elapsed: state.progressMs,
-            isPlaying: play2, beats: data.body.beats, segments: data.body.segments});
-          }, 
-          function(err) {
-            console.log(err);
-          });
+          // spotifyApi.getAudioAnalysisForTrack(state.track.id)
+          // .then(function(data) {
+          //   console.log("Beats Info: " + data.body.beats);
+          //   setTime({timeStamp: new Date(), elapsed: state.progressMs,
+          //   isPlaying: play2, beats: data.body.beats, segments: data.body.segments});
+          // }, 
+          // function(err) {
+          //   console.log(err);
+          // });
         }
       }}
       uris={queue}
