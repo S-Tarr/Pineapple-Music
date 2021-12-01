@@ -88,7 +88,6 @@ function GetPermissions(sessionId, queueing, setQueueing, pps, setPps) {
     })
     return () => unsubscribe;
   }, [sessionId]);
-  // return {"queueing": queueing, "pps": pps};
 }
 
 function GroupSessionSettings({ sessionId }) {
@@ -100,14 +99,25 @@ function GroupSessionSettings({ sessionId }) {
     right: false,
   });
   const anchor = "right";
-  const { updatePermissions } = useAuth();
-
+  const { updatePermissions, checkCreator } = useAuth();
   const [queueing, setQueueing] = useState();
   const [pps, setPps] = useState();
+  const [disableSettings, setDisableSettings] = useState(true);
+  const isOwnerPromise = checkCreator(sessionId)
+    .then((result) => {
+      return result;
+    });
+  const useOwnerPromise = () => {
+    isOwnerPromise.then((result) => {
+      if (result) {
+        setDisableSettings(false);
+      } else {
+        setDisableSettings(true);
+      }
+    });
+  };
+  useOwnerPromise();
   GetPermissions(sessionId, queueing, setQueueing, pps, setPps);
-  console.log("Queueing: ", queueing);
-  console.log("Pps: ", pps);
-  // You now have the individual queueing and pps, find a way to work those into the working switches
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -124,7 +134,9 @@ function GroupSessionSettings({ sessionId }) {
     <div>
       <Fragment key={anchor}>
         {/* onClick={toggleDrawer(anchor, true)}  */}
-        <IconButton onClick={toggleDrawer(anchor, true)}>
+        <IconButton
+          onClick={toggleDrawer(anchor, true)}
+          disabled={disableSettings}>
           <SettingsIcon fontSize="large" />
         </IconButton>
         <SwipeableDrawer

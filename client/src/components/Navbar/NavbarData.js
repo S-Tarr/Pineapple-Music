@@ -7,6 +7,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import SearchIcon from '@mui/icons-material/Search';
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import AlbumIcon from '@mui/icons-material/Album';
+import HistoryIcon from '@mui/icons-material/History';
 
 export const NavbarData = [
     {
@@ -43,5 +44,11 @@ export const NavbarData = [
         title: "Song",
         icon: <AlbumIcon />,
         link: "/song"
+    },
+
+    {
+        title: "History",
+        icon: <HistoryIcon />,
+        link: "/history"
     }
 ];

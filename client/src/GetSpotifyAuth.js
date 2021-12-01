@@ -1,27 +1,8 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
-// import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
-// import { collection, getDocs } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
-// const auth = getAuth(); // Authorization component
-// const db = getFirestore(app); // Firestore database
-
-// async function getAccessToken() {
-//   const docSnap = await getDocs(collection(db, "users"));
-//   console.log(auth.currentUser.uid)
-//   let temp = null;
-//   docSnap.forEach((thing) => {
-//     console.log(thing.data().uid)
-//     if (thing.data().uid == auth.currentUser.uid) {
-//       temp = thing.data();
-//       userDocId = thing.id;
-//       console.log("uid: " + userDocId)
-//       console.log(temp)
-//     }
-//   });
-//   console.log(temp)
-//   return temp;
-// }
+const auth = getAuth(); // Authorization component
 
 export default function useAuth(code) {
 
@@ -29,10 +10,12 @@ export default function useAuth(code) {
   const [refreshToken, setRefreshToken] = useState()
   const [expiresIn, setExpiresIn] = useState()
 
+  const currentUser = auth.currentUser.uid
+
   useEffect(() => {
     axios
       .post("http://localhost:3001/login", {
-        code,
+        code, currentUser,
       })
       .then(res => {
         setAccessToken(res.data.accessToken)
@@ -52,7 +35,7 @@ export default function useAuth(code) {
     const interval = setInterval(() => {
       axios
         .post("http://localhost:3001/refresh", {
-          refreshToken,
+          refreshToken, currentUser,
         })
         .then(res => {
           setAccessToken(res.data.accessToken)

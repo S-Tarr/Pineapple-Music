@@ -3,8 +3,8 @@
  */
 
 // Import the functions you need from SDKs
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth"
+const { initializeApp } = require("firebase/app");
+const { getAuth } = require("firebase/auth");
 
 // Firebase configuration
 const firebaseConfig = {
