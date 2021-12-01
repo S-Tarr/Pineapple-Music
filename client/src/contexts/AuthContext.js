@@ -153,7 +153,7 @@ export function AuthProvider({ children }) {
     docSnapSessions.forEach((currDoc) => {
       if (currDoc.data().sessionId == sessionId) {
         ownerId = currDoc.data().ownerUid;
-        if (ownerId == currentUser.uid) {
+        if (ownerId == auth.currentUser.uid) {
           isOwner = true;
         } else {
           isOwner = false;
