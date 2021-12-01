@@ -368,6 +368,27 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function addBookmark(trackId, time) {
+    try {
+      const docSnap = await getDocs(collection(db, "users"));
+      docSnap.forEach((currDoc) => {
+        if (currDoc.data().uid === currentUser.uid) {
+          console.log("trying to add bookmark under users", doc);
+          const userRef = doc(db, "users", currDoc.id);
+
+          updateDoc(userRef, {
+            bookmarks: {
+              trackId: { time }
+            }
+          });
+          // console.log(currDoc.data().groupSessions);
+        }
+      });
+    } catch (e) {
+      console.error("Error adding bookmark");
+    }
+  }
+
   function deleteAccount() {
     return deleteUser(auth.currentUser);
   }

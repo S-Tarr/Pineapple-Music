@@ -5,22 +5,6 @@ import Pineapple from '../assets/pineapple-supply-co-KvbCXEllJss-unsplash.jpg';
 import Canvas from "../components/Canvas";
 import Button from "@mui/material/Button";
 import TimeContextProvider from "../contexts/TimeContext";
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import app from "../firebase";
-import { getAuth } from "firebase/auth";
-import {
-    getFirestore,
-    collection,
-    query,
-    orderBy,
-    limit,
-    getDoc,
-    getDocs,
-    updateDoc,
-    where,
-    doc,
-    onSnapshot,
-  } from "firebase/firestore";
 import "./Pages.css"
 
 const SongPage = () => {
@@ -51,14 +35,6 @@ const SongPage = () => {
             setText("Song");
         }
     }
-    
-    const auth = getAuth(); // Authorization component
-    const db = getFirestore(app); // Firestore database
-    async function handleBookmark() {
-        // await addDoc(doc(db, "users", auth.currentUser.uid), {
-        //   queueOffset: offset - 1,
-        // });
-    }
 
     return (
     <div className="Page">
@@ -68,9 +44,6 @@ const SongPage = () => {
         </Button>
         <div className="Song-Div">
             <TimeContextProvider>
-                <button className="bookmark-button" onClick={() => handleBookmark()}>
-                    <BookmarkBorderIcon style={{ fontSize: 50 }} />
-                </button>
                 {visuals ?
                     <Canvas/>
                 :
