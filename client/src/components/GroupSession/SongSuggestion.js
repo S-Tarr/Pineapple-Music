@@ -297,6 +297,7 @@ function SongSuggestion({ sessionId }) {
         try {
           //Check if song suggestion already exists
           currentSuggestion = currDoc.data().currentSuggestion;
+          const downVotePercentage = 100 - (((upvoteCount * 1.0) / totalUsersInSession) * 100);
           if (
             currentSuggestion == null ||
             currentSuggestion === undefined ||
@@ -349,21 +350,21 @@ function SongSuggestion({ sessionId }) {
               getDocs(groupSessionQueueQuery).then(
                 (groupSessionQueueQuerySnapshot) => {
                   groupSessionQueueQuerySnapshot.forEach((queueDoc) => {
-                    setDoc(doc(db, "groupSessionQueue", queueDoc.id), {
+                    updateDoc(doc(db, "groupSessionQueue", queueDoc.id), {
                       createdAt: queueDoc.data().createdAt,
                       sessionId: queueDoc.data().sessionId,
                       queueId: queueDoc.data().queueId,
                       //songs: [...queueDoc.data().songs, currentSuggestion],
                       songs: arrayRemove(currentSuggestion),
                     }).then(() => {
-                                          setDoc(doc(db, "groupSessionQueue", queueDoc.id), {
-                      createdAt: queueDoc.data().createdAt,
-                      sessionId: queueDoc.data().sessionId,
-                      queueId: queueDoc.data().queueId,
-                      songs: [...queueDoc.data().songs, currentSuggestion],
+                      updateDoc(doc(db, "groupSessionQueue", queueDoc.id), {
+                        createdAt: queueDoc.data().createdAt,
+                        sessionId: queueDoc.data().sessionId,
+                        queueId: queueDoc.data().queueId,
+                        songs: [...queueDoc.data().songs, currentSuggestion],
+                      });
                     });
-                  });
-                    })
+                  })
 
                 }
               );
@@ -482,8 +483,8 @@ function SongSuggestion({ sessionId }) {
           sx={{ width: 255 }}
           image={
             recommendation == null ||
-            recommendation === undefined ||
-            recommendation == "undefined"
+              recommendation === undefined ||
+              recommendation == "undefined"
               ? albumCover
               : recommendation.albumUrl
           }
@@ -492,15 +493,15 @@ function SongSuggestion({ sessionId }) {
         <CardContent>
           <Typography variant="h6">
             {recommendation == null ||
-            recommendation === undefined ||
-            recommendation == "undefined"
+              recommendation === undefined ||
+              recommendation == "undefined"
               ? "Suggestion is based on the songs in the queue. Queue up at least 3 songs to see your suggestion."
               : recommendation.title}
           </Typography>
           <Typography variant="h7">
             {recommendation == null ||
-            recommendation === undefined ||
-            recommendation == "undefined"
+              recommendation === undefined ||
+              recommendation == "undefined"
               ? ""
               : recommendation.artist}
           </Typography>
