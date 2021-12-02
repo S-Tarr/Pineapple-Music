@@ -41,8 +41,12 @@ const Search = styled("div")(({ theme }) => ({
 
 function Bookmarks() {
     const [searchStr, setSearchStr] = useState("");
-    const [bookmarkCards, addCard] = useState([]);
+    const [bookmarkTabs, addTab] = useState([]);
 
+    useEffect(() => {
+       
+    }, [])
+    
     return (
         <div className="Page" align="center">
             <Typography
