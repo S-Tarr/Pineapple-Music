@@ -31,7 +31,6 @@ import {
   getDocs,
   onSnapshot,
   query,
-  setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -51,23 +50,23 @@ var spotifyApi = new SpotifyWebApi({
 
 const db = getFirestore(app); // Firestore database
 
-const getParamsFromSpotifyAuth = (hash) => {
-  console.log("trying to get the token", hash);
-  const paramsUrl = hash.substring(1).split("&");
-  const params = paramsUrl.reduce((accumulator, currentValue) => {
-    const [key, value] = currentValue.split("=");
-    accumulator[key] = value;
-    return accumulator;
-  }, {});
-  console.log(params);
-  return params;
-};
+// const getParamsFromSpotifyAuth = (hash) => {
+//   console.log("trying to get the token", hash);
+//   const paramsUrl = hash.substring(1).split("&");
+//   const params = paramsUrl.reduce((accumulator, currentValue) => {
+//     const [key, value] = currentValue.split("=");
+//     accumulator[key] = value;
+//     return accumulator;
+//   }, {});
+//   console.log(params);
+//   return params;
+// };
 
 async function getAccessToken() {
   const docSnap = await getDocs(collection(db, "users"));
   let temp = null;
   docSnap.forEach((thing) => {
-    if (thing.data().uid == auth.currentUser.uid) {
+    if (thing.data().uid === auth.currentUser.uid) {
       temp = thing.data();
     }
   });
@@ -83,14 +82,14 @@ function GetVoteStatus(
   setRecommendation
 ) {
 
-  useEffect(() => {
-    if (window.location.hash) {
-      const params = getParamsFromSpotifyAuth(window.location.hash);
-      spotifyApi.setAccessToken(params.access_token);
+  // useEffect(() => {
+  //   if (window.location.hash) {
+  //     const params = getParamsFromSpotifyAuth(window.location.hash);
+  //     spotifyApi.setAccessToken(params.access_token);
 
-      console.log("getting token", params);
-    }
-  }, [window.location.search]);
+  //     console.log("getting token", params);
+  //   }
+  // }, [window.location.search]);
 
   useEffect(() => {
     const groupSessionRef = collection(db, "groupSessions");
@@ -116,7 +115,7 @@ function GetVoteStatus(
           currDoc.data().votes != null &&
           currDoc.data().votes !== "undefined" &&
           currDoc.data().votes !== null &&
-          currDoc.data().votes != undefined
+          currDoc.data().votes !== undefined
         ) {
           voteSet = new Set(Object.keys(currDoc.data().votes));
 
@@ -283,10 +282,9 @@ function SongSuggestion({ sessionId }) {
     // var promise = getAccessToken();
     // promise.then((ret) => {
     //   setAccessToken(ret.SpotifyToken);
-    //   console.log(ret.SpotifyToken)
-    //   console.log(access_token)
     //   spotifyApi.setAccessToken(ret.SpotifyToken);
     // });
+    console.log("in useEffect", isLoaded);
 
     const groupSessionRef = collection(db, "groupSessions");
     const groupSessionQuery = query(
@@ -299,11 +297,11 @@ function SongSuggestion({ sessionId }) {
         try {
           //Check if song suggestion already exists
           currentSuggestion = currDoc.data().currentSuggestion;
-          const downVotePercentage = 100 - (((upvoteCount * 1.0) / totalUsersInSession) * 100);
+          //const downVotePercentage = 100 - (((upvoteCount * 1.0) / totalUsersInSession) * 100);
           if (
             currentSuggestion == null ||
             currentSuggestion === undefined ||
-            currentSuggestion == "undefined" ||
+            currentSuggestion === "undefined" ||
             (totalVoteCount !== 0 && totalVoteCount === totalUsersInSession) ||
             (totalVoteCount !== 0 &&
               ((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50)
@@ -486,7 +484,7 @@ function SongSuggestion({ sessionId }) {
           image={
             recommendation == null ||
               recommendation === undefined ||
-              recommendation == "undefined"
+              recommendation === "undefined"
               ? albumCover
               : recommendation.albumUrl
           }
@@ -496,14 +494,14 @@ function SongSuggestion({ sessionId }) {
           <Typography variant="h6">
             {recommendation == null ||
               recommendation === undefined ||
-              recommendation == "undefined"
+              recommendation === "undefined"
               ? "Suggestion is based on the songs in the queue. Queue up at least 3 songs to see your suggestion."
               : recommendation.title}
           </Typography>
           <Typography variant="h7">
             {recommendation == null ||
               recommendation === undefined ||
-              recommendation == "undefined"
+              recommendation === "undefined"
               ? ""
               : recommendation.artist}
           </Typography>
@@ -525,7 +523,7 @@ function SongSuggestion({ sessionId }) {
                 voted ||
                 recommendation == null ||
                 recommendation === undefined ||
-                recommendation == "undefined"
+                recommendation === "undefined"
               }
               endIcon={<ThumbUpIcon />}
               name="upvote"
@@ -539,7 +537,7 @@ function SongSuggestion({ sessionId }) {
                 voted ||
                 recommendation == null ||
                 recommendation === undefined ||
-                recommendation == "undefined"
+                recommendation === "undefined"
               }
               endIcon={<ThumbDownIcon />}
               name="downvote"

@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
 import {
     Avatar,
+    Divider,
     IconButton,
     LinearProgress,
     List,
@@ -65,9 +66,16 @@ function BookmarksInDrawer({ bookmarks, songsInQueue }) {
 
     let bookmarksToShow = [];
 
+    function millisToMinutesAndSeconds(millis) {
+        var minutes = Math.floor(millis / 60000);
+        var seconds = ((millis % 60000) / 1000).toFixed(0);
+        return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+      }
+
     var bookmarksOwner = {};
     for (const [key, value] of Object.entries(bookmarks)) {
-        bookmarksOwner[key] = value;
+        console.log(value)
+        bookmarksOwner[key] = millisToMinutesAndSeconds(value["time"]);
     }
     console.log(bookmarksOwner)
 
@@ -100,10 +108,12 @@ function BookmarksInDrawer({ bookmarks, songsInQueue }) {
                 {bookmarksToShow.map((bookmark) => (
                     <ListItem key={key++} alignItems="center">
                         <ListItemAvatar>
-                            <Avatar alt={bookmark.albumUrl} src={bookmark.albumUrl} />
+                            <Avatar sx={{ width: 100, height: 100 }}
+                                variant="square" alt={bookmark.albumUrl} src={bookmark.albumUrl} />
                         </ListItemAvatar>
-                        <ListItemText primary={bookmark.title} />
-                        <ListItemText primary={bookmark.time} />
+                        <ListItemText style={{padding:"13px", display:'flex', justifyContent:'center'}} primary={bookmark.title} />
+                        {/* <Divider style={{display:'flex', justifyContent:'flex-end'}} orientation="vertical" /> */}
+                        <ListItemText style={{padding:"13px", display:'flex', justifyContent:'flex-end'}}primary={bookmark.time} />
                     </ListItem>
                 ))}
             </List>) : (
