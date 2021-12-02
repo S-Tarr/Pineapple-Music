@@ -52,7 +52,7 @@ async function getAccessToken() {
 export default function Player() {
   const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("");
-  const {setTime} = useContext(TimeContext);
+  const {setTime, updateTime} = useContext(TimeContext);
   useEffect(() => {
     var promise = getAccessToken();
     promise.then((ret) => {
@@ -64,18 +64,22 @@ export default function Player() {
     console.log(accessToken);
   }, [isLoaded])
 
-  console.log(accessToken)
+  console.log("Token: " + accessToken)
 
   if (accessToken == undefined) {
     setIsLoaded(false)
   }
-  console.log(isLoaded)
 
   var play2 = true;
   let queue = GetQueue();
-  console.log(queue);
-  
+  //console.log("QUEUE: " + queue);
 
+  useEffect(()=> {
+    const interval = setInterval(async () => {
+      updateTime();
+    }, 1);
+    return () => clearInterval(interval);
+  }, []);
 
   if (!accessToken) return null;
   return (
@@ -85,14 +89,20 @@ export default function Player() {
       play={play2}
       autoPlay={true}
       callback={state => {
-        if (!state.isPlaying) play2 = false;
-        else play2 = true;
-        if (state.track.id != undefined && state.track.id != null) {
-          console.log("Track id" + state.track.id);
+        if (state.isPlaying) {
+          play2 = true;
+        }
+        else {
+          play2 = false;
+        }
+        if (state.track.id != undefined && state.track.id != null &&
+            state.track.id != "") {
+          //console.log("Track id: " + state.track.id);
           spotifyApi.getAudioAnalysisForTrack(state.track.id)
           .then(function(data) {
             setTime({timeStamp: new Date(), elapsed: state.progressMs,
-            isPlaying: play2, beats: data.body.beats, segments: data.body.segments});
+            isPlaying: state.isPlaying, beats: data.body.beats, segments: data.body.segments,
+            song: state.track.id});
           }, 
           function(err) {
             console.log(err);
