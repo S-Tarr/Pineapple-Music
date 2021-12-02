@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import ChatMessage from "./ChatMessage";
 import MessageForm from "./MessageForm";
 import SongSuggestion from "../GroupSession/SongSuggestion";
+import SkipVotingCard from "../GroupSession/SkipVotingCard";
 import app from "../../firebase";
 import { getAuth } from "firebase/auth";
 import {
@@ -122,9 +123,14 @@ const ChatRoom = ({ groupSessionID }) => {
               setMessagesWaiting={setMessagesWaiting}
             />
           </Grid>
-          <Grid item xs={4} style={suggestionStyle} sx={{ zIndex: "app bar" }}>
-            <SongSuggestion sessionId={groupSessionID} />
-          </Grid>
+          <div style={{display:"flex", flexDirection:"row", justifyContent: "flex-end", width:"100%", height:"100%", right: "50px"}}>
+            <Grid item xs={4} style={suggestionStyle} sx={{ zIndex: "app bar" }}>
+              <SongSuggestion sessionId={groupSessionID} />
+            </Grid>
+            <Grid item xs={4} style={suggestionStyle} sx={{ zIndex: "app bar" }}>
+              <SkipVotingCard sessionId={groupSessionID} />
+            </Grid>
+          </div>
           <Grid item xs={12}>
             <MessageForm
               groupSessionID={groupSessionID}

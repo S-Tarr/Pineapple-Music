@@ -79,23 +79,23 @@ function GetQueue(sessionId, groupSessionQueueId, groupSessionQueueDoc) {
   songs.forEach((song) => {
     queue.push(song.uri);
   });
-  console.log(queue);
-  console.log(songs);
+  // console.log(queue);
+  // console.log(songs);
   return queue;
 }
 
 async function getAccessToken() {
   const docSnap = await getDocs(collection(db, "users"));
-  console.log(auth.currentUser.uid)
+  // console.log(auth.currentUser.uid)
   let temp = null;
   docSnap.forEach((thing) => {
-    console.log(thing.data().uid)
+    // console.log(thing.data().uid)
     if (thing.data().uid === auth.currentUser.uid) {
       temp = thing.data();
       return thing.data();
     }
   });
-  console.log(temp)
+  // console.log(temp)
   return temp;
 }
 
@@ -152,6 +152,7 @@ export default function Player({
   useEffect(() => {
     const stateRef = collection(db, "groupSessions");
     const stateQuery = query(stateRef, where("sessionId", "==", sessionId));
+    let queueOffset = 0;
     const unsubscribe = onSnapshot(stateQuery, (querySnapshot) => {
       querySnapshot.forEach((doc) => {
         if (doc.data().playState) {
@@ -171,16 +172,16 @@ export default function Player({
     var promise = getAccessToken();
     promise.then((ret) => {
       setAccessToken(ret.SpotifyToken);
-      console.log(ret.SpotifyToken)
-      console.log(accessToken);
+      // console.log(ret.SpotifyToken)
+      // console.log(accessToken);
     });
-    console.log(accessToken);
+    // console.log(accessToken);
   }, [isLoaded]);
 
   if (accessToken === undefined) {
     setIsLoaded(false);
   }
-  console.log(isLoaded);
+  // console.log(isLoaded);
 
   const songQueue = GetQueue(
     sessionId,
@@ -188,10 +189,10 @@ export default function Player({
     groupSessionQueueDoc
   );
   
-  console.log(songQueue);
+  // console.log(songQueue);
 
   async function handlePlayPause() {
-    console.log(songQueue);
+    // console.log(songQueue);
     await updateDoc(doc(db, "groupSessions", docId), {
       playState: !play,
     });
@@ -229,10 +230,11 @@ export default function Player({
         token={accessToken}
         callback={(state) => {
           if (play) {
-            console.log("shit");
+            // console.log("shit");
             state.play = true; //setPlay(false)
           }
           state.offset = offset;
+          // console.log(offset);
         }}
         play={play}
         //autoPlay={true}
