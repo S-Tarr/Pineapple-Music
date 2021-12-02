@@ -40,14 +40,17 @@ let groupSessionQueueId;
 async function getAccessToken() {
   const docSnap = await getDocs(collection(db, "users"));
   console.log(auth.currentUser.uid)
+  var temp;
   docSnap.forEach((thing) => {
     console.log(thing.data().uid)
     if (thing.data().uid === auth.currentUser.uid) {
       console.log(thing.data())
+      temp = thing.data()
       return thing.data()
     }
   });
-  return null;
+  console.log("why the heck is it getting here")
+  return temp;
 }
 
 function GroupSessionSearchBar({ placeholder, spotifyData, authorized, groupSessionQueueDoc, groupSessionQueueId }) {

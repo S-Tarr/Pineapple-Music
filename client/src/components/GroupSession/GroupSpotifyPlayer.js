@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import SpotifyPlayer from "react-spotify-web-playback";
 import app from "../../firebase";
 import { getAuth } from "firebase/auth";
+import { useAuth } from "../../contexts/AuthContext";
+
 import {
   getFirestore,
   collection,
@@ -83,10 +85,38 @@ function GetQueue(sessionId, groupSessionQueueId, groupSessionQueueDoc) {
 }
 
 async function getAccessToken() {
-  const docRef = doc(db, "users", auth.currentUser.uid);
-  const docSnap = await getDoc(docRef);
-  return docSnap.data();
+  const docSnap = await getDocs(collection(db, "users"));
+  console.log(auth.currentUser.uid)
+  let temp = null;
+  docSnap.forEach((thing) => {
+    console.log(thing.data().uid)
+    if (thing.data().uid === auth.currentUser.uid) {
+      temp = thing.data();
+      return thing.data();
+    }
+  });
+  console.log(temp)
+  return temp;
 }
+
+// THOMAS
+function GetPermissions(sessionId, setQueueing, setPps) {
+  useEffect(() => {
+    const groupSessionRef = collection(db, "groupSessions");
+    const groupSession = query(
+      groupSessionRef,
+      where("sessionId", "==", sessionId)
+    );
+    const unsubscribe = onSnapshot(groupSession, (querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        setQueueing(doc.data().queueing);
+        setPps(doc.data().pps);
+      });
+    })
+    return () => unsubscribe;
+  }, [sessionId]);
+}
+//
 
 export default function Player({
   groupSessionQueueID,
@@ -96,6 +126,28 @@ export default function Player({
 }) {
   const [play, setPlay] = useState(false);
   const [offset, setOffset] = useState(0);
+
+  // THOMAS 
+  const { checkCreator } = useAuth();
+  const [queueing, setQueueing] = useState();
+  const [pps, setPps] = useState();
+  const [isOwner, setIsOwner] = useState(false);
+  const isOwnerPromise = checkCreator(sessionId)
+      .then((result) => {
+          return result;
+      });
+  const useOwnerPromise = () => {
+      isOwnerPromise.then((result) => {
+      if (result) {
+          setIsOwner(true);
+      } else {
+          setIsOwner(false);
+      }
+      });
+  };
+  useOwnerPromise();
+  GetPermissions(sessionId, setQueueing, setPps);
+  //
 
   useEffect(() => {
     const stateRef = collection(db, "groupSessions");
@@ -107,38 +159,25 @@ export default function Player({
         } else {
           setPlay(false);
         }
-        // console.log(doc.data().queueOffset);
         setOffset(doc.data().queueOffset);
-        // console.log(doc.data().queueOffset, offset);
       });
     });
     return () => unsubscribe;
   }, []);
-
-  // useEffect (() => {
-  //   const stateRef = collection(db, "groupSessions")
-  //   const stateQuery = query(stateRef, where("sessionId", "==", sessionId))
-  //   const unsubscribe = onSnapshot(stateQuery, (querySnapshot) => {
-  //       querySnapshot.forEach((doc) => {
-  //         setOffset(doc.data().offset);
-  //       })
-  //   });
-  //   return () => unsubscribe;
-  // }, []);
 
   const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("");
   useEffect(() => {
     var promise = getAccessToken();
     promise.then((ret) => {
-      if (ret != null && ret !== undefined && ret !== "undefined") {
-        setAccessToken(ret.SpotifyToken);
-      }
+      setAccessToken(ret.SpotifyToken);
+      console.log(ret.SpotifyToken)
+      console.log(accessToken);
     });
     console.log(accessToken);
   }, [isLoaded]);
 
-  if (accessToken == undefined) {
+  if (accessToken === undefined) {
     setIsLoaded(false);
   }
   console.log(isLoaded);
@@ -148,46 +187,9 @@ export default function Player({
     groupSessionQueueID,
     groupSessionQueueDoc
   );
-
-  // setQueue(temp)
-  // console.log(songQueue);
-  // const temp = GetQueue(sessionId, groupSessionQueueID, groupSessionQueueDoc);
-
-  // useEffect(() => {
-  //   setQueue(temp);
-  // }, [])
+  
   console.log(songQueue);
 
-  //   const [player, setPlayer] = useState(undefined);
-  //   useEffect(() => {
-  //     const script = document.createElement("script");
-  //     script.src = "https://sdk.scdn.co/spotify-player.js";
-  //     script.async = true;
-
-  //     document.body.appendChild(script);
-
-  //     window.onSpotifyWebPlaybackSDKReady = () => {
-
-  //         const player = new window.Spotify.Player({
-  //             name: 'Web Playback SDK',
-  //             getOAuthToken: cb => getAccessToken(),
-  //             volume: 0.5
-  //         });
-
-  //         setPlayer(player);
-
-  //         player.addListener('ready', ({ device_id }) => {
-  //             console.log('Ready with Device ID', device_id);
-  //         });
-
-  //         player.addListener('not_ready', ({ device_id }) => {
-  //             console.log('Device ID has gone offline', device_id);
-  //         });
-
-  //         player.connect();
-
-  //     };
-  //   }, []);
   async function handlePlayPause() {
     console.log(songQueue);
     await updateDoc(doc(db, "groupSessions", docId), {
@@ -242,17 +244,17 @@ export default function Player({
       />
 
       <div className="Player-Div">
-        <button className="forward-rewind" onClick={() => handleReverse()}>
+        <button className="forward-rewind" disabled={!isOwner && !pps} onClick={() => handleReverse()}>
           <FastRewindRoundedIcon style={{ fontSize: 50 }} />
         </button>
-        <button className="playPauseButton" onClick={() => handlePlayPause()}>
+        <button className="playPauseButton" disabled={!isOwner && !pps} onClick={() => handlePlayPause()}>
           {play ? (
             <PauseRoundedIcon style={{ fontSize: 50 }} />
           ) : (
             <PlayArrowRoundedIcon style={{ fontSize: 50 }} />
           )}
         </button>
-        <button className="forward-rewind" onClick={() => handleSkip()}>
+        <button className="forward-rewind" disabled={!isOwner && !pps} onClick={() => handleSkip()}>
           <FastForwardRoundedIcon style={{ fontSize: 50 }} />
         </button>
       </div>

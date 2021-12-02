@@ -63,6 +63,21 @@ const getParamsFromSpotifyAuth = (hash) => {
   return params;
 };
 
+async function getAccessToken() {
+  const docSnap = await getDocs(collection(db, "users"));
+  console.log(auth.currentUser.uid)
+  let temp = null;
+  docSnap.forEach((thing) => {
+    console.log(thing.data().uid)
+    if (thing.data().uid == auth.currentUser.uid) {
+      temp = thing.data();
+      console.log(temp)
+    }
+  });
+  console.log(temp)
+  return temp;
+}
+
 function GetVoteStatus(
   sessionId,
   setVoted,
@@ -71,6 +86,7 @@ function GetVoteStatus(
   setTotalUsersInSession,
   setRecommendation
 ) {
+
   useEffect(() => {
     if (window.location.hash) {
       const params = getParamsFromSpotifyAuth(window.location.hash);
@@ -250,6 +266,25 @@ function SongSuggestion({ sessionId }) {
     setRecommendation
   );
 
+  const [isLoaded, setIsLoaded] = useState(true);
+  const [access_token, setAccessToken] = useState("");
+  useEffect(() => {
+    var promise = getAccessToken();
+    promise.then((ret) => {
+      setAccessToken(ret.SpotifyToken);
+      console.log(ret.SpotifyToken)
+      console.log(access_token)
+      spotifyApi.setAccessToken(ret.SpotifyToken);
+    });
+    console.log(access_token);
+  }, [isLoaded])
+
+  console.log(access_token)
+
+  if (access_token == undefined) {
+    setIsLoaded(false)
+  }
+
   useEffect(() => {
     const groupSessionRef = collection(db, "groupSessions");
     const groupSessionQuery = query(
@@ -262,6 +297,7 @@ function SongSuggestion({ sessionId }) {
         try {
           //Check if song suggestion already exists
           currentSuggestion = currDoc.data().currentSuggestion;
+          const downVotePercentage = 100 - (((upvoteCount * 1.0) / totalUsersInSession) * 100);
           if (
             currentSuggestion == null ||
             currentSuggestion === undefined ||
@@ -314,20 +350,22 @@ function SongSuggestion({ sessionId }) {
               getDocs(groupSessionQueueQuery).then(
                 (groupSessionQueueQuerySnapshot) => {
                   groupSessionQueueQuerySnapshot.forEach((queueDoc) => {
-                    setDoc(doc(db, "groupSessionQueue", queueDoc.id), {
+                    updateDoc(doc(db, "groupSessionQueue", queueDoc.id), {
                       createdAt: queueDoc.data().createdAt,
                       sessionId: queueDoc.data().sessionId,
                       queueId: queueDoc.data().queueId,
                       //songs: [...queueDoc.data().songs, currentSuggestion],
                       songs: arrayRemove(currentSuggestion),
+                    }).then(() => {
+                      updateDoc(doc(db, "groupSessionQueue", queueDoc.id), {
+                        createdAt: queueDoc.data().createdAt,
+                        sessionId: queueDoc.data().sessionId,
+                        queueId: queueDoc.data().queueId,
+                        songs: [...queueDoc.data().songs, currentSuggestion],
+                      });
                     });
-                    setDoc(doc(db, "groupSessionQueue", queueDoc.id), {
-                      createdAt: queueDoc.data().createdAt,
-                      sessionId: queueDoc.data().sessionId,
-                      queueId: queueDoc.data().queueId,
-                      songs: [...queueDoc.data().songs, currentSuggestion],
-                    });
-                  });
+                  })
+
                 }
               );
             } else if (totalVoteCount === totalUsersInSession) {
@@ -361,6 +399,7 @@ function SongSuggestion({ sessionId }) {
                     })
                     .then(
                       function (data) {
+                        console.log(data.body)
                         const trackData = data.body.tracks[0];
                         if (
                           trackData == null ||
@@ -373,7 +412,7 @@ function SongSuggestion({ sessionId }) {
                           albumUrl: trackData.album.images[0].url,
                           artist: trackData.album.artists[0].name,
                           title: trackData.album.name,
-                          uri: trackData.album.uri,
+                          uri: trackData.uri,
                         };
 
                         const sessionRef = doc(db, "groupSessions", currDoc.id);
@@ -444,8 +483,8 @@ function SongSuggestion({ sessionId }) {
           sx={{ width: 255 }}
           image={
             recommendation == null ||
-            recommendation === undefined ||
-            recommendation == "undefined"
+              recommendation === undefined ||
+              recommendation == "undefined"
               ? albumCover
               : recommendation.albumUrl
           }
@@ -454,15 +493,15 @@ function SongSuggestion({ sessionId }) {
         <CardContent>
           <Typography variant="h6">
             {recommendation == null ||
-            recommendation === undefined ||
-            recommendation == "undefined"
+              recommendation === undefined ||
+              recommendation == "undefined"
               ? "Suggestion is based on the songs in the queue. Queue up at least 3 songs to see your suggestion."
               : recommendation.title}
           </Typography>
           <Typography variant="h7">
             {recommendation == null ||
-            recommendation === undefined ||
-            recommendation == "undefined"
+              recommendation === undefined ||
+              recommendation == "undefined"
               ? ""
               : recommendation.artist}
           </Typography>
