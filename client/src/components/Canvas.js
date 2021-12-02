@@ -1,5 +1,4 @@
 import React, { Component, createRef, useRef } from 'react';
-import songFile from './rocketMan.wav';
 import Overlay from 'react-bootstrap/Overlay';
 import Button from 'react-bootstrap/Button';
 import { SketchPicker } from 'react-color';
@@ -16,22 +15,25 @@ const bar_width = 1;
 const radius = 0;
 const center_x = width / 2;
 const center_y = height / 2;
+const minBar = 120;
+const maxBar = 260;
+const increment = 60;
 
 class Canvas extends Component {
     static contextType = TimeContext;
     constructor(props) {
         super(props)
-        this.audio = new Audio(songFile);
         this.canvas = createRef();
         this.target = createRef();
-        this.elapsedTime = 0;
-        this.endTime = new Date();
         this.toStart = true;
         this.i = 0;
         this.y = 0;
-        this.barBump = 200;
+        this.barBump = minBar;
         this.colors = '#2032CD';
         this.epilepsy = false;
+        this.mode = 1;
+        this.countMode1 = 0;
+        this.bumpPos = -1;
 
         this.state = {
             visColor: '#2032CD',
@@ -41,7 +43,7 @@ class Canvas extends Component {
         }
     }
 
-    animationLooper(canvas) {
+    animationLooper0(canvas) {
         canvas.width = width;
         canvas.height = height;
 
@@ -52,7 +54,7 @@ class Canvas extends Component {
             const rads = Math.PI * 2 / bars;
 
             // Math is magical
-            bar_height = this.barBump /*this.frequency_array[i]*/;
+            bar_height = this.barBump;
 
             const x = center_x + Math.cos(rads * i) * (radius);
             const y = center_y + Math.sin(rads * i) * (radius);
@@ -64,7 +66,54 @@ class Canvas extends Component {
         }
     }
 
-    drawBar(x1=0, y1=0, x2=0, y2=0, ctx, canvas) {
+    animationLooper1(canvas) {
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx = canvas.getContext("2d");
+
+        for (var i = 0; i < bars; i++) {
+            //divide a circle into equal part
+            const rads = Math.PI * 2 / bars;
+            const radCoef = .1047;
+            // Math is magical
+            bar_height = this.barBump;
+
+            const x = center_x + Math.cos(rads * i) * (radius);
+            const y = center_y + Math.sin(rads * i) * (radius);
+            x_end = center_x + Math.cos(rads * i) * (radius +
+                (((bar_height - 150) / 6) * Math.sin((i + this.countMode1) * radCoef)) + minBar);
+            y_end = center_y + Math.sin(rads * i) * (radius +
+                ((bar_height - 25) * Math.sin((i + this.countMode1) * radCoef)) + minBar);
+
+            //draw a bar
+            this.drawBar(x, y, x_end, y_end, ctx, canvas);
+        }
+    }
+
+    animationLooper2(canvas) {
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx = canvas.getContext("2d");
+        var ripple = this.barBump - minBar;
+        for (var i = 0; i < bars; i++) {
+            //divide a circle into equal part
+            const rads = Math.PI * 2 / bars;
+            // Math is magical
+            bar_height = this.barBump;
+
+            const x = center_x + Math.cos(rads * i) * (radius);
+            const y = center_y + Math.sin(rads * i) * (radius);
+            x_end = center_x + Math.cos(rads * i) * (radius + bar_height);
+            y_end = center_y + Math.sin(rads * i) * (radius + bar_height);
+            ripple -= 2;
+            //draw a bar
+            this.drawBar(x, y, x_end, y_end, ctx, canvas);
+        }
+    }
+
+    drawBar(x1, y1, x2, y2, ctx, canvas) {
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, "rgba(35, 7, 77, 1)");
         gradient.addColorStop(1, "rgba(204, 83, 51, 1)");
@@ -85,51 +134,66 @@ class Canvas extends Component {
         ctx.stroke();
     }
 
-    togglePlay = () => {
-        const { audio } = this;
-        if(audio.paused) {
-            audio.play();
-            this.rafId = requestAnimationFrame(this.tick);
-
-         } else {
-            audio.pause();
-            cancelAnimationFrame(this.rafId);
-         }
+    findBeat() {
+        while((this.context.elapsed / 1000) < this.context.beats[this.i].start) {
+            this.i--;
+        }
+        if (this.context.beats[this.i + 1].start != null) {
+            while((this.context.elapsed / 1000) > this.context.beats[this.i + 1].start) {
+                this.i++;
+            }
+        }
+        else {
+            this.i = 0;
+        }
     }
 
     tick = () => {
         if (!this.context.isPlaying) {
             cancelAnimationFrame(this.rafId);
+            this.toStart = true;
         }
         else {
-            this.endTime = new Date();
-            this.elapsedTime = ((this.endTime - this.context.timeStamp) + this.context.elapsed) / 1000;
-            //console.log("TIME: " + this.elapsedTime);
-            //console.log("START: " + this.context.beats[this.i].start);
-            if (this.elapsedTime >= this.context.beats[this.i].start) {
-                if (this.barBump < 260) {
-                    this.barBump = this.barBump + 60;
+            //bump start
+            if ((this.context.elapsed / 1000) >= this.context.beats[this.i].start) {
+                if (this.barBump < maxBar) {
+                    this.barBump = this.barBump + increment;
                 }
                 this.i++;
             }
             else {
-                if (this.barBump >= 100) {
+                if (this.barBump >= minBar) {
                     this.barBump = this.barBump - 3;
                 }
             }
-            if (this.elapsedTime >= this.context.segments[this.y].start) {
-                console.log("PITCHES: " + this.context.segments[this.y].pitches[0]);
+            if (this.countMode1 > 60) {
+                this.countMode1 = 0;
+            }
+            else {
+                this.countMode1+= 2;
+            }
+            //color start
+            if ((this.context.elapsed / 1000) >= this.context.segments[this.y].start) {
                 this.colors = this.state.visColor;
                 this.colors = this.colors.substring(1);
                 var temp = parseInt(this.colors, 16);
-                console.log("TEMP: " + temp);
                 temp = parseInt(temp * (1 - this.context.segments[this.y].pitches[0]));
                 this.colors = "#" + temp.toString(16);
-                console.log("HEX: " + this.colors);
                 this.y++;
             }
-            //console.log("BarBump: " + this.barBump);
-            this.animationLooper(this.canvas.current);
+            switch (this.mode) {
+                case 0:
+                    this.animationLooper0(this.canvas.current);
+                    break;
+                case 1:
+                    this.animationLooper1(this.canvas.current);
+                    break;
+                case 2:
+                    this.animationLooper2(this.canvas.current);
+                    break;
+                default:
+                    this.animationLooper0(this.canvas.current);
+            }
             this.rafId = requestAnimationFrame(this.tick);
         }
     }
@@ -160,8 +224,10 @@ class Canvas extends Component {
     
     toggleStart = () => {
         if(this.toStart) {
-            this.rafId = requestAnimationFrame(this.tick);
             this.toStart = false;
+            //this.getTime();
+            this.findBeat();
+            this.rafId = requestAnimationFrame(this.tick);
         } else {
             cancelAnimationFrame(this.rafId);
             this.toStart = true;

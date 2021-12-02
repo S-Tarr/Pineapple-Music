@@ -65,7 +65,7 @@ export default function Player() {
   const [shouldUpdate, setShouldUpdate] = useState(false)
   
   const { addBookmark } = useAuth();
-  const {setTime} = useContext(TimeContext);
+  const {setTime, updateTime} = useContext(TimeContext);
 
   useEffect(() => {
     var promise = getAccessToken();
@@ -78,17 +78,15 @@ export default function Player() {
     console.log(accessToken);
   }, [isLoaded])
 
-  console.log(accessToken)
+  console.log("Token: " + accessToken)
 
   if (accessToken == undefined) {
     setIsLoaded(false)
   }
-  console.log(isLoaded)
 
   var play2 = true;
   let queue = GetQueue();
-  console.log(queue);
-  
+  //console.log("QUEUE: " + queue);
 
   const auth = getAuth(); // Authorization component
   const db = getFirestore(app); // Firestore database
@@ -106,26 +104,41 @@ export default function Player() {
 
 
   if (!accessToken) return null;
+
+  useEffect(()=> {
+    const interval = setInterval(async () => {
+      updateTime();
+      
+    }, 1);
+    return () => clearInterval(interval);
+  }, []);
+  
   return (
     <div style={{width: "100%", display: "flex"}}>
       <SpotifyPlayer
         token={accessToken}
-        // play={play2}
+        play={play2}
         autoPlay={true}
         callback={state => {
-          if (!state.isPlaying) play2 = false;
-          else play2 = true;
+          if (state.isPlaying) {
+            play2 = true;
+          }
+          else {
+            play2 = false;
+          }
           console.log("Track id" + state.track.id);
-          if (state.track.id != undefined && state.track.id != null) {
-            // spotifyApi.getAudioAnalysisForTrack(state.track.id)
-            // .then(function(data) {
-            //   console.log("Beats Info: " + data.body.beats);
-            //   setTime({timeStamp: new Date(), elapsed: state.progressMs,
-            //   isPlaying: play2, beats: data.body.beats, segments: data.body.segments});
-            // }, 
-            // function(err) {
-            //   console.log(err);
-            // });
+          if (state.track.id != undefined && state.track.id != null &&
+              state.track.id != "") {
+            //console.log("Track id: " + state.track.id);
+            spotifyApi.getAudioAnalysisForTrack(state.track.id)
+            .then(function(data) {
+              setTime({timeStamp: new Date(), elapsed: state.progressMs,
+              isPlaying: state.isPlaying, beats: data.body.beats, segments: data.body.segments,
+              song: state.track.id});
+            }, 
+            function(err) {
+              console.log(err);
+            });
           }
           
           if (shouldUpdate) {
