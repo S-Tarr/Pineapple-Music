@@ -65,16 +65,12 @@ const getParamsFromSpotifyAuth = (hash) => {
 
 async function getAccessToken() {
   const docSnap = await getDocs(collection(db, "users"));
-  console.log(auth.currentUser.uid)
   let temp = null;
   docSnap.forEach((thing) => {
-    console.log(thing.data().uid)
     if (thing.data().uid == auth.currentUser.uid) {
       temp = thing.data();
-      console.log(temp)
     }
   });
-  console.log(temp)
   return temp;
 }
 
@@ -276,16 +272,22 @@ function SongSuggestion({ sessionId }) {
       console.log(access_token)
       spotifyApi.setAccessToken(ret.SpotifyToken);
     });
-    console.log(access_token);
+    console.log("getting access token in songsuggestion", access_token);
   }, [isLoaded])
 
-  console.log(access_token)
-
-  if (access_token == undefined) {
+  if (access_token == null) {
     setIsLoaded(false)
   }
 
   useEffect(() => {
+    // var promise = getAccessToken();
+    // promise.then((ret) => {
+    //   setAccessToken(ret.SpotifyToken);
+    //   console.log(ret.SpotifyToken)
+    //   console.log(access_token)
+    //   spotifyApi.setAccessToken(ret.SpotifyToken);
+    // });
+
     const groupSessionRef = collection(db, "groupSessions");
     const groupSessionQuery = query(
       groupSessionRef,
@@ -389,7 +391,7 @@ function SongSuggestion({ sessionId }) {
                 // spotifyApi.setAccessToken(
                 //   "BQDGSWrThtpTXehH9N9VNS86P4RqJCLknPtF_SkAn5ZCSnmmApfQUDt2cO3UFI_umd0yVkz39JlSkNejBlAfePYub0AcHl50LLZa3iMmmvQiFjPw_tHl32C4cmYWu0Ma82dJOGrbTlnghvp7v4j8CXPObWpD5Etlt_I2JiZ3_a8GVjb_FMWA8gIjT2nET1HFZUQPo2ZPUSmYXzUvtWQGXdDtcGRuxUpv0KrEAfiQS3Oj9b1Yt88T6Td7t3NAmY-4Pg0nFrXrK9toVq9_LgQRGTInErh18nwoiS3lCu1rWITZhg"
                 // );
-                //TODO: change this access token later. currently just for testing
+                // change this access token later. currently just for testing
 
                 if (songUris.length > 2) {
                   spotifyApi

@@ -15,17 +15,18 @@ import app from "../firebase";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
-  getFirestore,
-  collection,
-  doc,
-  query, 
-  where,
-  getDocs,
-  setDoc,
-  updateDoc,
+    getFirestore,
+    collection,
+    doc,
+    query,
+    where,
+    getDocs,
+    setDoc,
+    updateDoc,
 } from "firebase/firestore";
 
 import GroupSessionQueueDisplay from "../components/GroupSession/GroupSessionQueueDisplay";
+import GroupSessionBookmark from "../components/GroupSession/GroupSessionBookmark";
 
 const pgStyle = {
     "display": "flex",
@@ -55,13 +56,13 @@ function GetUser(currGroupSession, history) {
     currUser = auth.currentUser.uid;
     let userDocId = null;
     let docData = null;
-    
+
     const userRef = collection(db, "users");
     const user = query(
         userRef,
         where("uid", "==", currUser)
     );
-    
+
     const groupSessionRef = collection(db, "groupSessions");
     const groupSession = query(
         groupSessionRef,
@@ -75,7 +76,7 @@ function GetUser(currGroupSession, history) {
 
             console.log(newList);
             delete newList[currUser];
-        
+
             updateDoc(doc(db, "groupSessions", data_doc.id), {
                 users: newList
             });
@@ -86,9 +87,9 @@ function GetUser(currGroupSession, history) {
         querySnapshot.forEach((data_doc) => {
             userDocId = data_doc.id;
             docData = data_doc.data();
-            
+
             const newList = docData.groupSessions.splice(docData.groupSessions.indexOf(currGroupSession), 1);
-            
+
             updateDoc(doc(db, "users", userDocId), {
                 groupSessions: docData.groupSessions,
             });
@@ -99,7 +100,7 @@ function GetUser(currGroupSession, history) {
     });
 }
 
-function GroupSessionJoined (props) {
+function GroupSessionJoined(props) {
     const history = useHistory();
 
     const [title, setTitle] = useState("");
@@ -112,14 +113,14 @@ function GroupSessionJoined (props) {
     const [showSearch, setShowSearch] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [opacity, setOpacity] = useState(1);
-    const [color, setColor] = useState("rgba(" +40 + "," + 40 + "," + 40 + "," + 0.2 + ")");
+    const [color, setColor] = useState("rgba(" + 40 + "," + 40 + "," + 40 + "," + 0.2 + ")");
     const [buttonMessage, setButtonMessage] = useState("Open Song Queue");
 
     useEffect(() => {
         if (props.location.props == undefined) {
             const persistentData = localStorage.getItem("user-data");
             const data = JSON.parse(persistentData);
-            
+
             setTitle(data.title);
             setSessionId(data.sessionId);
             setImage(data.imageUrl);
@@ -132,47 +133,47 @@ function GroupSessionJoined (props) {
             setImage(props.location.props.imageUrl);
             setUsername(props.location.props.userName);
             setCreatedAt(props.location.props.createdAt);
-            
+
             localStorage.clear();
-            const groupSessionData = {title: props.location.props.title, sessionId: props.location.props.sessionId, imageUrl: props.location.props.imageUrl, username: props.location.props.userName, createdAt: props.location.props.createdAt}
+            const groupSessionData = { title: props.location.props.title, sessionId: props.location.props.sessionId, imageUrl: props.location.props.imageUrl, username: props.location.props.userName, createdAt: props.location.props.createdAt }
             localStorage.setItem("user-data", JSON.stringify(groupSessionData));
         }
     }, [title]);
 
     HandleUpdate();
 
-    const handleShow = (setShow, setOpacity, setColor, setButtonMessage) =>{
+    const handleShow = (setShow, setOpacity, setColor, setButtonMessage) => {
         setShow(!show);
         if (opacity == 1) {
             setOpacity(0.5);
-            setColor("rgba(" +40 + "," + 40 + "," + 40 + "," + 1 + ")");
+            setColor("rgba(" + 40 + "," + 40 + "," + 40 + "," + 1 + ")");
             setButtonMessage("Close Song Queue");
         }
         else {
             setOpacity(1);
-            setColor("rgba(" +40 + "," + 40 + "," + 40 + "," + 0.2 + ")");
+            setColor("rgba(" + 40 + "," + 40 + "," + 40 + "," + 0.2 + ")");
             setButtonMessage("Open Song Queue");
         }
     };
 
-    const handleLeave = (setLeave, setOpacity, setColor) =>{
+    const handleLeave = (setLeave, setOpacity, setColor) => {
         setLeave(!leave);
         if (opacity == 1) {
             setOpacity(0.5);
-            setColor("rgba(" +40 + "," + 40 + "," + 40 + "," + 1 + ")");
+            setColor("rgba(" + 40 + "," + 40 + "," + 40 + "," + 1 + ")");
         }
         else {
             setOpacity(1);
-            setColor("rgba(" +40 + "," + 40 + "," + 40 + "," + 0.2 + ")");
+            setColor("rgba(" + 40 + "," + 40 + "," + 40 + "," + 0.2 + ")");
         }
     };
 
     const handleRedirectOnLeave = () => {
         //FIND CURRENT USER AND FUCK THAT SHIT UP REAL QUICK
     }
-    
+
     return (
-        <div style={{backgroundColor: color, opacity: opacity}}>
+        <div style={{ backgroundColor: color, opacity: opacity }}>
 
             <div className="info-section" style={infoStyle}>
                 <Typography gutterBottom variant="h5" component="div">
@@ -188,29 +189,29 @@ function GroupSessionJoined (props) {
                 </Button>
                 <Overlay target={inputRef.current} show={show} placement="bottom">
                     {({ placement, arrowProps, show: _show, popper, ...props }) => (
-                    <div
-                        {...props}
-                        style={{
-                            display: "flex",
-                            flexDirection:"column",
-                            margin:"50px",
-                            backgroundColor: "#202020",
-                            padding: '2px 10px',
-                            color: 'white',
-                            width:"600px",
-                            height:"500px",
-                            borderRadius: 50,
-                            textAlign:"center",
-                            ...props.style,
-                        }}
-                    >
-                        <text>Group Session Song Queue</text>
+                        <div
+                            {...props}
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                margin: "50px",
+                                backgroundColor: "#202020",
+                                padding: '2px 10px',
+                                color: 'white',
+                                width: "600px",
+                                height: "500px",
+                                borderRadius: 50,
+                                textAlign: "center",
+                                ...props.style,
+                            }}
+                        >
+                            <text>Group Session Song Queue</text>
 
-                        {sessionId ? <div style={{backgroundColor:"#202020"}}><GroupSessionQueueDisplay sessionId={sessionId} title={title}></GroupSessionQueueDisplay></div>
-                        : <div></div>
-                        }
-                        
-                    </div>
+                            {sessionId ? <div style={{ backgroundColor: "#202020" }}><GroupSessionQueueDisplay sessionId={sessionId} title={title}></GroupSessionQueueDisplay></div>
+                                : <div></div>
+                            }
+
+                        </div>
                     )}
                 </Overlay>
 
@@ -219,24 +220,24 @@ function GroupSessionJoined (props) {
                 </Button>
                 <Overlay target={inputRef2.current} show={leave} placement="left">
                     {({ placement, arrowProps, show: _show, popper, ...props }) => (
-                    <div
-                        {...props}
-                        style={{
-                            display: "flex",
-                            flexDirection:"column",
-                            margin:"50px",
-                            backgroundColor: 'white',
-                            width:"300px",
-                            height:"200px",
-                            borderRadius: 50,
-                            textAlign:"center",
-                            ...props.style,
-                        }}
-                    >
-                        <text>Would You Like to leave the group session?</text>
-                        <Button onClick={() => GetUser(sessionId, history)}>LEAVE</Button>
-                        <Button onClick={() => handleLeave(setLeave, setOpacity, setColor)}>Back to Group Session</Button>
-                    </div>
+                        <div
+                            {...props}
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                margin: "50px",
+                                backgroundColor: 'white',
+                                width: "300px",
+                                height: "200px",
+                                borderRadius: 50,
+                                textAlign: "center",
+                                ...props.style,
+                            }}
+                        >
+                            <text>Would You Like to leave the group session?</text>
+                            <Button onClick={() => GetUser(sessionId, history)}>LEAVE</Button>
+                            <Button onClick={() => handleLeave(setLeave, setOpacity, setColor)}>Back to Group Session</Button>
+                        </div>
                     )}
                 </Overlay>
                 <UserList sessionId={sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
@@ -244,14 +245,18 @@ function GroupSessionJoined (props) {
                     <GroupSessionSettings sessionId={sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
                 </div> : <div></div>
                 }
+                {sessionId ? <div>
+                    <GroupSessionBookmark sessionId={sessionId} style={{ marginLeft: "auto", marginTop: "3rem" }} />
+                </div> : <div></div>
+                }
             </div>
             {sessionId ? <div>
-                <ChatRoom groupSessionID={sessionId} groupSessionTitle={title}/>
+                <ChatRoom groupSessionID={sessionId} groupSessionTitle={title} />
             </div> : <div></div>
             }
         </div>
     );
-    
+
 }
 
 export default GroupSessionJoined
