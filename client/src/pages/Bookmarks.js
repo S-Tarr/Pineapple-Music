@@ -43,9 +43,9 @@ function Bookmarks() {
     const [searchStr, setSearchStr] = useState("");
     const [bookmarkTabs, addTab] = useState([]);
 
-    useEffect(() => {
+    // useEffect(() => {
        
-    }, [])
+    // }, [])
     
     return (
         <div className="Page" align="center">

@@ -78,7 +78,7 @@ export default function Player() {
     console.log(accessToken);
   }, [isLoaded])
 
-  console.log("Token: " + accessToken)
+  //console.log("Token: " + accessToken)
 
   if (accessToken == undefined) {
     setIsLoaded(false)
@@ -102,9 +102,6 @@ export default function Player() {
     // forceUpdate;
   }
 
-
-  if (!accessToken) return null;
-
   useEffect(()=> {
     const interval = setInterval(async () => {
       updateTime();
@@ -112,7 +109,8 @@ export default function Player() {
     }, 1);
     return () => clearInterval(interval);
   }, []);
-  
+
+  if (!accessToken) return null;
   return (
     <div style={{width: "100%", display: "flex"}}>
       <SpotifyPlayer
