@@ -2,9 +2,13 @@ import React, { useState, useEffect, useContext } from "react"
 import SpotifyPlayer from "react-spotify-web-playback"
 import app from "../firebase";
 import { getAuth } from "firebase/auth";
+import { useAuth } from "../contexts/AuthContext";
 import { getFirestore, collection, query, orderBy, limit, getDocs, doc, onSnapshot} from "firebase/firestore";
 import { TimeContext } from '../contexts/TimeContext';
-import { Done } from "@material-ui/icons";
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import "./Components.css"
+import { stat } from "fs";
+
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var spotifyApi = new SpotifyWebApi({
@@ -49,10 +53,20 @@ async function getAccessToken() {
   return temp;
 }
 
+function useForceUpdate(){
+  const [value, setValue] = useState(0); // integer state
+  return () => setValue(value => value + 1); // update the state to force render
+}
+
 export default function Player() {
   const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("");
+  const [update, setUpdate] = useState(true);
+  const [shouldUpdate, setShouldUpdate] = useState(false)
+  
+  const { addBookmark } = useAuth();
   const {setTime} = useContext(TimeContext);
+
   useEffect(() => {
     var promise = getAccessToken();
     promise.then((ret) => {
@@ -76,30 +90,59 @@ export default function Player() {
   console.log(queue);
   
 
+  const auth = getAuth(); // Authorization component
+  const db = getFirestore(app); // Firestore database
+
+  useEffect(() => {
+    console.log("update: " + update);
+  }, [update]);
+
+  function handleBookmark() {
+    console.log("button pressed, init update: " + update);
+    setUpdate(!update);
+    setShouldUpdate(true);
+    // forceUpdate;
+  }
+
 
   if (!accessToken) return null;
   return (
-    <SpotifyPlayer
-      token={accessToken}
-      play={play2}
-      autoPlay={true}
-      callback={state => {
-        if (!state.isPlaying) play2 = false;
-        else play2 = true;
-        console.log("Track id" + state.track.id);
-        if (state.track.id != undefined && state.track.id != null) {
-          spotifyApi.getAudioAnalysisForTrack(state.track.id)
-          .then(function(data) {
-            console.log("Beats Info: " + data.body.beats);
-            setTime({timeStamp: new Date(), elapsed: state.progressMs,
-            isPlaying: play2, beats: data.body.beats, segments: data.body.segments});
-          }, 
-          function(err) {
-            console.log(err);
-          });
-        }
-      }}
-      uris={queue}
-    />
+    <div style={{width: "100%", display: "flex"}}>
+      <SpotifyPlayer
+        token={accessToken}
+        // play={play2}
+        autoPlay={true}
+        callback={state => {
+          if (!state.isPlaying) play2 = false;
+          else play2 = true;
+          console.log("Track id" + state.track.id);
+          if (state.track.id != undefined && state.track.id != null) {
+            // spotifyApi.getAudioAnalysisForTrack(state.track.id)
+            // .then(function(data) {
+            //   console.log("Beats Info: " + data.body.beats);
+            //   setTime({timeStamp: new Date(), elapsed: state.progressMs,
+            //   isPlaying: play2, beats: data.body.beats, segments: data.body.segments});
+            // }, 
+            // function(err) {
+            //   console.log(err);
+            // });
+          }
+          
+          if (shouldUpdate) {
+            console.log("reachedupdate")
+            addBookmark(state.track.id, state.progressMs)
+            setUpdate(!update);
+            setShouldUpdate(false);
+            state.isPlaying = !update;
+          }
+        }}
+        play = {update}
+        uris={queue}
+      />
+
+      <button button className="bookmark-button" onClick = {() => handleBookmark()}>
+          <BookmarkBorderIcon style={{ fontSize: 50 }} />
+      </button>
+    </div>
   )
 }

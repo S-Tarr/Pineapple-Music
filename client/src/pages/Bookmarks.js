@@ -41,6 +41,8 @@ const Search = styled("div")(({ theme }) => ({
 
 function Bookmarks() {
     const [searchStr, setSearchStr] = useState("");
+    const [bookmarkCards, addCard] = useState([]);
+
     return (
         <div className="Page" align="center">
             <Typography
@@ -61,6 +63,14 @@ function Bookmarks() {
                     inputProps={{ "aria-label": "search" }}
                 />
             </Search>
+
+            {/* <Grid container alignItems="center" spacing={9}>
+              {cards.map((card) => (
+                <Grid item key={key++} xs={12} sm={6} md={4}>
+                  <GroupSessionCard props={card} />
+                </Grid>
+              ))}
+            </Grid> */}
         </div>
     )
 }
