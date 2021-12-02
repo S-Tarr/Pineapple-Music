@@ -96,7 +96,7 @@ function BookmarksInDrawer({ bookmarks, songsInQueue }) {
                     Host's bookmarks
                 </Typography>{" "}
             </div>
-            <List>
+            {bookmarksToShow.length > 0 ? (<List>
                 {bookmarksToShow.map((bookmark) => (
                     <ListItem key={key++} alignItems="center">
                         <ListItemAvatar>
@@ -106,7 +106,14 @@ function BookmarksInDrawer({ bookmarks, songsInQueue }) {
                         <ListItemText primary={bookmark.time} />
                     </ListItem>
                 ))}
-            </List>
+            </List>) : (
+                <List>
+                    <ListItem>
+                        <ListItemText center primary={"No corresponding bookmarks for the songs in the queue"} />
+                    </ListItem>
+                </List>
+            )}
+
         </div>
     );
 }
