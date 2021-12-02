@@ -50,26 +50,30 @@ var spotifyApi = new SpotifyWebApi({
 
 const db = getFirestore(app); // Firestore database
 
-// const getParamsFromSpotifyAuth = (hash) => {
-//   console.log("trying to get the token", hash);
-//   const paramsUrl = hash.substring(1).split("&");
-//   const params = paramsUrl.reduce((accumulator, currentValue) => {
-//     const [key, value] = currentValue.split("=");
-//     accumulator[key] = value;
-//     return accumulator;
-//   }, {});
-//   console.log(params);
-//   return params;
-// };
+const getParamsFromSpotifyAuth = (hash) => {
+  console.log("trying to get the token", hash);
+  const paramsUrl = hash.substring(1).split("&");
+  const params = paramsUrl.reduce((accumulator, currentValue) => {
+    const [key, value] = currentValue.split("=");
+    accumulator[key] = value;
+    return accumulator;
+  }, {});
+  console.log(params);
+  return params;
+};
 
 async function getAccessToken() {
   const docSnap = await getDocs(collection(db, "users"));
+  console.log(auth.currentUser.uid)
   let temp = null;
   docSnap.forEach((thing) => {
-    if (thing.data().uid === auth.currentUser.uid) {
+    console.log(thing.data().uid)
+    if (thing.data().uid == auth.currentUser.uid) {
       temp = thing.data();
+      console.log(temp)
     }
   });
+  console.log(temp)
   return temp;
 }
 
@@ -79,17 +83,17 @@ function GetVoteStatus(
   setUpvoteCount,
   setTotalVoteCount,
   setTotalUsersInSession,
-  setRecommendation
+  setCurrSong
 ) {
 
-  // useEffect(() => {
-  //   if (window.location.hash) {
-  //     const params = getParamsFromSpotifyAuth(window.location.hash);
-  //     spotifyApi.setAccessToken(params.access_token);
+  useEffect(() => {
+    if (window.location.hash) {
+      const params = getParamsFromSpotifyAuth(window.location.hash);
+      spotifyApi.setAccessToken(params.access_token);
 
-  //     console.log("getting token", params);
-  //   }
-  // }, [window.location.search]);
+      console.log("getting token", params);
+    }
+  }, [window.location.search]);
 
   useEffect(() => {
     const groupSessionRef = collection(db, "groupSessions");
@@ -98,11 +102,11 @@ function GetVoteStatus(
       where("sessionId", "==", sessionId)
     );
     const unsubscribe = onSnapshot(groupSessionQuery, (querySnapshot) => {
-      let currentSuggestion = null;
+      let currentSong = null;
       querySnapshot.forEach((currDoc) => {
         //Check if the current user voted or not
-        currentSuggestion = currDoc.data().currentSuggestion;
-        setRecommendation(currentSuggestion);
+        currentSong = currDoc.data().currentSong;
+        setCurrSong(currentSong);
 
         //Update total active user count
         const size = Object.values(currDoc.data().users).filter(
@@ -112,15 +116,15 @@ function GetVoteStatus(
 
         let voteSet = new Set();
         if (
-          currDoc.data().votes != null &&
-          currDoc.data().votes !== "undefined" &&
-          currDoc.data().votes !== null &&
-          currDoc.data().votes !== undefined
+          currDoc.data().skipVotes != null &&
+          currDoc.data().skipVotes !== "undefined" &&
+          currDoc.data().skipVotes !== null &&
+          currDoc.data().skipVotes != undefined
         ) {
-          voteSet = new Set(Object.keys(currDoc.data().votes));
+          voteSet = new Set(Object.keys(currDoc.data().skipVotes));
 
           //Update upvoteCount and totalVoteCount
-          const upvoteCountTemp = Object.values(currDoc.data().votes).reduce(
+          const upvoteCountTemp = Object.values(currDoc.data().skipVotes).reduce(
             (a, v) => (v === "upvote" ? a + 1 : a),
             0
           );
@@ -158,10 +162,10 @@ function VotingResult({
 
   const addedMessage =
     // "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" +
-    "Added song";
+    "Skipped song";
   const skippedMessage =
     // "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" +
-    "Skipped song";
+    "Skip song failed";
 
   const LightTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -211,14 +215,7 @@ function VotingResult({
         onClose={handleAddedSongClose}
         TransitionComponent={Slide}
       >
-        {/* <SnackbarContent
-          style={{
-            color: "black",
-            backgroundColor: "rgba(255, 255, 255, 0.3)",
-            backdropFilter: "blur(10px)",
-          }}
-          message={addedSongState.added ? addedMessage : skippedMessage}
-        /> */}
+       
         {addedSongState.added ? (
           <Alert severity="success" sx={{ width: "100%" }}>
             {addedMessage}
@@ -233,12 +230,12 @@ function VotingResult({
   );
 }
 
-function SongSuggestion({ sessionId }) {
+function SkipVotingCard({ sessionId }) {
   const [voted, setVoted] = useState(0);
   const [upvoteCount, setUpvoteCount] = useState(0);
   const [totalVoteCount, setTotalVoteCount] = useState(0);
   const [totalUsersInSession, setTotalUsersInSession] = useState(0);
-  const [recommendation, setRecommendation] = useState();
+  const [currSong, setCurrSong] = useState();
 
   const [addedSongState, setAddedSongState] = useState({
     open: false,
@@ -258,7 +255,7 @@ function SongSuggestion({ sessionId }) {
     setUpvoteCount,
     setTotalVoteCount,
     setTotalUsersInSession,
-    setRecommendation
+    setCurrSong
   );
 
   const [isLoaded, setIsLoaded] = useState(true);
@@ -271,169 +268,141 @@ function SongSuggestion({ sessionId }) {
       console.log(access_token)
       spotifyApi.setAccessToken(ret.SpotifyToken);
     });
-    console.log("getting access token in songsuggestion", access_token);
+    console.log(access_token);
   }, [isLoaded])
 
-  if (access_token == null) {
+  console.log(access_token)
+
+  if (access_token == undefined) {
     setIsLoaded(false)
   }
 
   useEffect(() => {
-    // var promise = getAccessToken();
-    // promise.then((ret) => {
-    //   setAccessToken(ret.SpotifyToken);
-    //   spotifyApi.setAccessToken(ret.SpotifyToken);
-    // });
-    console.log("in useEffect", isLoaded);
-
     const groupSessionRef = collection(db, "groupSessions");
     const groupSessionQuery = query(
       groupSessionRef,
       where("sessionId", "==", sessionId)
     );
     getDocs(groupSessionQuery).then((groupSessionQuerySnapshot) => {
-      let currentSuggestion = null;
+      let currentSong = null;
       groupSessionQuerySnapshot.forEach((currDoc) => {
         try {
-          //Check if song suggestion already exists
-          currentSuggestion = currDoc.data().currentSuggestion;
-          //const downVotePercentage = 100 - (((upvoteCount * 1.0) / totalUsersInSession) * 100);
-          if (
-            currentSuggestion == null ||
-            currentSuggestion === undefined ||
-            currentSuggestion === "undefined" ||
-            (totalVoteCount !== 0 && totalVoteCount === totalUsersInSession) ||
-            (totalVoteCount !== 0 &&
-              ((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50)
-          ) {
+            //Check if song suggestion already exists
+            currentSong = currDoc.data().currentSong;
+            console.log(currentSong);
+            const downVotePercentage = 100 - (((upvoteCount * 1.0) / totalUsersInSession) * 100);
+            if (
+                currentSong == null ||
+                currentSong === undefined ||
+                currentSong == "undefined" || 
+                currDoc.data().offset != currDoc.data().currSongOffset ||
+                (totalVoteCount !== 0 && totalVoteCount === totalUsersInSession) ||
+                (totalVoteCount !== 0 &&
+                ((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50)
+            ) {
             //Song suggestion does not already exist (First song recommendation)
             // or upvote percentage greater than 50%
             // or every active user in the session has voted
             // therefore, get a new song to recommend
 
-            console.log(
-              "currentSuggestion is undefined or voting is over",
-              currentSuggestion
-            );
-
-            //Refresh the votes value for the new song suggestion
-            const sessionRef = doc(db, "groupSessions", currDoc.id);
-            updateDoc(sessionRef, {
-              votes: deleteField(),
-            });
-
-            //Reset voted to false if voting has ended
-            if (
-              totalVoteCount === totalUsersInSession ||
-              ((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50
-            ) {
-              setVoted(false);
-            }
-
-            //TODO:Add the recommended song to the queue if upvote percentage is greater than 50%
-            const groupSessionQueueRef = collection(db, "groupSessionQueue");
-            const groupSessionQueueQuery = query(
-              groupSessionQueueRef,
-              where("sessionId", "==", sessionId)
-            );
-
-            if (((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50) {
-              console.log(
-                "upvote greater than 50%",
-                ((upvoteCount * 1.0) / totalUsersInSession) * 100
-              );
-              setAddedSongState({
-                open: true,
-                added: true,
-              });
-              console.log(currentSuggestion);
-              getDocs(groupSessionQueueQuery).then(
-                (groupSessionQueueQuerySnapshot) => {
-                  groupSessionQueueQuerySnapshot.forEach((queueDoc) => {
-                    updateDoc(doc(db, "groupSessionQueue", queueDoc.id), {
-                      createdAt: queueDoc.data().createdAt,
-                      sessionId: queueDoc.data().sessionId,
-                      queueId: queueDoc.data().queueId,
-                      //songs: [...queueDoc.data().songs, currentSuggestion],
-                      songs: arrayRemove(currentSuggestion),
-                    }).then(() => {
-                      updateDoc(doc(db, "groupSessionQueue", queueDoc.id), {
-                        createdAt: queueDoc.data().createdAt,
-                        sessionId: queueDoc.data().sessionId,
-                        queueId: queueDoc.data().queueId,
-                        songs: [...queueDoc.data().songs, currentSuggestion],
-                      });
-                    });
-                  })
-
-                }
-              );
-            } else if (totalVoteCount === totalUsersInSession) {
-              setAddedSongState({
-                open: true,
-                added: false,
-              });
-            }
-
-            //Get recommendation song using Spotify API by fetching current songs
-            getDocs(groupSessionQueueQuery).then(
-              (groupSessionQueueQuerySnapshot) => {
-                let songs = [];
-                groupSessionQueueQuerySnapshot.forEach((doc) => {
-                  songs = doc.data().songs;
-                });
-                let songUris = songs.map((track) =>
-                  track.uri.substring(track.uri.lastIndexOf(":") + 1)
+                console.log(
+                    "current song is undefined or voting is over",
+                    currentSong
                 );
 
-                // spotifyApi.setAccessToken(
-                //   "BQDGSWrThtpTXehH9N9VNS86P4RqJCLknPtF_SkAn5ZCSnmmApfQUDt2cO3UFI_umd0yVkz39JlSkNejBlAfePYub0AcHl50LLZa3iMmmvQiFjPw_tHl32C4cmYWu0Ma82dJOGrbTlnghvp7v4j8CXPObWpD5Etlt_I2JiZ3_a8GVjb_FMWA8gIjT2nET1HFZUQPo2ZPUSmYXzUvtWQGXdDtcGRuxUpv0KrEAfiQS3Oj9b1Yt88T6Td7t3NAmY-4Pg0nFrXrK9toVq9_LgQRGTInErh18nwoiS3lCu1rWITZhg"
-                // );
-                // change this access token later. currently just for testing
+                //Refresh the votes value for the new song suggestion
+                const sessionRef = doc(db, "groupSessions", currDoc.id);
+                updateDoc(sessionRef, {
+                    skipVotes: deleteField(),
+                });
 
-                if (songUris.length > 2) {
-                  spotifyApi
-                    .getRecommendations({
-                      limit: 1,
-                      seed_tracks: songUris.slice(0, 5),
-                    })
-                    .then(
-                      function (data) {
-                        console.log(data.body)
-                        const trackData = data.body.tracks[0];
-                        if (
-                          trackData == null ||
-                          trackData === "undefined" ||
-                          trackData === undefined
-                        ) {
-                          throw new Error("queue is possibly empty");
-                        }
-                        const docData = {
-                          albumUrl: trackData.album.images[0].url,
-                          artist: trackData.album.artists[0].name,
-                          title: trackData.album.name,
-                          uri: trackData.uri,
-                        };
-
-                        const sessionRef = doc(db, "groupSessions", currDoc.id);
-                        updateDoc(sessionRef, {
-                          currentSuggestion: docData,
-                        });
-                        setRecommendation(docData);
-                      },
-                      function (err) {
-                        console.log("Something went wrong!", err);
-                      }
-                    );
-                } else {
-                  setRecommendation("undefined");
+                //Reset voted to false if voting has ended
+                if (
+                totalVoteCount === totalUsersInSession ||
+                ((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50
+                ) {
+                setVoted(false);
                 }
-              }
-            );
-          } else {
-            console.log("currentSuggestion is not undefined");
-            setRecommendation(currentSuggestion);
-          }
+
+                //TODO:Add the recommended song to the queue if upvote percentage is greater than 50%
+                const groupSessionQueueRef = collection(db, "groupSessionQueue");
+                const groupSessionQueueQuery = query(
+                    groupSessionQueueRef,
+                    where("sessionId", "==", sessionId)
+                );
+
+                if (((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50) {
+                    console.log(
+                        "upvote greater than 50%",
+                        ((upvoteCount * 1.0) / totalUsersInSession) * 100
+                    );
+                    setAddedSongState({
+                        open: true,
+                        added: true,
+                    });
+
+                    {/*FLAG 3, HANDLE SKIP TO NEXT SONG IN GROUP SESSION QUEUE*/}
+                    getDocs(groupSessionQueueQuery).then(
+                        (groupSessionQueueQuerySnapshot) => {
+                        groupSessionQueueQuerySnapshot.forEach((queueDoc) => {
+                            const sessionRef = collection(db, "groupSessions");
+                            const sessionRefQuery = query(
+                                sessionRef,
+                                where("sessionId", "==", sessionId)
+                            );
+                            
+                            groupSessionQuerySnapshot.forEach((newdoc) => {
+                                let offset = newdoc.data().queueOffset;
+                                const newSessionRef = doc(db, "groupSessions", currDoc.id);
+                                console.log(groupSessionQuerySnapshot);
+                                updateDoc(newSessionRef, {
+                                    queueOffset: offset + 1
+                                })
+                            })                        
+                        })
+
+                        }
+                    );
+                } else if (totalVoteCount === totalUsersInSession) {
+                    setAddedSongState({
+                        open: true,
+                        added: false,
+                    });
+                }
+
+                //Get current song
+                getDocs(groupSessionQueueQuery).then(
+                  (groupSessionQueueQuerySnapshot) => {
+                    let offset = 0;
+                    let songs = [];
+                    groupSessionQueueQuerySnapshot.forEach((doc) => {
+                      songs = doc.data().songs;
+                    });
+                    
+                    const sessionRef = collection(db, "groupSessions");
+                    const sessionRefQuery = query(
+                        sessionRef,
+                        where("sessionId", "==", sessionId)
+                    );
+                    const newsessionRef = doc(db, "groupSessions", currDoc.id);
+                    getDocs(sessionRefQuery).then((sessionRefQuerySnapshot) => {
+                        sessionRefQuerySnapshot.forEach((doc) => {
+                            offset = doc.data().queueOffset;
+                            if (songs[offset] != undefined) {
+                                updateDoc(newsessionRef, {
+                                    currentSong: songs[offset],
+                                    currSongOffset: offset,
+                                });
+                                setCurrSong(songs[offset]);
+                            }
+                        })
+                    })
+                  }
+                );
+            } else {
+                console.log("currentSuggestion is not undefined");
+                setCurrSong(currentSong);
+            }
         } catch (e) {
           console.log(e);
         }
@@ -455,11 +424,12 @@ function SongSuggestion({ sessionId }) {
       groupSessionQuerySnapshot.forEach((currDoc) => {
         const sessionRef = doc(db, "groupSessions", currDoc.id);
         updateDoc(sessionRef, {
-          [`votes.${auth.currentUser.uid}`]: `${event.target.name}`,
+          [`skipVotes.${auth.currentUser.uid}`]: `${event.target.name}`,
         });
       });
     });
   };
+
 
   return (
     <Card
@@ -476,34 +446,35 @@ function SongSuggestion({ sessionId }) {
           backdropFilter: "blur(10px)",
         }}
       >
-        <CardHeader color="primary" title="Next Song Suggestion" />
+        <CardHeader color="primary" title="Skip Currently Playing?" />
+        {/*change below to do current song stuff*/}
         <CardMedia
           align="center"
           component="img"
           sx={{ width: 255 }}
           image={
-            recommendation == null ||
-              recommendation === undefined ||
-              recommendation === "undefined"
+            currSong == null ||
+              currSong === undefined ||
+              currSong == "undefined"
               ? albumCover
-              : recommendation.albumUrl
+              : currSong.albumUrl
           }
           alt="album cover"
         />
         <CardContent>
           <Typography variant="h6">
-            {recommendation == null ||
-              recommendation === undefined ||
-              recommendation === "undefined"
-              ? "Suggestion is based on the songs in the queue. Queue up at least 3 songs to see your suggestion."
-              : recommendation.title}
+            {currSong == null ||
+              currSong === undefined ||
+              currSong == "undefined"
+              ? "Suggestion is based on the current playing song. Play a song to vote."
+              : currSong.title}
           </Typography>
           <Typography variant="h7">
-            {recommendation == null ||
-              recommendation === undefined ||
-              recommendation === "undefined"
+            {currSong == null ||
+              currSong === undefined ||
+              currSong == "undefined"
               ? ""
-              : recommendation.artist}
+              : currSong.artist}
           </Typography>
           <br />
           <br />
@@ -521,9 +492,9 @@ function SongSuggestion({ sessionId }) {
               variant="text"
               disabled={
                 voted ||
-                recommendation == null ||
-                recommendation === undefined ||
-                recommendation === "undefined"
+                currSong == null ||
+                currSong === undefined ||
+                currSong == "undefined"
               }
               endIcon={<ThumbUpIcon />}
               name="upvote"
@@ -535,9 +506,9 @@ function SongSuggestion({ sessionId }) {
               variant="text"
               disabled={
                 voted ||
-                recommendation == null ||
-                recommendation === undefined ||
-                recommendation === "undefined"
+                currSong == null ||
+                currSong === undefined ||
+                currSong == "undefined"
               }
               endIcon={<ThumbDownIcon />}
               name="downvote"
@@ -549,6 +520,7 @@ function SongSuggestion({ sessionId }) {
           <br />
           <Divider />
           <br />
+          {/* SEE WHAT ADDEDSONGSTATE, HANDLEADDEDSONGCLOSE does */}
           <VotingResult
             votes={upvoteCount}
             totalUsersInSession={totalUsersInSession}
@@ -562,4 +534,4 @@ function SongSuggestion({ sessionId }) {
   );
 }
 
-export default SongSuggestion;
+export default SkipVotingCard;

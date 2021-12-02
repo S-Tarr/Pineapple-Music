@@ -314,6 +314,7 @@ export function AuthProvider({ children }) {
         users: [currentUser.uid],
         playState: false,
         queueing: queueing,
+        queueOffset: 0,
         pps: pps,
       });
       const docRef2 = await addDoc(collection(db, "groupSessionQueue"), {
