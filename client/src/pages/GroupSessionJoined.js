@@ -23,6 +23,7 @@ import {
   getDocs,
   setDoc,
   updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 
 import GroupSessionQueueDisplay from "../components/GroupSession/GroupSessionQueueDisplay";
@@ -89,8 +90,12 @@ function GetUser(currGroupSession, history) {
             
             const newList = docData.groupSessions.splice(docData.groupSessions.indexOf(currGroupSession), 1);
             
+            console.log("data_doc.data().groupSessions: ", data_doc.data().groupSessions);
+            console.log("docData.groupSessions: ", docData.groupSessions);
+            console.log("currentGroupSession: ", currGroupSession);
             updateDoc(doc(db, "users", userDocId), {
                 groupSessions: docData.groupSessions,
+                leftGroupSessions: arrayUnion(currGroupSession),
             });
         });
     });
@@ -101,6 +106,7 @@ function GetUser(currGroupSession, history) {
 
 function GroupSessionJoined (props) {
     const history = useHistory();
+    console.log("currentUser GSJ: ", auth.currentUser.uid); //THOMAS
 
     const [title, setTitle] = useState("");
     const [sessionId, setSessionId] = useState();

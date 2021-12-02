@@ -28,6 +28,7 @@ import {
   getDocs,
   updateDoc,
   arrayUnion,
+  arrayRemove,
   query,
   orderBy,
   onSnapshot,
@@ -170,7 +171,6 @@ export function AuthProvider({ children }) {
       docSnapSessions.forEach((currDoc) => {
         if (currDoc.data().sessionId === sessionId) {
           const sessionRef = doc(db, "groupSessions", currDoc.id);
-          console.log("sessionRef", sessionRef);
           updateDoc(sessionRef, {
             [`users.${currentUser.uid}`]: "active",
           });
@@ -182,6 +182,7 @@ export function AuthProvider({ children }) {
           const userRef = doc(db, "users", currDoc.id);
           updateDoc(userRef, {
             groupSessions: arrayUnion(sessionId),
+            leftGroupSessions: arrayRemove(sessionId),
           });
         }
       });
