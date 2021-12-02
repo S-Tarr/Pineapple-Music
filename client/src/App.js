@@ -19,6 +19,7 @@ import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import SongPage from "./pages/SongPage";
 import SearchPage from "./pages/SearchPage";
+import History from "./pages/History";
 import AddProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
@@ -66,6 +67,7 @@ function App() {
                         path="/groupsessionhome"
                         component={GroupSessionJoined}
                       />
+                      <Route path="/history" component={History} />
                     </Switch>
                   </div>
                 </div>

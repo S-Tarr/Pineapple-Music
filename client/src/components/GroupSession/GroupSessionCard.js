@@ -37,7 +37,7 @@ function GroupSessionCard({
   const { joinGroupSession, updateUserState } = useAuth();
 
   const history = useHistory();
-  async function handleJoin() { //TODO
+  async function handleJoin() {
     handleSubmitGroup(sessionId);
     joinGroupSession(sessionId, username);
     history.push({
