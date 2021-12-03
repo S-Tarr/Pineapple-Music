@@ -109,12 +109,7 @@ export default function Player(props) {
     const qSnap = await getDocs(q);
     qSnap.forEach((doc) => {
       // console.log("trackid: " + currentSongId + " " + "data: " + value)
-<<<<<<< HEAD
-      if (currentSongId) {
-        // console.log(doc.data())
-=======
       if (currentSongId && doc.data().bookmarks) {
->>>>>>> 8d411e935e545cbbe15a3e70babd4e0c30be5b92
         for (const [key, value] of Object.entries(doc.data().bookmarks)) {
           bookmarkDict[key] = (value["time"]);
         }

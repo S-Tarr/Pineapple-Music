@@ -76,7 +76,7 @@ const db = getFirestore(app); // Firestore database
 const auth = getAuth();
 
 
-async function updateCards(setCards, cards) {
+async function updateCards(setCards) {
   console.log("updating!")
   const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid));
   getDocs(q)
@@ -88,35 +88,84 @@ async function updateCards(setCards, cards) {
           doc.data().bookmarks != null &&
           doc.data().bookmarks !== "undefined"
         ) {
+          
+          var arr = []
           for (const [key, value] of Object.entries(doc.data().bookmarks)) {
             const props = {
-              songName: "song name",
+              songName: "group session1",
               time: Infinity
             };
-            console.log("song/time", key, value["time"])
-            props["songName"] = key;
+            props["songName"] = value["title"]
             props["time"] = value["time"]
-            setCards(cards => [...cards, props]);
+            //setCards((cards) => [props, ...cards]);
+            console.log("inside:", JSON.stringify(arr))
+            arr.push(props)
+            console.log(JSON.stringify(props))
+            console.log("inside after", JSON.stringify(arr))
           }
-          console.log(JSON.stringify(cards))
+          console.log("outside", arr)
+          setCards(arr)
         }
-        
       });
+      
     })
 }
 
+// async function getMyBooks() {
+//   const docSnapUsers = await getDocs(collection(db, "users"))
+//   let bookmarks = null
+//   docSnapUsers.forEach((currDoc) => {
+//     if (currDoc.data().uid === auth.currentUser.uid) {
+//       // for (const [key, value] of Object.entries(currDoc.data().bookmarks)) {
+//       //   var temp = {"title": value["title"], "time": value["time"]}
+//       //   console.log(value["title"], value["time"])
+//       //   arr.push(temp)
+//       // }
+//       bookmarks = currDoc.data().bookmarks
+//       console.log(bookmarks)
+//     }
+//   })
+//   return bookmarks
+// }
+
 function Bookmarks() {
-    const [searchStr, setSearchStr] = useState("");
-    const [cards, setCards] = useState([]);
+    const [isLoaded, setIsLoaded] = useState(true)
+    const [bookmarks, setBookmarks] = useState([])
+    const [cards, setCards] = useState([])
     
-    
-    let key = 0;
+    let key = 0;  
 
     // useEffect(() => {
     //   console.log("rerender!")
     // }, [cards]);
 
-    updateCards(setCards, cards);
+    // updateCards(setCards);
+
+  // useEffect(() => {
+  //   var promise = getMyBooks()
+
+  //     promise.then((ret) => {
+  //       setBookmarks(ret)
+  //       console.log(ret)
+  //     })
+  //     console.log(bookmarks)
+  // }, [isLoaded]);
+
+  // console.log(bookmarks)
+
+  // if (!bookmarks) {
+  //   console.log("ya yeet")
+  //   setIsLoaded(false)
+  // }
+  // } else {
+  //   bookmarks.forEach((value) => {
+  //     cards.push(value)
+  //   })
+  // }
+    useEffect(() => {
+      updateCards(setCards);
+    }, [])
+    console.log(cards)
     return (
         <div className="Page" align="center">
           <Typography
@@ -141,9 +190,9 @@ function Bookmarks() {
             <Grid container alignItems="center" spacing={9}>
               {cards.map((card) => (
                 <Grid item key={key++} xs={12} sm={6} md={4}>
-                  <BookmarkCard props={card} />
-                </Grid>
-              ))}
+                  <BookmarkCard props={card}/>
+                </Grid>))
+              }
             </Grid>
           </Container>
         </div>
