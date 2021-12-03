@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react"
+import React, { useState, useEffect, useContext, useRef } from "react"
 import SpotifyPlayer from "react-spotify-web-playback"
 import app from "../firebase";
 import { getAuth } from "firebase/auth";
@@ -6,6 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { getFirestore, collection, query, orderBy, limit, getDocs, where, onSnapshot} from "firebase/firestore";
 import { TimeContext } from '../contexts/TimeContext';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import "./Components.css"
 import { stat } from "fs";
 
@@ -59,7 +60,7 @@ function useForceUpdate(){
 }
 
 export default function Player(props) {
-  const {setTime, updateTime} = useContext(TimeContext);
+  const {setTime, updateTime, elapsed} = useContext(TimeContext);
   const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("");
   const [update, setUpdate] = useState(true);
@@ -68,6 +69,9 @@ export default function Player(props) {
   const [bookmarkTime, setBookmarkTime] = useState(-1);
   
   const { addBookmark } = useAuth();
+  const dictRef = useRef();
+
+  var bookmarkDict = {}
 
   spotifyApi.setAccessToken(props.accessToken);
 
@@ -90,7 +94,6 @@ export default function Player(props) {
 
 
   var play2 = true;
-  var isLoaded = true;
 
   const auth = getAuth(); // Authorization component
   const db = getFirestore(app); // Firestore database
@@ -106,19 +109,75 @@ export default function Player(props) {
     // forceUpdate;
   } 
 
-  async function findBookmarkTime(id) {
+  async function refreshBookmarks() {
+    console.log("refreshing...")
     const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid));
     const qSnap = await getDocs(q);
     qSnap.forEach((doc) => {
-      const[key, value] = Object.entries(doc.data().bookmarks[currentSongId])
-      console.log("uid: " + doc.data().uid + " " + "data: " + key + "; " + value)
+      // console.log("trackid: " + currentSongId + " " + "data: " + value)
+      if (currentSongId) {
+        for (const [key, value] of Object.entries(doc.data().bookmarks)) {
+          bookmarkDict[key] = (value["time"]);
+        }
+        dictRef.current = bookmarkDict;
+        for (const [key, value] of Object.entries(bookmarkDict)) {
+          console.log("key/value: " + key + " " + value)
+        }
+        // console.log("trackid: " + currentSongId + " " + "data: " + value)
+        // console.log("trackid: " + currentSongId + " " + "uid: " + doc.data().uid + " " + "data: " + key + "; " + value)
+      }
     });
+    console.log("current, bookmark: " + elapsed, bookmarkDict[currentSongId])
+    console.log("refreshtest:", bookmarkDict[currentSongId])
+
+    temp();
     // setBookmarkTime(thing.data.bookmarks[id])
-}
+  }
+
+  // async function findBookmarkTime(id) {
+  //   const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid));
+  //   const qSnap = await getDocs(q);
+  //   qSnap.forEach((doc) => {
+  //     if (id) {
+  //       if (!doc.data().bookmarks[id]) {
+  //         setBookmarkTime(-1);
+  //       }
+  //       const[key, value] = Object.entries(doc.data().bookmarks[id])
+  //       console.log("trackid: " + currentSongId + " " + "data: " + value)
+  //       // console.log("trackid: " + currentSongId + " " + "uid: " + doc.data().uid + " " + "data: " + key + "; " + value)
+  //       setBookmarkTime(value)
+  //     }
+  //   });
+  // }
+
+  function temp() {
+    console.log("temp:", currentSongId, bookmarkDict[currentSongId])
+    for (const [key, value] of Object.entries(bookmarkDict)) {
+      console.log("temploop: " + key + " " + value)
+    }
+    console.log("temp dict", JSON.stringify(dictRef.current))
+  }
+
+  useEffect(() => {
+    // console.log("songid: " + currentSongId)
+    if (dictRef.current) {
+      if (dictRef.current.hasOwnProperty(currentSongId)) {
+        console.log("skip?: " + elapsed, dictRef.current[currentSongId])
+        if (elapsed > dictRef.current[currentSongId]) {
+          console.log("SKIP")
+        }
+      }
+    }
+  }, [elapsed, bookmarkDict])
+  
 
   useEffect(()=> {
     const interval = setInterval(async () => {
       updateTime();
+
+      // if (currentSongId) {
+      //   findBookmarkTime(currentSongId)
+      // }
       
     }, 500);
     return () => clearInterval(interval);
@@ -139,10 +198,10 @@ export default function Player(props) {
           else {
             play2 = false;
           }
-          console.log("Track id" + state.track.id);
+          console.log("Track id: " + state.track.id);
           setCurrentSongId(state.track.id);
 
-          findBookmarkTime(state.track.id);
+          refreshBookmarks();
 
           if (state.track.id != undefined && state.track.id != null &&
             state.track.id != "") {
@@ -170,6 +229,9 @@ export default function Player(props) {
 
       <button button className="bookmark-button" onClick = {() => handleBookmark()}>
           <BookmarkBorderIcon style={{ fontSize: 50 }} />
+      </button>
+      <button button className="bookmark-button" onClick = {() => refreshBookmarks()}>
+          <RefreshIcon style={{ fontSize: 50 }} />
       </button>
     </div>
     
