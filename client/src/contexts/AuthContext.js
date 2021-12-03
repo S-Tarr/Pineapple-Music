@@ -34,7 +34,6 @@ import {
   onSnapshot,
   deleteField,
 } from "firebase/firestore";
-
 import groupSessionCover from "../assets/groupSessionCover.jpeg";
 
 // Firebase configuration
@@ -472,6 +471,8 @@ export function AuthProvider({ children }) {
     addGroupSession,
     getYourGroupSessions,
     addBookmark,
+    editBookmark,
+    delBookmark,
     searchGroupSessions,
     getGroupSessions,
     joinGroupSession,
