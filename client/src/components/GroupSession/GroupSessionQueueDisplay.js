@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import { useDrag, useDrop } from 'react-dnd';
 import app from "../../firebase";
 import GroupSessionSearchBar from './GroupSessionSearchBar';
+import GroupSessionPlaylistSearchBar from './GroupSessionPlaylistSearchBar';
 import Track from '../Track';
 import Player from './GroupSpotifyPlayer'
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
@@ -18,7 +19,10 @@ import {
   onSnapshot,
   getDocs,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
+import TimeContextProvider from '../../contexts/TimeContext';
+import Canvas from '../Canvas';
 
 const db = getFirestore(app);
 
@@ -26,6 +30,10 @@ let sessionId;
 let groupSessionQueueId;
 let groupSessionId;
 let groupSessionQueueDoc;
+
+const inputRef = createRef();
+const inputRef2 = createRef();
+const inputRef3 = createRef();
 
 const CLIENT_ID = "477666821b8941c4bd163b4ff55ed9af";
 const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
@@ -49,8 +57,15 @@ const handleSpotifyLogin = () => {
     window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
   };
 
+
 function ExampleDrag(props) {
     //implement function for onDROP
+    const [showPlaylistContents, setShowPlaylistContents] = useState(false);
+    const [playlistContents, setPlaylistContents] = useState(props.item.tracks);
+
+    const handleFilter = (event) => {
+        setShowPlaylistContents(!showPlaylistContents);
+    };
 
     const [{ isDragging }, drag, dragPreview] = useDrag({
         
@@ -65,7 +80,6 @@ function ExampleDrag(props) {
             isDragging: monitor.isDragging()
         })
     })
-
     return (
         <div ref={drag}>
             {/* <Track track={props.item}></Track> */}
@@ -73,17 +87,64 @@ function ExampleDrag(props) {
                 className="d-flex m-2 align-items-center"
                 style={{ cursor: "pointer", display:"flex", flexDirection:'row' }}
                 >
-                <img src={props.item.albumUrl} style={{ height: "64px", width: "64px" }} />
-                <div className="ml-3">
-                    <div>{props.item.title}</div>
-                    <div className="text-muted">{props.item.artist}</div>
-                </div>
+                
+                {/*FIX BELOW SO THAT IT DOESN't ONLY DO IT FOR INDEX 1*/}
+                {props.item.tracks && props.index === 0 ? 
+                (<div style={{backgroundColor:"black", marginBottom: 20}}>
+                    <div style={{marginBottom:10}}>Playing From Playlist</div>
+                    <div style={{display:'flex', flexDirection: 'row'}}>
+                        <img src={props.item.albumUrl} style={{ height: "64px", width: "64px" }} />
+                        <div>
+                            {props.item.title}
+                            <div className="text-muted">{props.item.artist}</div>
+                        </div>
+                    </div>
+                    <Button variant="danger" ref={inputRef3} onClick={handleFilter}>Display Contents</Button>
+                    <Overlay target={inputRef3.current} show={showPlaylistContents} placement="bottom">
+                        {({ placement, arrowProps, show: _show, popper, ...props }) => (
+                            <div {...props}>
+
+                                <div style={{backgroundColor: "whitesmoke"}}>
+                                    {/*incorportate the below */}
+                                    {playlistContents.map((track, index) => {
+                                        return (
+                                            <div>
+                                                { index < 5 ? 
+                                                <div style={{ backgroundColor: "black" }}>
+                                                    <div style={{display:'flex', flexDirection: 'row'}}>
+                                                        <img src={track.track.album.images[0].url} style={{ height: "64px", width: "64px" }} />
+                                                        <div className="ml-3" style={{color:'white'}}>
+                                                            <div>{track.track.name}</div>
+                                                            <div className="text-muted">{track.track.artists[0].name}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                : <div>
+                                                </div>
+                                                }
+                                            </div>
+                                        )   
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                    </Overlay>
+                </div>) : 
+                (<div>
+                    <img src={props.item.albumUrl} style={{ height: "64px", width: "64px" }} />
+                    <div className="ml-3">
+                        <div>{props.item.title}</div>
+                        <div className="text-muted">{props.item.artist}</div>
+                    </div>
+                </div>)}
+
             </div>
         </div>
     )
 }
 
 function Drop(props) {
+
     const [{ canDrop, isOver }, drop] = useDrop(() => ({
         // The type (or types) to accept - strings or symbols
         accept: 'BOX',
@@ -114,11 +175,10 @@ function GetSongs(props) {
             groupSessionRef,
             where("sessionId", "==", sessionId)
         );
-        //let groupSessionId;
         getDocs(groupSession).then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 groupSessionId = doc.id;
-
+                
                 const groupSessionQueueRef = collection(db, "groupSessionQueue");
 
                 const groupSessionQueue = query(
@@ -138,14 +198,11 @@ function GetSongs(props) {
           });
 
     }, []);
-    console.log(songs);
     return songs;
 }
 
-const inputRef = createRef();
-
 // THOMAS
-function GetPermissions(sessionId, setQueueing, setPps, setShowSearch) {
+function GetPermissions(sessionId, setQueueing, setPps, setShowSearch, setShowPlaylistSearch) {
     useEffect(() => {
       const groupSessionRef = collection(db, "groupSessions");
       const groupSession = query(
@@ -157,6 +214,7 @@ function GetPermissions(sessionId, setQueueing, setPps, setShowSearch) {
           setQueueing(doc.data().queueing);
           if (doc.data().queueing == false) {
             setShowSearch(false);
+            setShowPlaylistSearch(false);
           }
           setPps(doc.data().pps);
         });
@@ -171,12 +229,13 @@ function GroupSessionQueueDisplay(props) {
     
     const [droppedIndex, setDroppedIndex] = useState();
     const [showSearch, setShowSearch] = useState(false);
+    const [showPlaylistSearch, setShowPlaylistSearch] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
+    const [offset, setOffset] = useState(0);
 
     const [authorized, setAuthorized] = useState(true);
     const [token, setToken] = useState({})
 
-    // THOMAS
     const { checkCreator } = useAuth();
     const [queueing, setQueueing] = useState();
     const [pps, setPps] = useState();
@@ -194,14 +253,27 @@ function GroupSessionQueueDisplay(props) {
         }
         });
     };
+
+    useEffect(() => {
+        const groupSessionRef = collection(db, "groupSessions");
+        const groupSession = query(
+            groupSessionRef,
+            where("sessionId", "==", sessionId)
+        );
+        getDocs(groupSession).then((querySnapshot) => {
+            querySnapshot.forEach((newdoc) => {
+                let tempOffset = newdoc.data().queueOffset;
+                setOffset(tempOffset);
+            });
+        });
+    }, [offset])
+
     useOwnerPromise();
-    GetPermissions(sessionId, setQueueing, setPps, setShowSearch);
-    //
+    GetPermissions(sessionId, setQueueing, setPps, setShowSearch, setShowPlaylistSearch);
 
     useEffect(() => {
         if (window.location.hash) {
         setToken(getParamsFromSpotifyAuth(window.location.hash).access_token);
-        console.log(token);
         setAuthorized(false);
         }
     }, [authorized]);
@@ -219,11 +291,21 @@ function GroupSessionQueueDisplay(props) {
         setShowSearch(!showSearch);
     };
 
+    const handleShowPlaylist = (event) => {
+        setShowPlaylistSearch(!showPlaylistSearch);
+    };
+
     const handleDeleteButton = (event) => {
         setShowDelete(!showDelete);
     }
 
     const handleDelete = (items, setItems, index2) => {
+        console.log(offset);
+        if (offset != 0) {  
+            updateDoc(doc(db, "groupSessions", groupSessionId), {
+                queueOffset: offset - 1
+            });
+        }
         var cloneArray = items.filter((item, index) => index !== index2)
         //set new docs in the firebase
         ChangeDoc(cloneArray, setItems, "delete");
@@ -237,7 +319,6 @@ function GroupSessionQueueDisplay(props) {
         if (type == "delete") {
             window.location.reload(false);
         }
-        // window.location.reload(false);
     }
     
     const handleDrop = (array, index, item) => {
@@ -264,6 +345,26 @@ function GroupSessionQueueDisplay(props) {
         }
     };
 
+    const [visuals, setVisuals] = useState(false);
+    const [text, setText] = useState("Visuals");
+
+    const toggleVisuals = () => {
+        if (visuals) {
+            setVisuals(false);
+        }
+        else {
+            setVisuals(true);
+        }
+    }
+    const toggleText = () => {
+        if (visuals) {
+            setText("Visuals");
+        }
+        else {
+            setText("Song");
+        }
+    }
+
     return (
         <div>
             <Button variant="danger" ref={inputRef} onClick={handleFilter} disabled={!isOwner & !queueing}>ADD SONG</Button>
@@ -288,19 +389,57 @@ function GroupSessionQueueDisplay(props) {
                     </div>
                 )}
             </Overlay>
-            
+
+            <Button variant="danger" ref={inputRef2} onClick={handleShowPlaylist} disabled={!isOwner & !queueing}>ADD PLAYLIST</Button>
+            <Overlay target={inputRef2.current} show={showPlaylistSearch} placement="bottom">
+                {({ placement, arrowProps, show: _show, popper, ...props }) => (
+
+                    <div {...props}>
+                        <div style={{backgroundColor: "whitesmoke"}}>
+                            {/*REPLACE BELOW */}
+                            <GroupSessionPlaylistSearchBar placeholder="Enter a song name..." spotifyData={token} authorized={authorized} groupSessionQueueDoc={groupSessionQueueDoc} groupSessionQueueId={groupSessionQueueId}/>
+                            
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={handleSpotifyLogin}
+                            >
+                                Login to Spotify
+                            </Button>
+                        
+                        
+                        </div>
+                    </div>
+                )}
+            </Overlay>
+
             <Button variant="danger" onClick={handleDeleteButton} disabled={!isOwner & !queueing}>DELETE SONG</Button>
             {items.map((number, index) => {
                 return (
-                    <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
-                        <Drop item={number} index={index} type={'BOX'} setDroppedIndex={setDroppedIndex} handleDrop={handleDrop} items={items}></Drop>
-                        {showDelete == true && <Button variant="danger" onClick={() => handleDelete(items, setItems, index)}>X</Button>}
-    
+                    <div>
+                        {/*index >= offset ? */
+                            <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
+                                <Drop item={number} index={index} type={'BOX'} setDroppedIndex={setDroppedIndex} handleDrop={handleDrop} items={items}></Drop>
+                                {showDelete == true && <Button variant="danger" onClick={() => handleDelete(items, setItems, index)}>X</Button>}
+                            </div> /*:
+                            <div></div>*/
+                        }
                     </div>
                 )   
             })}
+            <Button variant="text"
+            onClick={() => {toggleVisuals(); toggleText()}}>
+                {text}
+            </Button>
             <div>
-                <Player groupSessionQueueId={groupSessionQueueId} groupSessionQueueDoc={groupSessionQueueDoc} sessionId={sessionId} docId={groupSessionId}/>
+                <TimeContextProvider>
+                    {visuals ?
+                        <Canvas/>
+                    :
+                        null
+                    }
+                    <Player groupSessionQueueId={groupSessionQueueId} groupSessionQueueDoc={groupSessionQueueDoc} sessionId={sessionId} docId={groupSessionId}/>
+                </TimeContextProvider>
             </div>
         </div>
         

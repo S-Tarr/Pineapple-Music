@@ -370,7 +370,7 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function addBookmark(trackId, time) {
+  async function addBookmark(trackId, time, title) {
     try {
       const docSnap = await getDocs(collection(db, "users"));
       docSnap.forEach((currDoc) => {
@@ -380,7 +380,7 @@ export function AuthProvider({ children }) {
 
           setDoc(userRef, {
             bookmarks: {
-              [trackId] : { time }
+              [trackId] : { time, title },
             }
           }, {merge:true});
           // console.log(currDoc.data().groupSessions);

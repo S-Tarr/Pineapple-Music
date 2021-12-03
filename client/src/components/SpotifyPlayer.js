@@ -9,6 +9,7 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import "./Components.css"
 import { stat } from "fs";
+import { off } from "process";
 
 var SpotifyWebApi = require('spotify-web-api-node');
 
@@ -65,8 +66,11 @@ export default function Player(props) {
   const [accessToken, setAccessToken] = useState("");
   const [update, setUpdate] = useState(true);
   const [shouldUpdate, setShouldUpdate] = useState(false)
+  const [shouldSkip, setShouldSkip] = useState(false)
   const [currentSongId, setCurrentSongId] = useState("");
   const [bookmarkTime, setBookmarkTime] = useState(-1);
+  const [offset, setOffset] = useState(0);
+  const [skipped, setSkipped] = useState(false);
   
   const { addBookmark } = useAuth();
   const dictRef = useRef();
@@ -74,17 +78,6 @@ export default function Player(props) {
   var bookmarkDict = {}
 
   spotifyApi.setAccessToken(props.accessToken);
-
-  useEffect(() => {
-    var promise = getAccessToken();
-    promise.then((ret) => {
-      setAccessToken(ret.SpotifyToken);
-      console.log(ret.SpotifyToken)
-      console.log(accessToken)
-      spotifyApi.setAccessToken(ret.SpotifyToken);
-    });
-    console.log(accessToken);
-  }, [isLoaded])
 
   //console.log("Token: " + accessToken)
 
@@ -110,31 +103,35 @@ export default function Player(props) {
   } 
 
   async function refreshBookmarks() {
+    // console.log("offset:", offset)
     console.log("refreshing...")
     const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid));
     const qSnap = await getDocs(q);
     qSnap.forEach((doc) => {
       // console.log("trackid: " + currentSongId + " " + "data: " + value)
+<<<<<<< HEAD
       if (currentSongId) {
         // console.log(doc.data())
+=======
+      if (currentSongId && doc.data().bookmarks) {
+>>>>>>> 8d411e935e545cbbe15a3e70babd4e0c30be5b92
         for (const [key, value] of Object.entries(doc.data().bookmarks)) {
           bookmarkDict[key] = (value["time"]);
         }
         dictRef.current = bookmarkDict;
-        for (const [key, value] of Object.entries(bookmarkDict)) {
-          console.log("key/value: " + key + " " + value)
-        }
         // console.log("trackid: " + currentSongId + " " + "data: " + value)
         // console.log("trackid: " + currentSongId + " " + "uid: " + doc.data().uid + " " + "data: " + key + "; " + value)
       }
     });
-    console.log("current, bookmark: " + elapsed, bookmarkDict[currentSongId])
-    console.log("refreshtest:", bookmarkDict[currentSongId])
-
-    temp();
     // setBookmarkTime(thing.data.bookmarks[id])
   }
 
+  function temp() {
+    setOffset(offset + 1);
+    setSkipped(true)
+    console.log(skipped)
+    console.log("offset:", offset)
+  }
   // async function findBookmarkTime(id) {
   //   const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid));
   //   const qSnap = await getDocs(q);
@@ -151,14 +148,6 @@ export default function Player(props) {
   //   });
   // }
 
-  function temp() {
-    console.log("temp:", currentSongId, bookmarkDict[currentSongId])
-    for (const [key, value] of Object.entries(bookmarkDict)) {
-      console.log("temploop: " + key + " " + value)
-    }
-    console.log("temp dict", JSON.stringify(dictRef.current))
-  }
-
   useEffect(() => {
     // console.log("songid: " + currentSongId)
     if (dictRef.current) {
@@ -166,21 +155,31 @@ export default function Player(props) {
         console.log("skip?: " + elapsed, dictRef.current[currentSongId])
         if (elapsed > dictRef.current[currentSongId]) {
           console.log("SKIP")
+          setSkipped(true)
+          temp()
+          console.log("setting useeffect " + skipped)
+          // setShouldSkip(true)
         }
       }
     }
-  }, [elapsed, bookmarkDict])
+  }, [elapsed])
+
+  useEffect(() => {
+    if (shouldSkip) {
+      console.log("changing offset")
+      // setOffset(offset + 1)
+    }
+    let timer1 = setTimeout(() => setShouldSkip(false), 9000);
+    return () => {
+      clearTimeout(timer1);
+    };
+  }, [shouldSkip])
   
 
   useEffect(()=> {
     const interval = setInterval(async () => {
       updateTime();
-
-      // if (currentSongId) {
-      //   findBookmarkTime(currentSongId)
-      // }
-      
-    }, 500);
+    }, 13);
     return () => clearInterval(interval);
   }, [isLoaded]);
 
@@ -192,7 +191,18 @@ export default function Player(props) {
         uris={props.songQueue}
         play={play2}
         autoPlay={true}
-        callback={state => {
+        callback={(state) => {
+          console.log("CALLED BACK HOLY SHIT!!!!!!")
+          // state.offset = offset
+          
+          console.log(state.offset)
+
+          if (skipped) {
+            console.log("OMGGGGGGGGGG")
+            state.needsUpdate = true
+            setSkipped(false)
+          }
+
           if (state.isPlaying) {
             play2 = true;
           }
@@ -201,6 +211,8 @@ export default function Player(props) {
           }
           console.log("Track id: " + state.track.id);
           setCurrentSongId(state.track.id);
+          // setOffset(state.previousTracks.length);
+          console.log("offset :", offset)
 
           refreshBookmarks();
 
@@ -214,18 +226,19 @@ export default function Player(props) {
               song: state.track.id});
             }, 
             function(err) {
-              console.log(err);
+              console.log("API ERROR: " + err);
             });
           }
           if (shouldUpdate) {
             console.log("reachedupdate")
-            addBookmark(state.track.id, state.progressMs)
+            addBookmark(state.track.id, state.progressMs, state.track.name)
             setUpdate(!update);
             setShouldUpdate(false);
             state.isPlaying = !update;
           }
         }}
         play = {update}
+        offset = {offset}
       />
 
       <button button className="bookmark-button" onClick = {() => handleBookmark()}>
@@ -233,6 +246,9 @@ export default function Player(props) {
       </button>
       <button button className="bookmark-button" onClick = {() => refreshBookmarks()}>
           <RefreshIcon style={{ fontSize: 50 }} />
+      </button>
+      <button button className="bookmark-button" onClick = {() => temp()}>
+          AHHHH
       </button>
     </div>
     

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import SpotifyPlayer from "react-spotify-web-playback";
 import app from "../../firebase";
 import { getAuth } from "firebase/auth";
@@ -21,27 +21,20 @@ import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import FastRewindRoundedIcon from "@mui/icons-material/FastRewindRounded";
 import FastForwardRoundedIcon from "@mui/icons-material/FastForwardRounded";
 import PauseRoundedIcon from "@mui/icons-material/PauseRounded";
+import { TimeContext } from "../../contexts/TimeContext";
+
+var SpotifyWebApi = require('spotify-web-api-node');
+
+var spotifyApi = new SpotifyWebApi({
+  clientId : '0fbe30c6e814404e8324aa3838a7f322',
+  clientSecret: 'e414b612d1ff45dd9ba6643e3161bdff',
+  redirectUri: 'localhost:3000/Pineapple-Music'
+});
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
-/*function GetQueue(groupSessionQueueID) {
-  const [songQueue, setSongQueue] = useState();
-  const currentUser = auth.currentUser;
-  useEffect(() => {
-    const queueRef = collection(db, 'groupSessionQueue', groupSessionQueueID);
-    const queueQuery = query(queueRef, orderBy('addedAt'), limit(25));
-    const unsubscribe = onSnapshot(queueQuery, querySnapshot => {
-        let queue = [];
-        querySnapshot.forEach(doc => {
-            var data = doc.data();
-            queue.push(data.songUri);
-        })
-        setSongQueue(queue.reverse());
-    })
-    return () => unsubscribe;
-  }, [])
-  return songQueue;
-}*/
+
+{/*ALAN: ADD PLAYLIST TRACKS TO songs below AND REMOVE RELATIVE TO OFFSET SONGS */}
 function GetQueue(sessionId, groupSessionQueueId, groupSessionQueueDoc) {
   const [songs, setSongs] = useState([]);
 
@@ -126,6 +119,7 @@ export default function Player({
 }) {
   const [play, setPlay] = useState(false);
   const [offset, setOffset] = useState(0);
+  const {setTime, updateTime, elapsed} = useContext(TimeContext);
 
   // THOMAS 
   const { checkCreator } = useAuth();
@@ -160,6 +154,7 @@ export default function Player({
         } else {
           setPlay(false);
         }
+        //ADD IN CREATEOFFSET HERE AS WELL
         setOffset(doc.data().queueOffset);
       });
     });
@@ -182,6 +177,7 @@ export default function Player({
     setIsLoaded(false);
   }
   // console.log(isLoaded);
+  spotifyApi.setAccessToken(accessToken);
 
   const songQueue = GetQueue(
     sessionId,
@@ -223,21 +219,41 @@ export default function Player({
     });
   }
 
+  useEffect(()=> {
+    const interval = setInterval(async () => {
+      updateTime();
+    }, 13);
+    return () => clearInterval(interval);
+  }, [isLoaded]);
+
   if (!accessToken) return null;
   return (
     <>
       <SpotifyPlayer
         token={accessToken}
+        play={play}
+        //autoPlay={true}
+        uris={songQueue}
         callback={(state) => {
           if (play) {
             state.play = true; //setPlay(false)
           }
           state.offset = offset;
           // console.log(offset);
+          if (state.track.id != undefined && state.track.id != null &&
+            state.track.id != "") {
+          //console.log("Track id: " + state.track.id);
+            spotifyApi.getAudioAnalysisForTrack(state.track.id)
+            .then(function(data) {
+              setTime({timeStamp: new Date(), elapsed: state.progressMs,
+              isPlaying: state.isPlaying, beats: data.body.beats, segments: data.body.segments,
+              song: state.track.id});
+            }, 
+            function(err) {
+              console.log("API ERROR: " + err);
+            });
+          }
         }}
-        play={play}
-        //autoPlay={true}
-        uris={songQueue}
         offset={offset}
         styles={{
           color: "#FFFFFF",
