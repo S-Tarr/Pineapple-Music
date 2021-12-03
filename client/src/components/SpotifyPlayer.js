@@ -3,7 +3,7 @@ import SpotifyPlayer from "react-spotify-web-playback"
 import app from "../firebase";
 import { getAuth } from "firebase/auth";
 import { useAuth } from "../contexts/AuthContext";
-import { getFirestore, collection, query, orderBy, limit, getDocs, doc, onSnapshot} from "firebase/firestore";
+import { getFirestore, collection, query, orderBy, limit, getDocs, where, onSnapshot} from "firebase/firestore";
 import { TimeContext } from '../contexts/TimeContext';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import "./Components.css"
@@ -63,9 +63,11 @@ export default function Player() {
   const [accessToken, setAccessToken] = useState("");
   const [update, setUpdate] = useState(true);
   const [shouldUpdate, setShouldUpdate] = useState(false)
+  const [currentSongId, setCurrentSongId] = useState("");
+  const [bookmarkTime, setBookmarkTime] = useState(-1);
   
   const { addBookmark } = useAuth();
-  const {setTime, updateTime} = useContext(TimeContext);
+  const {setTime, updateTime, elapsed} = useContext(TimeContext);
 
   useEffect(() => {
     var promise = getAccessToken();
@@ -96,17 +98,27 @@ export default function Player() {
   }, [update]);
 
   function handleBookmark() {
-    console.log("button pressed, init update: " + update);
+    console.log("id: " + currentSongId);
     setUpdate(!update);
     setShouldUpdate(true);
     // forceUpdate;
-  }
+  } 
+
+  async function findBookmarkTime(id) {
+    const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid));
+    const qSnap = await getDocs(q);
+    qSnap.forEach((doc) => {
+      const[key, value] = Object.entries(doc.data().bookmarks[currentSongId])
+      console.log("uid: " + doc.data().uid + " " + "data: " + key + "; " + value)
+    });
+    // setBookmarkTime(thing.data.bookmarks[id])
+}
 
   useEffect(()=> {
     const interval = setInterval(async () => {
       updateTime();
       
-    }, 1);
+    }, 500);
     return () => clearInterval(interval);
   }, []);
 
@@ -125,8 +137,13 @@ export default function Player() {
             play2 = false;
           }
           console.log("Track id" + state.track.id);
+          setCurrentSongId(state.track.id);
+
+          findBookmarkTime(state.track.id);
+
           if (state.track.id != undefined && state.track.id != null &&
               state.track.id != "") {
+            
             //console.log("Track id: " + state.track.id);
             spotifyApi.getAudioAnalysisForTrack(state.track.id)
             .then(function(data) {
