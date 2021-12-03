@@ -230,13 +230,13 @@ export default function Player(props) {
               console.log("API ERROR: " + err);
             });
           }
-          // if (shouldUpdate) {
-          //   console.log("reachedupdate")
-          //   addBookmark(state.track.id, state.progressMs)
-          //   setUpdate(!update);
-          //   setShouldUpdate(false);
-          //   state.isPlaying = !update;
-          // }
+          if (shouldUpdate) {
+            console.log("reachedupdate")
+            addBookmark(state.track.id, state.progressMs, state.track.name)
+            setUpdate(!update);
+            setShouldUpdate(false);
+            state.isPlaying = !update;
+          }
         }}
         play = {update}
         offset = {offset}
