@@ -40,10 +40,10 @@ function GroupSessionPlaylistSearch({ placeholder, spotifyData, authorized, grou
   groupSessionQueueDoc = groupSessionQueueDoc;
   groupSessionQueueId = groupSessionQueueId;
 
-  console.log(spotifyData);
   const [filteredData, setFilteredData] = useState([]);
   const [wordEntered, setWordEntered] = useState("");
-  const [searchResults, setSearchResults] = useState([])
+  const [searchResults, setSearchResults] = useState([]);
+  const [playlistTracks, setPlaylistTracks] = useState([]);
   const access_token = spotifyData;
   useEffect(() => {
     if (!access_token) return
@@ -67,7 +67,7 @@ function GroupSessionPlaylistSearch({ placeholder, spotifyData, authorized, grou
                 artist: playlist.owner.display_name,
                 title: playlist.name,
                 uri: playlist.uri,
-                tracks: playlist.tracks.href,
+                tracks: "temp",
                 id: playlist.id,
                 albumUrl: smallestPlaylistImage.url,
               }
@@ -98,21 +98,33 @@ function GroupSessionPlaylistSearch({ placeholder, spotifyData, authorized, grou
   async function handleRedirect(playlist) {
     //figure out how to handle below stuff
     //have to use a state set function to get the values correctly
-    var items;
-    const playlistTracks = spotifyApi.getPlaylistTracks(playlist.id).then(res => {
-      return res;
-    }).then(data => {
-      items = data;
-    })
-    
-
-    console.log(playlistTracks);
 
     handleSubmitTrack(playlist);
 
     const docRef = await setDoc(doc(db, "groupSessionQueue", groupSessionQueueId), {
         createdAt: groupSessionQueueDoc.createdAt, sessionId: groupSessionQueueDoc.sessionId, queueId: groupSessionQueueDoc.queueId, songs: [...groupSessionQueueDoc.songs, playlist]
     });
+
+    spotifyApi.getPlaylistTracks(playlist.id).then(res => {
+      let items = res.body.items;
+  
+      const groupSessionRef = collection(db, "groupSessionQueue");
+      const groupSession = query(
+          groupSessionRef,
+          where("sessionId", "==", groupSessionQueueDoc.sessionId)
+      );
+      let item;
+      getDocs(groupSession).then((querySnapshot) => {
+        querySnapshot.forEach((newdoc) => {
+          let length = newdoc.data().songs.length;
+          let item = newdoc.data().songs[length-1];
+          item.tracks = items;
+          setDoc(doc(db, "groupSessionQueue", groupSessionQueueId), {
+              createdAt: groupSessionQueueDoc.createdAt, sessionId: groupSessionQueueDoc.sessionId, queueId: groupSessionQueueDoc.queueId, songs: [...groupSessionQueueDoc.songs, item]
+          });
+        });
+      })
+    })
     //window.location.reload(false);
   }
 

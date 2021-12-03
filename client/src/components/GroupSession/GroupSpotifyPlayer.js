@@ -160,6 +160,7 @@ export default function Player({
         } else {
           setPlay(false);
         }
+        //ADD IN CREATEOFFSET HERE AS WELL
         setOffset(doc.data().queueOffset);
       });
     });

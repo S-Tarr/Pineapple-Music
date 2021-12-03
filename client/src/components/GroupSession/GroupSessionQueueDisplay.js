@@ -28,6 +28,10 @@ let groupSessionQueueId;
 let groupSessionId;
 let groupSessionQueueDoc;
 
+const inputRef = createRef();
+const inputRef2 = createRef();
+const inputRef3 = createRef();
+
 const CLIENT_ID = "477666821b8941c4bd163b4ff55ed9af";
 const SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize";
 
@@ -50,8 +54,16 @@ const handleSpotifyLogin = () => {
     window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPES_URL_PARAM}&response_type=token&show_dialog=true`;
   };
 
+
 function ExampleDrag(props) {
     //implement function for onDROP
+    const [showPlaylistContents, setShowPlaylistContents] = useState(false);
+    const [playlistContents, setPlaylistContents] = useState(props.item.tracks);
+    console.log(playlistContents);
+
+    const handleFilter = (event) => {
+        setShowPlaylistContents(!showPlaylistContents);
+    };
 
     const [{ isDragging }, drag, dragPreview] = useDrag({
         
@@ -66,7 +78,6 @@ function ExampleDrag(props) {
             isDragging: monitor.isDragging()
         })
     })
-
     return (
         <div ref={drag}>
             {/* <Track track={props.item}></Track> */}
@@ -74,17 +85,57 @@ function ExampleDrag(props) {
                 className="d-flex m-2 align-items-center"
                 style={{ cursor: "pointer", display:"flex", flexDirection:'row' }}
                 >
-                <img src={props.item.albumUrl} style={{ height: "64px", width: "64px" }} />
-                <div className="ml-3">
-                    <div>{props.item.title}</div>
-                    <div className="text-muted">{props.item.artist}</div>
-                </div>
+                
+                {/*FIX BELOW SO THAT IT DOESN't ONLY DO IT FOR INDEX 1*/}
+                {props.item.tracks && props.index === 0 ? 
+                (<div style={{backgroundColor:"black", marginBottom: 20}}>
+                    <div style={{marginBottom:10}}>Playing From Playlist</div>
+                    <div style={{display:'flex', flexDirection: 'row'}}>
+                        <img src={props.item.albumUrl} style={{ height: "64px", width: "64px" }} />
+                        <div>
+                            {props.item.title}
+                            <div className="text-muted">{props.item.artist}</div>
+                        </div>
+                    </div>
+                    <Button variant="danger" ref={inputRef3} onClick={handleFilter}>Display Contents</Button>
+                    <Overlay target={inputRef3.current} show={showPlaylistContents} placement="bottom">
+                        {({ placement, arrowProps, show: _show, popper, ...props }) => (
+                            <div {...props}>
+
+                                <div style={{backgroundColor: "whitesmoke"}}>
+                                    {/*incorportate the below */}
+                                    {playlistContents.map((track, index) => {
+                                        console.log(track.track);
+                                        return (
+                                            <div style={{display:'flex', flexDirection: 'row'}}>
+                                                <img src={track.track.album.images[0].url} style={{ height: "64px", width: "64px" }} />
+                                                <div className="ml-3">
+                                                    <div>{track.track.name}</div>
+                                                    <div className="text-muted">{track.track.artists[0].name}</div>
+                                                </div>
+                                            </div>
+                                        )   
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                    </Overlay>
+                </div>) : 
+                (<div>
+                    <img src={props.item.albumUrl} style={{ height: "64px", width: "64px" }} />
+                    <div className="ml-3">
+                        <div>{props.item.title}</div>
+                        <div className="text-muted">{props.item.artist}</div>
+                    </div>
+                </div>)}
+
             </div>
         </div>
     )
 }
 
 function Drop(props) {
+
     const [{ canDrop, isOver }, drop] = useDrop(() => ({
         // The type (or types) to accept - strings or symbols
         accept: 'BOX',
@@ -129,6 +180,7 @@ function GetSongs(props) {
                 getDocs(groupSessionQueue).then((querySnapshot) => {
                     let SongsInSession = [];
                     querySnapshot.forEach((doc) => {
+                        console.log(doc.data());
                         groupSessionQueueId = doc.id;
                         groupSessionQueueDoc = doc.data();
                         SongsInSession = doc.data().songs;
@@ -139,12 +191,8 @@ function GetSongs(props) {
           });
 
     }, []);
-    console.log(songs);
     return songs;
 }
-
-const inputRef = createRef();
-const inputRef2 = createRef();
 
 // THOMAS
 function GetPermissions(sessionId, setQueueing, setPps, setShowSearch, setShowPlaylistSearch) {
