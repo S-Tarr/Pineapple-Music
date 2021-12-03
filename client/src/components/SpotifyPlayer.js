@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useContext } from "react"
 import SpotifyPlayer from "react-spotify-web-playback"
-import app from "../firebase";
-import { getAuth } from "firebase/auth";
-import { getFirestore, collection, query, orderBy, limit, getDocs, doc, onSnapshot} from "firebase/firestore";
 import { TimeContext } from '../contexts/TimeContext';
-import { Done } from "@material-ui/icons";
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var spotifyApi = new SpotifyWebApi({
@@ -13,79 +9,24 @@ var spotifyApi = new SpotifyWebApi({
   redirectUri: 'localhost:3000/Pineapple-Music'
 });
 
-const auth = getAuth(); // Authorization component
-const db = getFirestore(app); // Firestore database
-function GetQueue() {
-  const [songQueue, setSongQueue] = useState();
-  const currentUser = auth.currentUser;
-  useEffect(() => {
-    const queueRef = collection(db, 'userQueue', currentUser.uid, 'queue');
-    const queueQuery = query(queueRef, orderBy('addedAt'), limit(25));
-    const unsubscribe = onSnapshot(queueQuery, querySnapshot => {
-        let queue = [];
-        querySnapshot.forEach(doc => {
-            var data = doc.data();
-            queue.push(data.songUri);
-        })
-        setSongQueue(queue.reverse());
-    })
-    return () => unsubscribe;
-  }, [])
-  return songQueue;
-}
-
-async function getAccessToken() {
-  const docSnap = await getDocs(collection(db, "users"));
-  console.log(auth.currentUser.uid)
-  let temp = null;
-  docSnap.forEach((thing) => {
-    console.log(thing.data().uid)
-    if (thing.data().uid == auth.currentUser.uid) {
-      temp = thing.data();
-      
-    }
-  });
-  console.log(temp)
-  return temp;
-}
-
-export default function Player() {
-  const [isLoaded, setIsLoaded] = useState(true);
-  const [accessToken, setAccessToken] = useState("");
+export default function Player(props) {
   const {setTime, updateTime} = useContext(TimeContext);
-  useEffect(() => {
-    var promise = getAccessToken();
-    promise.then((ret) => {
-      setAccessToken(ret.SpotifyToken);
-      console.log(ret.SpotifyToken)
-      console.log(accessToken)
-      spotifyApi.setAccessToken(ret.SpotifyToken);
-    });
-    console.log(accessToken);
-  }, [isLoaded])
-
-  console.log("Token: " + accessToken)
-
-  if (accessToken == undefined) {
-    setIsLoaded(false)
-  }
-
+  spotifyApi.setAccessToken(props.accessToken);
   var play2 = true;
-  let queue = GetQueue();
-  //console.log("QUEUE: " + queue);
+  var isLoaded = true;
 
   useEffect(()=> {
     const interval = setInterval(async () => {
       updateTime();
     }, 1);
     return () => clearInterval(interval);
-  }, []);
+  }, [isLoaded]);
 
-  if (!accessToken) return null;
+  if (!props.accessToken) return null;
   return (
     <SpotifyPlayer
-      token={accessToken}
-      uris={queue}
+      token={props.accessToken}
+      uris={props.songQueue}
       play={play2}
       autoPlay={true}
       callback={state => {
