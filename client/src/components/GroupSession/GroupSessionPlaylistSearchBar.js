@@ -125,7 +125,7 @@ function GroupSessionPlaylistSearch({ placeholder, spotifyData, authorized, grou
         });
       })
     })
-    window.location.reload(false);
+    //window.location.reload(false);
   }
 
   return (
