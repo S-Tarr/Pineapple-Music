@@ -104,7 +104,6 @@ function GetUser(currGroupSession, history) {
 
 function GroupSessionJoined(props) {
     const history = useHistory();
-    console.log("currentUser GSJ: ", auth.currentUser.uid); //THOMAS
 
     const [title, setTitle] = useState("");
     const [sessionId, setSessionId] = useState();

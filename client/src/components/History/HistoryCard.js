@@ -69,7 +69,13 @@ function GroupSessionCard({
             horizontal: "left",
           }}
         >
-          <Typography sx={{ p: 2 }}>{username}<br></br>{createdAt}</Typography>
+          <Typography sx={{ p: 2 }}>
+            Owner Id: {username}
+            <br></br>
+            Creation Date: {createdAt}
+            <br></br>
+            Session Id: {sessionId}
+          </Typography>
       </Popover>
     </ListItem>
   );
