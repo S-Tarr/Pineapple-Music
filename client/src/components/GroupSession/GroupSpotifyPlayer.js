@@ -215,7 +215,6 @@ export default function Player({
         token={accessToken}
         callback={(state) => {
           if (play) {
-            // console.log("shit");
             state.play = true; //setPlay(false)
           }
           state.offset = offset;
