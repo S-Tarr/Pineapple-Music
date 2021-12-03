@@ -391,9 +391,49 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function editBookmark(trackId, newTime) {
+    try {
+      const docSnap = await getDocs(collection(db, "users"));
+      docSnap.forEach((currDoc) => {
+        if (currDoc.data().uid === currentUser.uid) {
+          console.log("trying to edit bookmark under users", doc);
+          const userRef = doc(db, "users", currDoc.id);
+
+          var usersUpdate = {};
+          usersUpdate[`bookmarks.${trackId}.time`] = newTime;
+          await updateDoc(userRef, {usersUpdate})
+            
+        }
+      });
+    } catch (e) {
+      console.error("Error adding bookmark");
+    }
+  }
+
+  async function delBookmark(trackId) {
+    try {
+      const docSnap = await getDocs(collection(db, "users"));
+      docSnap.forEach((currDoc) => {
+        if (currDoc.data().uid === currentUser.uid) {
+          console.log("trying to delete bookmark under users", doc);
+          const userRef = doc(db, "users", currDoc.id);
+
+          await updateDoc(userRef, {
+            bookmarks: {
+              [trackId] : FieldValue.delete(),
+            }
+          },);
+        }
+      });
+    } catch (e) {
+      console.error("Error adding bookmark");
+    }
+  }
+
   function deleteAccount() {
     return deleteUser(auth.currentUser);
   }
+
 
   /**
    * Calls the firebase function to login with a username and password.
