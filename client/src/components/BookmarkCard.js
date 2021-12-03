@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Button,
   Card,
@@ -9,6 +9,7 @@ import {
   Popover
 } from "@mui/material";
 import { useHistory } from "react-router";
+import Overlay from 'react-bootstrap/Overlay';
 
 import { useAuth } from "../contexts/AuthContext";
 import app from "../firebase";
@@ -28,6 +29,9 @@ function GroupSessionCard({
 }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const { editBookmark, delBookmark } = useAuth();
+  const [show, setShow] = React.useState(false);
+  const [buttonMessage, setMessage] = React.useState("Edit");
+  let target = useRef();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -37,9 +41,33 @@ function GroupSessionCard({
     setAnchorEl(null);
   };
 
+  const handleShow = (event) => {
+    console.log("Show: " + show);
+    setShow(!show);
+    if (show) {
+      setMessage("Edit");
+    }
+    else {
+      setMessage("Close");
+    }
+  }
+
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
   console.log("bookmark", songName, time)
+
+  const[changeVal, setChangeVal] = useState("");
+  function handleChange(event) {
+    setChangeVal(event.target.value)
+  }
+
+  function handleEdit(event) {
+    console.log(changeVal)
+    if (changeVal && !isNaN(+changeVal) && changeVal > 0) {
+      editBookmark(trackId, changeVal)
+    }
+  }
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardContent>
@@ -51,9 +79,35 @@ function GroupSessionCard({
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" onClick={() => editBookmark(trackId, time)}>
-          Edit
+        <Button size="small" ref={target} onClick={handleShow.bind(this)}>
+          {buttonMessage}
         </Button>
+        <Overlay target={target.current} show={show} placement="bottom">
+                {({ placement, arrowProps, show: _show, popper, ...props }) => (
+                <div
+                    {...props}
+                    style={{
+                        display: "flex",
+                        flexDirection:"column",
+                        margin:"50px",
+                        backgroundColor: "#202020",
+                        padding: '2px 10px',
+                        color: 'white',
+                        width:"300px",
+                        height:"200px",
+                        borderRadius: 50,
+                        textAlign:"center",
+                        ...props.style,
+                    }}
+                >
+                    <text>Edit Bookmark</text>
+                    <div style={{backgroundColor:"#202020"}}>
+                      <input type="text" onChange={handleChange} placeholder="Input new time in ms"></input>
+                      <input type="submit" value="Submit" onClick={handleEdit} />
+                    </div>
+                </div>
+                )}
+            </Overlay>
         <Button size="small" onClick={() => delBookmark(trackId)}>
           Delete
         </Button>

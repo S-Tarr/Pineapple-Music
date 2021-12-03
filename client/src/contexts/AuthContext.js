@@ -399,14 +399,18 @@ export function AuthProvider({ children }) {
           console.log("trying to edit bookmark under users", doc);
           const userRef = doc(db, "users", currDoc.id);
 
-          var usersUpdate = {};
-          usersUpdate[`bookmarks.${trackId}.time`] = newTime;
-          updateDoc(userRef, {usersUpdate})
+          // var usersUpdate = {};
+          // usersUpdate[`bookmarks.${trackId}.time`] = newTime;
+          // updateDoc(userRef, {usersUpdate})
+
+          updateDoc(userRef, {
+            ["bookmarks." + trackId + ".time"]: newTime
+          },);
             
         }
       });
     } catch (e) {
-      console.error("Error adding bookmark");
+      console.error("Error editing bookmark");
     }
   }
 
