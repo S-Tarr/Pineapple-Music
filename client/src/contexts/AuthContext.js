@@ -32,7 +32,7 @@ import {
   query,
   orderBy,
   onSnapshot,
-  deleteField
+  deleteField,
 } from "firebase/firestore";
 import groupSessionCover from "../assets/groupSessionCover.jpeg";
 

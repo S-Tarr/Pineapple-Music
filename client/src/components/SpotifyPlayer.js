@@ -61,7 +61,7 @@ function useForceUpdate(){
 }
 
 export default function Player(props) {
-  const {setTime, updateTime, elapsed, updateBook} = useContext(TimeContext);
+  const {setTime, updateTime, elapsed, updateBook, bookTime} = useContext(TimeContext);
   const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("");
   const [update, setUpdate] = useState(true);
@@ -147,8 +147,8 @@ export default function Player(props) {
     // console.log("songid: " + currentSongId)
     if (dictRef.current) {
       if (dictRef.current.hasOwnProperty(currentSongId)) {
-        console.log("skip?: " + elapsed, dictRef.current[currentSongId])
-        if (elapsed > dictRef.current[currentSongId]) {
+        console.log("skip?: " + bookTime, dictRef.current[currentSongId])
+        if (bookTime > dictRef.current[currentSongId]) {
           console.log("SKIP")
           setSkipped(true)
           temp()
@@ -157,7 +157,7 @@ export default function Player(props) {
         }
       }
     }
-  }, [elapsed])
+  }, [bookTime])
 
   useEffect(() => {
     if (shouldSkip) {
