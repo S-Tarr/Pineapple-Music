@@ -79,17 +79,6 @@ export default function Player(props) {
 
   spotifyApi.setAccessToken(props.accessToken);
 
-  useEffect(() => {
-    var promise = getAccessToken();
-    promise.then((ret) => {
-      setAccessToken(ret.SpotifyToken);
-      console.log(ret.SpotifyToken)
-      console.log(accessToken)
-      spotifyApi.setAccessToken(ret.SpotifyToken);
-    });
-    console.log(accessToken);
-  }, [isLoaded])
-
   //console.log("Token: " + accessToken)
 
   if (accessToken == undefined) {
@@ -185,11 +174,6 @@ export default function Player(props) {
   useEffect(()=> {
     const interval = setInterval(async () => {
       updateTime();
-
-      // if (currentSongId) {
-      //   findBookmarkTime(currentSongId)
-      // }
-      
     }, 13);
     return () => clearInterval(interval);
   }, [isLoaded]);
@@ -237,7 +221,7 @@ export default function Player(props) {
               song: state.track.id});
             }, 
             function(err) {
-              console.log(err);
+              console.log("API ERROR: " + err);
             });
           }
           // if (shouldUpdate) {

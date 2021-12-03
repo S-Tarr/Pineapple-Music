@@ -21,6 +21,8 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
+import TimeContextProvider from '../../contexts/TimeContext';
+import Canvas from '../Canvas';
 
 const db = getFirestore(app);
 
@@ -343,6 +345,26 @@ function GroupSessionQueueDisplay(props) {
         }
     };
 
+    const [visuals, setVisuals] = useState(false);
+    const [text, setText] = useState("Visuals");
+
+    const toggleVisuals = () => {
+        if (visuals) {
+            setVisuals(false);
+        }
+        else {
+            setVisuals(true);
+        }
+    }
+    const toggleText = () => {
+        if (visuals) {
+            setText("Visuals");
+        }
+        else {
+            setText("Song");
+        }
+    }
+
     return (
         <div>
             <Button variant="danger" ref={inputRef} onClick={handleFilter} disabled={!isOwner & !queueing}>ADD SONG</Button>
@@ -405,8 +427,19 @@ function GroupSessionQueueDisplay(props) {
                     </div>
                 )   
             })}
+            <Button variant="text"
+            onClick={() => {toggleVisuals(); toggleText()}}>
+                {text}
+            </Button>
             <div>
-                <Player groupSessionQueueId={groupSessionQueueId} groupSessionQueueDoc={groupSessionQueueDoc} sessionId={sessionId} docId={groupSessionId}/>
+                <TimeContextProvider>
+                    {visuals ?
+                        <Canvas/>
+                    :
+                        null
+                    }
+                    <Player groupSessionQueueId={groupSessionQueueId} groupSessionQueueDoc={groupSessionQueueDoc} sessionId={sessionId} docId={groupSessionId}/>
+                </TimeContextProvider>
             </div>
         </div>
         
