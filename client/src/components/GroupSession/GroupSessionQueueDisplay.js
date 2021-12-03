@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import { useDrag, useDrop } from 'react-dnd';
 import app from "../../firebase";
 import GroupSessionSearchBar from './GroupSessionSearchBar';
+import GroupSessionPlaylistSearchBar from './GroupSessionPlaylistSearchBar';
 import Track from '../Track';
 import Player from './GroupSpotifyPlayer'
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
@@ -143,9 +144,10 @@ function GetSongs(props) {
 }
 
 const inputRef = createRef();
+const inputRef2 = createRef();
 
 // THOMAS
-function GetPermissions(sessionId, setQueueing, setPps, setShowSearch) {
+function GetPermissions(sessionId, setQueueing, setPps, setShowSearch, setShowPlaylistSearch) {
     useEffect(() => {
       const groupSessionRef = collection(db, "groupSessions");
       const groupSession = query(
@@ -157,6 +159,7 @@ function GetPermissions(sessionId, setQueueing, setPps, setShowSearch) {
           setQueueing(doc.data().queueing);
           if (doc.data().queueing == false) {
             setShowSearch(false);
+            setShowPlaylistSearch(false);
           }
           setPps(doc.data().pps);
         });
@@ -171,6 +174,7 @@ function GroupSessionQueueDisplay(props) {
     
     const [droppedIndex, setDroppedIndex] = useState();
     const [showSearch, setShowSearch] = useState(false);
+    const [showPlaylistSearch, setShowPlaylistSearch] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
 
     const [authorized, setAuthorized] = useState(true);
@@ -195,7 +199,7 @@ function GroupSessionQueueDisplay(props) {
         });
     };
     useOwnerPromise();
-    GetPermissions(sessionId, setQueueing, setPps, setShowSearch);
+    GetPermissions(sessionId, setQueueing, setPps, setShowSearch, setShowPlaylistSearch);
     //
 
     useEffect(() => {
@@ -217,6 +221,10 @@ function GroupSessionQueueDisplay(props) {
 
     const handleFilter = (event) => {
         setShowSearch(!showSearch);
+    };
+
+    const handleShowPlaylist = (event) => {
+        setShowPlaylistSearch(!showPlaylistSearch);
     };
 
     const handleDeleteButton = (event) => {
@@ -288,7 +296,30 @@ function GroupSessionQueueDisplay(props) {
                     </div>
                 )}
             </Overlay>
-            
+
+            <Button variant="danger" ref={inputRef2} onClick={handleShowPlaylist} disabled={!isOwner & !queueing}>ADD PLAYLIST</Button>
+            <Overlay target={inputRef2.current} show={showPlaylistSearch} placement="bottom">
+                {({ placement, arrowProps, show: _show, popper, ...props }) => (
+
+                    <div {...props}>
+                        <div style={{backgroundColor: "whitesmoke"}}>
+                            {/*REPLACE BELOW */}
+                            <GroupSessionPlaylistSearchBar placeholder="Enter a song name..." spotifyData={token} authorized={authorized} groupSessionQueueDoc={groupSessionQueueDoc} groupSessionQueueId={groupSessionQueueId}/>
+                            
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={handleSpotifyLogin}
+                            >
+                                Login to Spotify
+                            </Button>
+                        
+                        
+                        </div>
+                    </div>
+                )}
+            </Overlay>
+
             <Button variant="danger" onClick={handleDeleteButton} disabled={!isOwner & !queueing}>DELETE SONG</Button>
             {items.map((number, index) => {
                 return (
