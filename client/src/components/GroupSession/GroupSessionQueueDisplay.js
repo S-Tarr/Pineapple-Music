@@ -89,7 +89,7 @@ function ExampleDrag(props) {
                 >
                 
                 {/*FIX BELOW SO THAT IT DOESN't ONLY DO IT FOR INDEX 1*/}
-                {props.item.tracks && props.index === 0 ? 
+                {props.item.tracks && props.index === props.offset ? 
                 (<div style={{backgroundColor:"black", marginBottom: 20}}>
                     <div style={{marginBottom:10}}>Playing From Playlist</div>
                     <div style={{display:'flex', flexDirection: 'row'}}>
@@ -160,7 +160,7 @@ function Drop(props) {
 
     return (
         <div ref={drop}>
-            <ExampleDrag item={props.item} index={props.index} handleDrop={props.handleDrop} type={'BOX'} items={props.items}></ExampleDrag>
+            <ExampleDrag offset={props.offset} item={props.item} index={props.index} handleDrop={props.handleDrop} type={'BOX'} items={props.items}></ExampleDrag>
         </div>
     )
 }
@@ -413,14 +413,13 @@ function GroupSessionQueueDisplay(props) {
                 )}
             </Overlay>
 
-            <Button variant="danger" onClick={handleDeleteButton} disabled={!isOwner & !queueing}>DELETE SONG</Button>
+            <Button variant="danger" onClick={handleDeleteButton} disabled={!isOwner & !queueing}>DELETE CURRENT</Button>
             {items.map((number, index) => {
-                console.log(offset + " " + index)
                 return (
                     <div>
                         {index >= offset ? 
                             <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
-                                <Drop item={number} index={index} type={'BOX'} setDroppedIndex={setDroppedIndex} handleDrop={handleDrop} items={items}></Drop>
+                                <Drop offset={offset} item={number} index={index} type={'BOX'} setDroppedIndex={setDroppedIndex} handleDrop={handleDrop} items={items}></Drop>
                                 {showDelete == true && <Button variant="danger" onClick={() => handleDelete(items, setItems, index)}>X</Button>}
                             </div> :
                             <div></div>

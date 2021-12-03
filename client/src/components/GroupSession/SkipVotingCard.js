@@ -277,6 +277,11 @@ function SkipVotingCard({ sessionId }) {
             //Check if song suggestion already exists
             currentSong = currDoc.data().currentSong;
             const downVotePercentage = 100 - (((upvoteCount * 1.0) / totalUsersInSession) * 100);
+            const groupSessionQueueRef = collection(db, "groupSessionQueue");
+            const groupSessionQueueQuery = query(
+                groupSessionQueueRef,
+                where("sessionId", "==", sessionId)
+            );
             if (
                 currentSong == null ||
                 currentSong === undefined ||
@@ -311,11 +316,6 @@ function SkipVotingCard({ sessionId }) {
                 }
 
                 //TODO:Add the recommended song to the queue if upvote percentage is greater than 50%
-                const groupSessionQueueRef = collection(db, "groupSessionQueue");
-                const groupSessionQueueQuery = query(
-                    groupSessionQueueRef,
-                    where("sessionId", "==", sessionId)
-                );
 
                 if (((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50) {
                     console.log(
@@ -385,8 +385,40 @@ function SkipVotingCard({ sessionId }) {
                   }
                 );
             } else {
-                console.log("currentSuggestion is not undefined");
-                setCurrSong(currentSong);
+                getDocs(groupSessionQueueQuery).then(
+                  (groupSessionQueueQuerySnapshot) => {
+                    let offset = 0;
+                    let songs = [];
+                    groupSessionQueueQuerySnapshot.forEach((doc) => {
+                      songs = doc.data().songs;
+                    });
+                    
+                    const sessionRef = collection(db, "groupSessions");
+                    const sessionRefQuery = query(
+                        sessionRef,
+                        where("sessionId", "==", sessionId)
+                    );
+                    const newsessionRef = doc(db, "groupSessions", currDoc.id);
+                    getDocs(sessionRefQuery).then((sessionRefQuerySnapshot) => {
+                        sessionRefQuerySnapshot.forEach((doc) => {
+                            offset = doc.data().queueOffset;
+                            if (songs[offset] != undefined) {
+                                if (currentSong != songs[offset]) {
+                                  updateDoc(newsessionRef, {
+                                    currentSong: songs[offset],
+                                    currSongOffset: offset,
+                                  });
+                                  setCurrSong(songs[offset]);
+                                }
+                                else {
+                                  console.log("currentSuggestion is not undefined");
+                                  setCurrSong(currentSong);
+                                }
+                            }
+                        })
+                    })
+                  }
+                );
             }
         } catch (e) {
           console.log(e);
