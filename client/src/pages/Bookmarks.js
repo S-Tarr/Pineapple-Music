@@ -1,7 +1,40 @@
-import { React, useState } from 'react'
-import { Typography, InputBase } from '@mui/material'
+import { React, useState, useEffect, useRef } from 'react'
 import { styled, alpha } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
+import BookmarkCard from "../components/BookmarkCard"
+import {
+  Box,
+  Container,
+  Grid,
+  IconButton,
+  InputBase,
+  LinearProgress,
+  CircularProgress,
+  Modal,
+  Typography,
+  Avatar,
+  Divider,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  SwipeableDrawer,
+  Paper,
+} from "@mui/material";
+
+import { getAuth } from "firebase/auth";
+import {
+  getDocs,
+  getFirestore,
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
+
+import { useAuth } from "../contexts/AuthContext";
+import app from "../firebase";
 
 const Search = styled("div")(({ theme }) => ({
     position: "relative",
@@ -39,26 +72,63 @@ const Search = styled("div")(({ theme }) => ({
     },
   }));
 
+const db = getFirestore(app); // Firestore database
+const auth = getAuth();
+
+
+async function updateCards(setCards, cards) {
+  console.log("updating!")
+  const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid));
+  getDocs(q)
+    .then((docSnap) => {
+      docSnap.forEach((doc) => {
+        console.log("uid:", doc.data().uid)
+        if (
+          doc.data().bookmarks !== undefined &&
+          doc.data().bookmarks != null &&
+          doc.data().bookmarks !== "undefined"
+        ) {
+          for (const [key, value] of Object.entries(doc.data().bookmarks)) {
+            const props = {
+              songName: "song name",
+              time: Infinity
+            };
+            console.log("song/time", key, value["time"])
+            props["songName"] = key;
+            props["time"] = value["time"]
+            setCards(cards => [...cards, props]);
+          }
+          console.log(JSON.stringify(cards))
+        }
+        
+      });
+    })
+}
+
 function Bookmarks() {
     const [searchStr, setSearchStr] = useState("");
-    const [bookmarkTabs, addTab] = useState([]);
+    const [cards, setCards] = useState([]);
+    
+    
+    let key = 0;
 
     // useEffect(() => {
-       
-    // }, [])
-    
+    //   console.log("rerender!")
+    // }, [cards]);
+
+    updateCards(setCards, cards);
     return (
         <div className="Page" align="center">
-            <Typography
-                sx={{ fontWeight: "bold", pt: 3}}
-                variant="h3"
-                component="div"
-                gutterBottom
-            >
-                Bookmarks
-            </Typography>
+          <Typography
+              sx={{ fontWeight: "bold", pt: 3}}
+              variant="h3"
+              component="div"
+              gutterBottom
+          >
+              Bookmarks
+          </Typography>
 
-            <Search>
+            {/* <Search>
                 <SearchIconWrapper> <SearchIcon /> </SearchIconWrapper>
                 <StyledInputBase
                     value={searchStr}
@@ -66,15 +136,16 @@ function Bookmarks() {
                     placeholder="Search"
                     inputProps={{ "aria-label": "search" }}
                 />
-            </Search>
-
-            {/* <Grid container alignItems="center" spacing={9}>
+            </Search> */}
+          <Container maxWidth="md" sx={{ marginTop: 2, paddingBottom: 4 }}>
+            <Grid container alignItems="center" spacing={9}>
               {cards.map((card) => (
                 <Grid item key={key++} xs={12} sm={6} md={4}>
-                  <GroupSessionCard props={card} />
+                  <BookmarkCard props={card} />
                 </Grid>
               ))}
-            </Grid> */}
+            </Grid>
+          </Container>
         </div>
     )
 }
