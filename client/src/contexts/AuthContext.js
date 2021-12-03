@@ -412,6 +412,7 @@ export function AuthProvider({ children }) {
 
   async function delBookmark(trackId) {
     try {
+      
       const docSnap = await getDocs(collection(db, "users"));
       docSnap.forEach((currDoc) => {
         if (currDoc.data().uid === currentUser.uid) {
@@ -419,14 +420,12 @@ export function AuthProvider({ children }) {
           const userRef = doc(db, "users", currDoc.id);
 
           updateDoc(userRef, {
-            bookmarks: {
-              [trackId] : deleteField(),
-            }
+            ["bookmarks." + trackId]: deleteField()
           },);
         }
       });
     } catch (e) {
-      console.error("Error adding bookmark");
+      console.error("Error deleting bookmark");
     }
   }
 

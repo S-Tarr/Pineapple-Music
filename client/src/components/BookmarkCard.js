@@ -51,10 +51,10 @@ function GroupSessionCard({
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" onClick={editBookmark(trackId, time)}>
+        <Button size="small" onClick={() => editBookmark(trackId, time)}>
           Edit
         </Button>
-        <Button size="small" onClick={delBookmark(trackId)}>
+        <Button size="small" onClick={() => delBookmark(trackId)}>
           Delete
         </Button>
         <Popover
