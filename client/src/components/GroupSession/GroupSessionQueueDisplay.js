@@ -19,6 +19,7 @@ import {
   onSnapshot,
   getDocs,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 
 const db = getFirestore(app);
@@ -59,7 +60,6 @@ function ExampleDrag(props) {
     //implement function for onDROP
     const [showPlaylistContents, setShowPlaylistContents] = useState(false);
     const [playlistContents, setPlaylistContents] = useState(props.item.tracks);
-    console.log(playlistContents);
 
     const handleFilter = (event) => {
         setShowPlaylistContents(!showPlaylistContents);
@@ -105,14 +105,21 @@ function ExampleDrag(props) {
                                 <div style={{backgroundColor: "whitesmoke"}}>
                                     {/*incorportate the below */}
                                     {playlistContents.map((track, index) => {
-                                        console.log(track.track);
                                         return (
-                                            <div style={{display:'flex', flexDirection: 'row'}}>
-                                                <img src={track.track.album.images[0].url} style={{ height: "64px", width: "64px" }} />
-                                                <div className="ml-3">
-                                                    <div>{track.track.name}</div>
-                                                    <div className="text-muted">{track.track.artists[0].name}</div>
+                                            <div>
+                                                { index < 5 ? 
+                                                <div style={{ backgroundColor: "black" }}>
+                                                    <div style={{display:'flex', flexDirection: 'row'}}>
+                                                        <img src={track.track.album.images[0].url} style={{ height: "64px", width: "64px" }} />
+                                                        <div className="ml-3" style={{color:'white'}}>
+                                                            <div>{track.track.name}</div>
+                                                            <div className="text-muted">{track.track.artists[0].name}</div>
+                                                        </div>
+                                                    </div>
                                                 </div>
+                                                : <div>
+                                                </div>
+                                                }
                                             </div>
                                         )   
                                     })}
@@ -166,11 +173,10 @@ function GetSongs(props) {
             groupSessionRef,
             where("sessionId", "==", sessionId)
         );
-        //let groupSessionId;
         getDocs(groupSession).then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 groupSessionId = doc.id;
-
+                
                 const groupSessionQueueRef = collection(db, "groupSessionQueue");
 
                 const groupSessionQueue = query(
@@ -180,7 +186,6 @@ function GetSongs(props) {
                 getDocs(groupSessionQueue).then((querySnapshot) => {
                     let SongsInSession = [];
                     querySnapshot.forEach((doc) => {
-                        console.log(doc.data());
                         groupSessionQueueId = doc.id;
                         groupSessionQueueDoc = doc.data();
                         SongsInSession = doc.data().songs;
@@ -224,11 +229,11 @@ function GroupSessionQueueDisplay(props) {
     const [showSearch, setShowSearch] = useState(false);
     const [showPlaylistSearch, setShowPlaylistSearch] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
+    const [offset, setOffset] = useState(0);
 
     const [authorized, setAuthorized] = useState(true);
     const [token, setToken] = useState({})
 
-    // THOMAS
     const { checkCreator } = useAuth();
     const [queueing, setQueueing] = useState();
     const [pps, setPps] = useState();
@@ -246,14 +251,27 @@ function GroupSessionQueueDisplay(props) {
         }
         });
     };
+
+    useEffect(() => {
+        const groupSessionRef = collection(db, "groupSessions");
+        const groupSession = query(
+            groupSessionRef,
+            where("sessionId", "==", sessionId)
+        );
+        getDocs(groupSession).then((querySnapshot) => {
+            querySnapshot.forEach((newdoc) => {
+                let tempOffset = newdoc.data().queueOffset;
+                setOffset(tempOffset);
+            });
+        });
+    }, [offset])
+
     useOwnerPromise();
     GetPermissions(sessionId, setQueueing, setPps, setShowSearch, setShowPlaylistSearch);
-    //
 
     useEffect(() => {
         if (window.location.hash) {
         setToken(getParamsFromSpotifyAuth(window.location.hash).access_token);
-        console.log(token);
         setAuthorized(false);
         }
     }, [authorized]);
@@ -280,6 +298,12 @@ function GroupSessionQueueDisplay(props) {
     }
 
     const handleDelete = (items, setItems, index2) => {
+        console.log(offset);
+        if (offset != 0) {  
+            updateDoc(doc(db, "groupSessions", groupSessionId), {
+                queueOffset: offset - 1
+            });
+        }
         var cloneArray = items.filter((item, index) => index !== index2)
         //set new docs in the firebase
         ChangeDoc(cloneArray, setItems, "delete");
@@ -293,7 +317,6 @@ function GroupSessionQueueDisplay(props) {
         if (type == "delete") {
             window.location.reload(false);
         }
-        // window.location.reload(false);
     }
     
     const handleDrop = (array, index, item) => {
@@ -371,10 +394,14 @@ function GroupSessionQueueDisplay(props) {
             <Button variant="danger" onClick={handleDeleteButton} disabled={!isOwner & !queueing}>DELETE SONG</Button>
             {items.map((number, index) => {
                 return (
-                    <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
-                        <Drop item={number} index={index} type={'BOX'} setDroppedIndex={setDroppedIndex} handleDrop={handleDrop} items={items}></Drop>
-                        {showDelete == true && <Button variant="danger" onClick={() => handleDelete(items, setItems, index)}>X</Button>}
-    
+                    <div>
+                        {index >= offset ? 
+                            <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
+                                <Drop item={number} index={index} type={'BOX'} setDroppedIndex={setDroppedIndex} handleDrop={handleDrop} items={items}></Drop>
+                                {showDelete == true && <Button variant="danger" onClick={() => handleDelete(items, setItems, index)}>X</Button>}
+                            </div> :
+                            <div></div>
+                        }
                     </div>
                 )   
             })}

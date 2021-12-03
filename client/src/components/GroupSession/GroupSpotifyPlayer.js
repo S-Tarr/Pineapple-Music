@@ -24,24 +24,8 @@ import PauseRoundedIcon from "@mui/icons-material/PauseRounded";
 
 const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
-/*function GetQueue(groupSessionQueueID) {
-  const [songQueue, setSongQueue] = useState();
-  const currentUser = auth.currentUser;
-  useEffect(() => {
-    const queueRef = collection(db, 'groupSessionQueue', groupSessionQueueID);
-    const queueQuery = query(queueRef, orderBy('addedAt'), limit(25));
-    const unsubscribe = onSnapshot(queueQuery, querySnapshot => {
-        let queue = [];
-        querySnapshot.forEach(doc => {
-            var data = doc.data();
-            queue.push(data.songUri);
-        })
-        setSongQueue(queue.reverse());
-    })
-    return () => unsubscribe;
-  }, [])
-  return songQueue;
-}*/
+
+{/*ALAN: ADD PLAYLIST TRACKS TO songs below AND REMOVE RELATIVE TO OFFSET SONGS */}
 function GetQueue(sessionId, groupSessionQueueId, groupSessionQueueDoc) {
   const [songs, setSongs] = useState([]);
 
