@@ -20,6 +20,7 @@ import ResetPassword from "./pages/ResetPassword";
 import SongPage from "./pages/SongPage";
 import SearchPage from "./pages/SearchPage";
 import History from "./pages/History";
+import Bookmarks from "./pages/Bookmarks";
 import AddProfilePicture from "./pages/AddProfilePicture/addProfilePicture";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
@@ -62,6 +63,7 @@ function App() {
                         path="/profilepicture"
                         component={AddProfilePicture}
                       />
+                      <Route path="/bookmarks" component={Bookmarks} />
                       <Route path="/song" component={SongPage} />
                       <Route
                         path="/groupsessionhome"

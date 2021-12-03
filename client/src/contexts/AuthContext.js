@@ -27,13 +27,14 @@ import {
   Timestamp,
   getDocs,
   updateDoc,
+  setDoc,
   arrayUnion,
   arrayRemove,
   query,
   orderBy,
   onSnapshot,
+  deleteField,
 } from "firebase/firestore";
-
 import groupSessionCover from "../assets/groupSessionCover.jpeg";
 
 // Firebase configuration
@@ -314,6 +315,7 @@ export function AuthProvider({ children }) {
         users: [currentUser.uid],
         playState: false,
         queueing: queueing,
+        queueOffset: 0,
         pps: pps,
       });
       const docRef2 = await addDoc(collection(db, "groupSessionQueue"), {
@@ -369,9 +371,73 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function addBookmark(trackId, time, title) {
+    try {
+      const docSnap = await getDocs(collection(db, "users"));
+      docSnap.forEach((currDoc) => {
+        if (currDoc.data().uid === currentUser.uid) {
+          console.log("trying to add bookmark under users", doc);
+          const userRef = doc(db, "users", currDoc.id);
+
+          setDoc(userRef, {
+            bookmarks: {
+              [trackId] : { time, title },
+            }
+          }, {merge:true});
+          // console.log(currDoc.data().groupSessions);
+        }
+      });
+    } catch (e) {
+      console.error("Error adding bookmark");
+    }
+  }
+
+  async function editBookmark(trackId, newTime) {
+    try {
+      const docSnap = await getDocs(collection(db, "users"));
+      docSnap.forEach((currDoc) => {
+        if (currDoc.data().uid === currentUser.uid) {
+          console.log("trying to edit bookmark under users", doc);
+          const userRef = doc(db, "users", currDoc.id);
+
+          // var usersUpdate = {};
+          // usersUpdate[`bookmarks.${trackId}.time`] = newTime;
+          // updateDoc(userRef, {usersUpdate})
+
+          updateDoc(userRef, {
+            ["bookmarks." + trackId + ".time"]: newTime
+          },);
+            
+        }
+      });
+    } catch (e) {
+      console.error("Error editing bookmark");
+    }
+  }
+
+  async function delBookmark(trackId) {
+    try {
+      
+      const docSnap = await getDocs(collection(db, "users"));
+      docSnap.forEach((currDoc) => {
+        if (currDoc.data().uid === currentUser.uid) {
+          console.log("trying to delete bookmark under users", doc);
+          const userRef = doc(db, "users", currDoc.id);
+
+          updateDoc(userRef, {
+            ["bookmarks." + trackId]: deleteField()
+          },);
+        }
+      });
+    } catch (e) {
+      console.error("Error deleting bookmark");
+    }
+  }
+
   function deleteAccount() {
     return deleteUser(auth.currentUser);
   }
+
 
   /**
    * Calls the firebase function to login with a username and password.
@@ -408,6 +474,9 @@ export function AuthProvider({ children }) {
     addSpotifyToken,
     addGroupSession,
     getYourGroupSessions,
+    addBookmark,
+    editBookmark,
+    delBookmark,
     searchGroupSessions,
     getGroupSessions,
     joinGroupSession,
