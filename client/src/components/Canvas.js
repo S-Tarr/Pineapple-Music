@@ -3,6 +3,19 @@ import Overlay from 'react-bootstrap/Overlay';
 import Button from 'react-bootstrap/Button';
 import { SketchPicker } from 'react-color';
 import { TimeContext } from '../contexts/TimeContext';
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from '@mui/material/MenuItem';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const theme = createTheme({
+    palette: {
+      primary: {
+        // Purple and green play nicely together.
+        main: '#11cb5f',
+      },
+    },
+  });
 
 // Changing Variables
 let ctx, x_end, y_end, bar_height;
@@ -18,6 +31,10 @@ const center_y = height / 2;
 const minBar = 120;
 const maxBar = 260;
 const increment = 60;
+const rCoef1 = (10 * Math.PI) / 360;
+const waveLen = 35;
+const rCoef2 = (2 * Math.PI) / waveLen;
+const dampen = 4 / 360;
 
 class Canvas extends Component {
     static contextType = TimeContext;
@@ -31,15 +48,16 @@ class Canvas extends Component {
         this.barBump = minBar;
         this.colors = '#2032CD';
         this.epilepsy = false;
-        this.mode = 1;
         this.countMode1 = 0;
-        this.bumpPos = -1;
+        this.bumpPos = [-69, -69, -69, -69]; //array of positions for the current beat vis
+        this.bumpIndex = 0;
 
         this.state = {
             visColor: '#2032CD',
             show: false,
             opacity: 1,
             buttonMessage: "Settings",
+            mode: 0,
         }
     }
 
@@ -82,7 +100,7 @@ class Canvas extends Component {
             const x = center_x + Math.cos(rads * i) * (radius);
             const y = center_y + Math.sin(rads * i) * (radius);
             x_end = center_x + Math.cos(rads * i) * (radius +
-                (((bar_height - 150) / 6) * Math.sin((i + this.countMode1) * radCoef)) + minBar);
+                (((bar_height - 150) / 4) * Math.sin((i + this.countMode1) * radCoef)) + minBar);
             y_end = center_y + Math.sin(rads * i) * (radius +
                 ((bar_height - 25) * Math.sin((i + this.countMode1) * radCoef)) + minBar);
 
@@ -91,26 +109,53 @@ class Canvas extends Component {
         }
     }
 
+    incrementPos(toAdd) {
+        var x = 0;
+        for (x = 0; x <= 3; x++) {
+            if (this.bumpPos[x] == -69) {
+                continue;
+            }
+            else {
+                this.bumpPos[x] += toAdd;
+                if (this.bumpPos[x] >= 360) {
+                    this.bumpPos[x] = -69;
+                }
+            }
+        }
+    }
+
     animationLooper2(canvas) {
         canvas.width = width;
         canvas.height = height;
 
         ctx = canvas.getContext("2d");
-        var ripple = this.barBump - minBar;
+        var ripple = [0, 0, 0, 0];
         for (var i = 0; i < bars; i++) {
             //divide a circle into equal part
             const rads = Math.PI * 2 / bars;
             // Math is magical
-            bar_height = this.barBump;
+
+            bar_height = minBar;
+            var bibble = 0;
+            for (; bibble <= 3; bibble++) {
+                if (i >= this.bumpPos[bibble] - waveLen &&
+                    i <= this.bumpPos[bibble] &&
+                    this.bumpPos[bibble] != -69) {
+                    bar_height += (Math.sin(ripple[bibble] * rCoef2) *
+                        (40 * Math.sin(this.bumpPos[bibble] * rCoef1))) /
+                        (1 + ((1 + this.bumpPos[bibble]) * dampen));
+                    ripple[bibble]++;
+                }
+            }
 
             const x = center_x + Math.cos(rads * i) * (radius);
             const y = center_y + Math.sin(rads * i) * (radius);
-            x_end = center_x + Math.cos(rads * i) * (radius + bar_height);
-            y_end = center_y + Math.sin(rads * i) * (radius + bar_height);
-            ripple -= 2;
+            x_end = center_x + Math.sin(rads * i) * (radius + bar_height);
+            y_end = center_y + -Math.cos(rads * i) * (radius + bar_height);
             //draw a bar
             this.drawBar(x, y, x_end, y_end, ctx, canvas);
         }
+        this.incrementPos(2);
     }
 
     drawBar(x1, y1, x2, y2, ctx, canvas) {
@@ -159,6 +204,11 @@ class Canvas extends Component {
                 if (this.barBump < maxBar) {
                     this.barBump = this.barBump + increment;
                 }
+                this.bumpPos[this.bumpIndex] = 0;
+                this.bumpIndex++;
+                if (this.bumpIndex > 3) {
+                    this.bumpIndex = 0;
+                }
                 this.i++;
             }
             else {
@@ -181,7 +231,7 @@ class Canvas extends Component {
                 this.colors = "#" + temp.toString(16);
                 this.y++;
             }
-            switch (this.mode) {
+            switch (this.state.mode) {
                 case 0:
                     this.animationLooper0(this.canvas.current);
                     break;
@@ -242,6 +292,10 @@ class Canvas extends Component {
             this.epilepsy = true;
         }
     }
+
+    handleChange = (event) => {
+        this.setState({mode: event.target.value})
+    }
     
     render() {
         return <>
@@ -276,6 +330,20 @@ class Canvas extends Component {
                         <button onClick={this.toggleColor}>
                             Toggle Colors
                         </button>
+                        <ThemeProvider theme={theme}>
+                            <InputLabel id="demo-simple-select-label" color="primary">Age</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={this.state.mode}
+                                label="Mode"
+                                onChange={this.handleChange}
+                            >
+                                <MenuItem value={0}>Basic</MenuItem>
+                                <MenuItem value={1}>3D</MenuItem>
+                                <MenuItem value={2}>Ripples</MenuItem>
+                            </Select>
+                        </ThemeProvider>
                     </div>
                 </div>
                 )}
