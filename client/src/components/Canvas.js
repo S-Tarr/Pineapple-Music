@@ -450,7 +450,7 @@ class Canvas extends Component {
                             onChangeComplete={ this.handleChangeComplete }
                         />
                         <ThemeProvider theme={theme}>
-                            <InputLabel id="demo-simple-select-label" color="primary">Age</InputLabel>
+                            <InputLabel id="demo-simple-select-label" color="primary">Mode</InputLabel>
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
@@ -462,7 +462,7 @@ class Canvas extends Component {
                                 <MenuItem value={1}>3D</MenuItem>
                                 <MenuItem value={2}>Ripples</MenuItem>
                             </Select>
-                            <InputLabel id="color" color="primary">Age</InputLabel>
+                            <InputLabel id="color" color="primary">Color Mode</InputLabel>
                             <Select
                                 labelId="color"
                                 id="colorSelect"

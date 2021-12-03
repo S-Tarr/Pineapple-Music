@@ -120,7 +120,7 @@ export default function Player(props) {
     const qSnap = await getDocs(q);
     qSnap.forEach((doc) => {
       // console.log("trackid: " + currentSongId + " " + "data: " + value)
-      if (currentSongId) {
+      if (currentSongId && doc.data().bookmarks) {
         for (const [key, value] of Object.entries(doc.data().bookmarks)) {
           bookmarkDict[key] = (value["time"]);
         }
@@ -190,7 +190,7 @@ export default function Player(props) {
       //   findBookmarkTime(currentSongId)
       // }
       
-    }, 1000);
+    }, 13);
     return () => clearInterval(interval);
   }, [isLoaded]);
 
