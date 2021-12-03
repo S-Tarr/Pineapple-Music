@@ -42,16 +42,13 @@ function GetQueue() {
 
 async function getAccessToken() {
   const docSnap = await getDocs(collection(db, "users"));
-  console.log(auth.currentUser.uid)
   let temp = null;
   docSnap.forEach((thing) => {
-    console.log(thing.data().uid)
     if (thing.data().uid == auth.currentUser.uid) {
       temp = thing.data();
       
     }
   });
-  console.log(temp)
   return temp;
 }
 
@@ -79,8 +76,6 @@ export default function Player(props) {
 
   spotifyApi.setAccessToken(props.accessToken);
 
-  //console.log("Token: " + accessToken)
-
   if (accessToken == undefined) {
     setIsLoaded(false)
   }
@@ -92,59 +87,33 @@ export default function Player(props) {
   const db = getFirestore(app); // Firestore database
 
   useEffect(() => {
-    console.log("update: " + update);
   }, [update]);
 
   function handleBookmark() {
-    console.log("id: " + currentSongId);
     setUpdate(!update);
     setShouldUpdate(true);
     // forceUpdate;
   } 
 
   async function refreshBookmarks() {
-    // console.log("offset:", offset)
-    console.log("refreshing...")
     const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid));
     const qSnap = await getDocs(q);
     qSnap.forEach((doc) => {
-      // console.log("trackid: " + currentSongId + " " + "data: " + value)
       if (currentSongId && doc.data().bookmarks) {
         for (const [key, value] of Object.entries(doc.data().bookmarks)) {
           bookmarkDict[key] = (value["time"]);
         }
         dictRef.current = bookmarkDict;
-        // console.log("trackid: " + currentSongId + " " + "data: " + value)
-        // console.log("trackid: " + currentSongId + " " + "uid: " + doc.data().uid + " " + "data: " + key + "; " + value)
       }
     });
-    // setBookmarkTime(thing.data.bookmarks[id])
   }
 
   function temp() {
     setOffset(offset + 1);
     setSkipped(true)
-    console.log(skipped)
-    console.log("offset:", offset)
   }
-  // async function findBookmarkTime(id) {
-  //   const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid));
-  //   const qSnap = await getDocs(q);
-  //   qSnap.forEach((doc) => {
-  //     if (id) {
-  //       if (!doc.data().bookmarks[id]) {
-  //         setBookmarkTime(-1);
-  //       }
-  //       const[key, value] = Object.entries(doc.data().bookmarks[id])
-  //       console.log("trackid: " + currentSongId + " " + "data: " + value)
-  //       // console.log("trackid: " + currentSongId + " " + "uid: " + doc.data().uid + " " + "data: " + key + "; " + value)
-  //       setBookmarkTime(value)
-  //     }
-  //   });
-  // }
 
   useEffect(() => {
-    // console.log("songid: " + currentSongId)
     if (dictRef.current) {
       if (dictRef.current.hasOwnProperty(currentSongId)) {
         console.log("skip?: " + bookTime, dictRef.current[currentSongId])
@@ -152,8 +121,6 @@ export default function Player(props) {
           console.log("SKIP")
           setSkipped(true)
           temp()
-          console.log("setting useeffect " + skipped)
-          // setShouldSkip(true)
         }
       }
     }
@@ -161,7 +128,6 @@ export default function Player(props) {
 
   useEffect(() => {
     if (shouldSkip) {
-      console.log("changing offset")
       // setOffset(offset + 1)
     }
     let timer1 = setTimeout(() => setShouldSkip(false), 9000);
@@ -193,13 +159,9 @@ export default function Player(props) {
         play={play2}
         autoPlay={true}
         callback={(state) => {
-          console.log("CALLED BACK HOLY SHIT!!!!!!")
           // state.offset = offset
-          
-          console.log(state.offset)
 
           if (skipped) {
-            console.log("OMGGGGGGGGGG")
             state.needsUpdate = true
             setSkipped(false)
           }
@@ -212,14 +174,11 @@ export default function Player(props) {
           }
           console.log("Track id: " + state.track.id);
           setCurrentSongId(state.track.id);
-          // setOffset(state.previousTracks.length);
-          console.log("offset :", offset)
 
           refreshBookmarks();
 
           if (state.track.id != undefined && state.track.id != null &&
             state.track.id != "") {
-          //console.log("Track id: " + state.track.id);
             spotifyApi.getAudioAnalysisForTrack(state.track.id)
             .then(function(data) {
               setTime({timeStamp: new Date(), elapsed: state.progressMs,
@@ -231,7 +190,6 @@ export default function Player(props) {
             });
           }
           if (shouldUpdate) {
-            console.log("reachedupdate")
             addBookmark(state.track.id, state.progressMs, state.track.name)
             setUpdate(!update);
             setShouldUpdate(false);

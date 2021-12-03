@@ -72,23 +72,18 @@ function GetQueue(sessionId, groupSessionQueueId, groupSessionQueueDoc) {
   songs.forEach((song) => {
     queue.push(song.uri);
   });
-  // console.log(queue);
-  // console.log(songs);
   return queue;
 }
 
 async function getAccessToken() {
   const docSnap = await getDocs(collection(db, "users"));
-  // console.log(auth.currentUser.uid)
   let temp = null;
   docSnap.forEach((thing) => {
-    // console.log(thing.data().uid)
     if (thing.data().uid === auth.currentUser.uid) {
       temp = thing.data();
       return thing.data();
     }
   });
-  // console.log(temp)
   return temp;
 }
 
@@ -167,16 +162,12 @@ export default function Player({
     var promise = getAccessToken();
     promise.then((ret) => {
       setAccessToken(ret.SpotifyToken);
-      // console.log(ret.SpotifyToken)
-      // console.log(accessToken);
     });
-    // console.log(accessToken);
   }, [isLoaded]);
 
   if (accessToken === undefined) {
     setIsLoaded(false);
   }
-  // console.log(isLoaded);
   spotifyApi.setAccessToken(accessToken);
 
   const songQueue = GetQueue(
@@ -184,24 +175,18 @@ export default function Player({
     groupSessionQueueID,
     groupSessionQueueDoc
   );
-  
-  // console.log(songQueue);
 
   async function handlePlayPause() {
-    // console.log(songQueue);
     await updateDoc(doc(db, "groupSessions", docId), {
       playState: !play,
     });
   }
 
   async function handleSkip() {
-    // setQueue(queue.slice(queue.indexOf(uri)));
     if (offset == songQueue.length - 1) {
-      // setOffset(songQueue.len - 1);
       return;
     }
 
-    // console.log("skip: " + offset);
     await updateDoc(doc(db, "groupSessions", docId), {
       queueOffset: offset + 1,
     });
@@ -209,11 +194,9 @@ export default function Player({
 
   async function handleReverse() {
     if (offset == 0) {
-      // setOffset(0);
       return;
     }
 
-    // console.log("reverse: " + offset);
     await updateDoc(doc(db, "groupSessions", docId), {
       queueOffset: offset - 1,
     });
@@ -239,10 +222,8 @@ export default function Player({
             state.play = true; //setPlay(false)
           }
           state.offset = offset;
-          // console.log(offset);
           if (state.track.id != undefined && state.track.id != null &&
             state.track.id != "") {
-          //console.log("Track id: " + state.track.id);
             spotifyApi.getAudioAnalysisForTrack(state.track.id)
             .then(function(data) {
               setTime({timeStamp: new Date(), elapsed: state.progressMs,
