@@ -316,6 +316,7 @@ class Canvas extends Component {
     }
 
     tick = () => {
+        console.log("Book Time: " + this.context.bookTime);
         if (!this.context.isPlaying) {
             cancelAnimationFrame(this.rafId);
             this.toStart = true;

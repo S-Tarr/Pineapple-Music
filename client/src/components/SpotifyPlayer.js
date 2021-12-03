@@ -61,7 +61,7 @@ function useForceUpdate(){
 }
 
 export default function Player(props) {
-  const {setTime, updateTime, elapsed} = useContext(TimeContext);
+  const {setTime, updateTime, elapsed, updateBook} = useContext(TimeContext);
   const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("");
   const [update, setUpdate] = useState(true);
@@ -176,6 +176,12 @@ export default function Player(props) {
       updateTime();
     }, 13);
     return () => clearInterval(interval);
+  }, [isLoaded]);
+
+  useEffect(() => {
+    const interval2 = setInterval(async() => {
+      updateBook();
+    }, 1000);
   }, [isLoaded]);
 
   if (!props.accessToken) return null;
