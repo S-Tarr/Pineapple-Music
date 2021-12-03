@@ -24,9 +24,10 @@ const auth = getAuth(); // Authorization component
 const db = getFirestore(app); // Firestore database
 
 function GroupSessionCard({
-  props: { songName, time },
+  props: { trackId, songName, time },
 }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const { editBookmark, delBookmark } = useAuth();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -50,12 +51,10 @@ function GroupSessionCard({
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">
-          Delete
+        <Button size="small" onClick={editBookmark(trackId, time)}>
+          Edit
         </Button>
-        <Button
-          size="small"
-        >
+        <Button size="small" onClick={delBookmark(trackId)}>
           Delete
         </Button>
         <Popover

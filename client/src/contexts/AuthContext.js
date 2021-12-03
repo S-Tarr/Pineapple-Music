@@ -32,8 +32,8 @@ import {
   query,
   orderBy,
   onSnapshot,
+  deleteField
 } from "firebase/firestore";
-
 import groupSessionCover from "../assets/groupSessionCover.jpeg";
 
 // Firebase configuration
@@ -401,7 +401,7 @@ export function AuthProvider({ children }) {
 
           var usersUpdate = {};
           usersUpdate[`bookmarks.${trackId}.time`] = newTime;
-          await updateDoc(userRef, {usersUpdate})
+          updateDoc(userRef, {usersUpdate})
             
         }
       });
@@ -418,9 +418,9 @@ export function AuthProvider({ children }) {
           console.log("trying to delete bookmark under users", doc);
           const userRef = doc(db, "users", currDoc.id);
 
-          await updateDoc(userRef, {
+          updateDoc(userRef, {
             bookmarks: {
-              [trackId] : FieldValue.delete(),
+              [trackId] : deleteField(),
             }
           },);
         }
@@ -471,6 +471,8 @@ export function AuthProvider({ children }) {
     addGroupSession,
     getYourGroupSessions,
     addBookmark,
+    editBookmark,
+    delBookmark,
     searchGroupSessions,
     getGroupSessions,
     joinGroupSession,

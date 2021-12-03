@@ -92,9 +92,11 @@ async function updateCards(setCards) {
           var arr = []
           for (const [key, value] of Object.entries(doc.data().bookmarks)) {
             const props = {
+              trackId: "id",
               songName: "group session1",
               time: Infinity
             };
+            props["trackId"] = key
             props["songName"] = value["title"]
             props["time"] = value["time"]
             //setCards((cards) => [props, ...cards]);
