@@ -58,7 +58,8 @@ function useForceUpdate(){
   return () => setValue(value => value + 1); // update the state to force render
 }
 
-export default function Player() {
+export default function Player(props) {
+  const {setTime, updateTime} = useContext(TimeContext);
   const [isLoaded, setIsLoaded] = useState(true);
   const [accessToken, setAccessToken] = useState("");
   const [update, setUpdate] = useState(true);
@@ -67,7 +68,8 @@ export default function Player() {
   const [bookmarkTime, setBookmarkTime] = useState(-1);
   
   const { addBookmark } = useAuth();
-  const {setTime, updateTime, elapsed} = useContext(TimeContext);
+
+  spotifyApi.setAccessToken(props.accessToken);
 
   useEffect(() => {
     var promise = getAccessToken();
@@ -86,9 +88,9 @@ export default function Player() {
     setIsLoaded(false)
   }
 
+
   var play2 = true;
-  let queue = GetQueue();
-  //console.log("QUEUE: " + queue);
+  var isLoaded = true;
 
   const auth = getAuth(); // Authorization component
   const db = getFirestore(app); // Firestore database
@@ -120,13 +122,14 @@ export default function Player() {
       
     }, 500);
     return () => clearInterval(interval);
-  }, []);
+  }, [isLoaded]);
 
-  if (!accessToken) return null;
+  if (!props.accessToken) return null;
   return (
     <div style={{width: "100%", display: "flex"}}>
       <SpotifyPlayer
-        token={accessToken}
+        token={props.accessToken}
+        uris={props.songQueue}
         play={play2}
         autoPlay={true}
         callback={state => {
@@ -142,9 +145,8 @@ export default function Player() {
           findBookmarkTime(state.track.id);
 
           if (state.track.id != undefined && state.track.id != null &&
-              state.track.id != "") {
-            
-            //console.log("Track id: " + state.track.id);
+            state.track.id != "") {
+          //console.log("Track id: " + state.track.id);
             spotifyApi.getAudioAnalysisForTrack(state.track.id)
             .then(function(data) {
               setTime({timeStamp: new Date(), elapsed: state.progressMs,
@@ -155,7 +157,6 @@ export default function Player() {
               console.log(err);
             });
           }
-          
           if (shouldUpdate) {
             console.log("reachedupdate")
             addBookmark(state.track.id, state.progressMs)
@@ -165,12 +166,15 @@ export default function Player() {
           }
         }}
         play = {update}
-        uris={queue}
       />
 
       <button button className="bookmark-button" onClick = {() => handleBookmark()}>
           <BookmarkBorderIcon style={{ fontSize: 50 }} />
       </button>
     </div>
+    
+      
+        
+
   )
 }
