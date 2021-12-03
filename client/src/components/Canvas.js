@@ -35,6 +35,7 @@ const rCoef1 = (10 * Math.PI) / 360;
 const waveLen = 35;
 const rCoef2 = (2 * Math.PI) / waveLen;
 const dampen = 4 / 360;
+const colorSpeed = 80;
 
 class Canvas extends Component {
     static contextType = TimeContext;
@@ -46,8 +47,13 @@ class Canvas extends Component {
         this.i = 0;
         this.y = 0;
         this.barBump = minBar;
-        this.colors = '#2032CD';
-        this.epilepsy = false;
+        this.colors = '#ffffff';
+        this.colorsEnd = '#ffffff';
+        this.addColor = 0;
+        this.addColorR = 0;
+        this.addColorG = 0;
+        this.addColorB = 0;
+        this.colorCounter = 0;
         this.countMode1 = 0;
         this.bumpPos = [-69, -69, -69, -69]; //array of positions for the current beat vis
         this.bumpIndex = 0;
@@ -58,6 +64,7 @@ class Canvas extends Component {
             opacity: 1,
             buttonMessage: "Settings",
             mode: 0,
+            colorMode: 0,
         }
     }
 
@@ -165,11 +172,18 @@ class Canvas extends Component {
         ctx.fillStyle = gradient;
         
         var lineColor;
-        if (this.epilepsy) {
-            lineColor = this.colors;
-        }
-        else {
-            lineColor = this.state.visColor;
+        switch (this.state.colorMode) {
+            case 0:
+                lineColor = this.state.visColor;
+                break;
+            case 1:
+                lineColor = this.colors;
+                break;
+            case 2:
+                lineColor = this.colors;
+                break;
+            default:
+                lineColor = this.state.visColor;
         }
         ctx.strokeStyle = lineColor;
         ctx.lineWidth = bar_width;
@@ -179,7 +193,115 @@ class Canvas extends Component {
         ctx.stroke();
     }
 
+    changeColor1() {
+        if (this.context.segments[this.y + 1] != null &&
+            (this.context.elapsed / 1000) >= this.context.segments[this.y].start) {
+            this.colorsEnd = '#ffffff';
+            this.colorsEnd = this.colorsEnd.substring(1);
+            var temp = parseInt(this.colorsEnd, 16);
+            temp = parseInt(temp * (this.context.segments[this.y + 1].pitches[0]));
+            var tempColor = this.colors.substring(1);
+            var temp2 = parseInt(tempColor, 16);
+            this.addColor = (temp - temp2) / 10;
+            this.colorsEnd = "#" + temp.toString(16);
+            this.y++;
+        }
+        else {
+            this.colors = this.colors.substring(1);
+            var c1 = parseInt(this.colors, 16);
+            c1 = parseInt(c1 + this.addColor);
+            this.colors = "#" + c1.toString(16);
+            this.colorCounter++;
+            if (this.colorCounter >= 10) {
+                this.addColor = 0;
+                this.colorCounter = 0;
+            }
+        }
+    }
+
+    componentToHex(c) {
+      var hex = c.toString(16);
+      return hex.length == 1 ? "0" + hex : hex;
+    }
+      
+    rgbToHex(r, g, b) {
+      return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+    }
+
+    hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    changeColor2() {
+        if (this.context.segments[this.y] != null &&
+            (this.context.elapsed / 1000) >= this.context.segments[this.y].start) {
+            this.colorsEnd = '#ffffff';
+            this.colorsEnd = this.colorsEnd.substring(1);
+            var temp = parseInt(this.colorsEnd, 16);
+            temp = parseInt(temp * (this.context.segments[this.y + 1].pitches[0]));
+            if (temp <= 1048575) {
+                temp = 1048576;
+            }
+            this.colorsEnd = "#" + temp.toString(16);
+            var endRGB = this.hexToRgb(this.colorsEnd);
+            var curRGB = this.hexToRgb(this.colors);
+            this.addColorR = (endRGB.r - curRGB.r) / colorSpeed;
+            this.addColorG = (endRGB.g - curRGB.g) / colorSpeed;
+            this.addColorB = (endRGB.b - curRGB.b) / colorSpeed;
+            this.y += 6;
+        }
+        else {
+            var bipRGB = this.hexToRgb(this.colors);
+            bipRGB.r += this.addColorR;
+            if (bipRGB.r < 0) {
+                bipRGB.r = 0;
+            }
+            if (bipRGB.r > 255) {
+                bipRGB.r = 255;
+            }
+            bipRGB.g += this.addColorG;
+            if (bipRGB.g < 0) {
+                bipRGB.g = 0;
+            }
+            if (bipRGB.g > 255) {
+                bipRGB.g = 255;
+            }
+            bipRGB.b += this.addColorB;
+            if (bipRGB.b < 0) {
+                bipRGB.b = 0;
+            }
+            if (bipRGB.b > 255) {
+                bipRGB.b = 255;
+            }
+            this.colors = this.rgbToHex(parseInt(bipRGB.r), parseInt(bipRGB.g), parseInt(bipRGB.b))
+            this.colorCounter++;
+            if (this.colorCounter >= colorSpeed) {
+                this.addColor = 0;
+                this.colorCounter = 0;
+            }
+        }
+    }
+
     findBeat() {
+        while((this.context.elapsed / 1000) < this.context.segments[this.y].start) {
+            this.y--;
+        }
+        if (this.context.segments[this.y + 1].start != null) {
+            while((this.context.elapsed / 1000) > this.context.segments[this.y + 1].start) {
+                this.y++;
+            }
+        }
+        else {
+            this.y = 0;
+        }
+    }
+
+    findSegment() {
         while((this.context.elapsed / 1000) < this.context.beats[this.i].start) {
             this.i--;
         }
@@ -223,13 +345,16 @@ class Canvas extends Component {
                 this.countMode1+= 2;
             }
             //color start
-            if ((this.context.elapsed / 1000) >= this.context.segments[this.y].start) {
-                this.colors = this.state.visColor;
-                this.colors = this.colors.substring(1);
-                var temp = parseInt(this.colors, 16);
-                temp = parseInt(temp * (1 - this.context.segments[this.y].pitches[0]));
-                this.colors = "#" + temp.toString(16);
-                this.y++;
+            switch (this.state.colorMode) {
+                case 0:
+                    break;
+                case 1:
+                    this.changeColor1();
+                    break;
+                case 2:
+                    this.changeColor2();
+                    break;
+                default:
             }
             switch (this.state.mode) {
                 case 0:
@@ -268,7 +393,8 @@ class Canvas extends Component {
 
     handleChangeComplete = (color) => {
         this.setState({
-            visColor: color.hex
+            visColor: color.hex,
+            colorMode: 0,
         })
     }
     
@@ -277,6 +403,7 @@ class Canvas extends Component {
             this.toStart = false;
             //this.getTime();
             this.findBeat();
+            this.findSegment();
             this.rafId = requestAnimationFrame(this.tick);
         } else {
             cancelAnimationFrame(this.rafId);
@@ -284,13 +411,8 @@ class Canvas extends Component {
         }
     }
 
-    toggleColor = () => {
-        if (this.epilepsy) {
-            this.epilepsy = false;
-        }
-        else {
-            this.epilepsy = true;
-        }
+    handleChangeColor = (event) => {
+        this.setState({colorMode: event.target.value})
     }
 
     handleChange = (event) => {
@@ -327,9 +449,6 @@ class Canvas extends Component {
                             color={ this.state.visColor }
                             onChangeComplete={ this.handleChangeComplete }
                         />
-                        <button onClick={this.toggleColor}>
-                            Toggle Colors
-                        </button>
                         <ThemeProvider theme={theme}>
                             <InputLabel id="demo-simple-select-label" color="primary">Age</InputLabel>
                             <Select
@@ -342,6 +461,18 @@ class Canvas extends Component {
                                 <MenuItem value={0}>Basic</MenuItem>
                                 <MenuItem value={1}>3D</MenuItem>
                                 <MenuItem value={2}>Ripples</MenuItem>
+                            </Select>
+                            <InputLabel id="color" color="primary">Age</InputLabel>
+                            <Select
+                                labelId="color"
+                                id="colorSelect"
+                                value={this.state.colorMode}
+                                label="Color Mode"
+                                onChange={this.handleChangeColor}
+                            >
+                                <MenuItem value={0}>Basic</MenuItem>
+                                <MenuItem value={1}>Pitch</MenuItem>
+                                <MenuItem value={2}>Mood</MenuItem>
                             </Select>
                         </ThemeProvider>
                     </div>
