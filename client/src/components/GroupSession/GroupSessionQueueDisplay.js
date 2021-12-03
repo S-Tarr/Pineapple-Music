@@ -395,12 +395,12 @@ function GroupSessionQueueDisplay(props) {
             {items.map((number, index) => {
                 return (
                     <div>
-                        {index >= offset ? 
+                        {/*index >= offset ? */
                             <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
                                 <Drop item={number} index={index} type={'BOX'} setDroppedIndex={setDroppedIndex} handleDrop={handleDrop} items={items}></Drop>
                                 {showDelete == true && <Button variant="danger" onClick={() => handleDelete(items, setItems, index)}>X</Button>}
-                            </div> :
-                            <div></div>
+                            </div> /*:
+                            <div></div>*/
                         }
                     </div>
                 )   
