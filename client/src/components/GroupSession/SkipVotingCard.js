@@ -51,29 +51,23 @@ var spotifyApi = new SpotifyWebApi({
 const db = getFirestore(app); // Firestore database
 
 const getParamsFromSpotifyAuth = (hash) => {
-  console.log("trying to get the token", hash);
   const paramsUrl = hash.substring(1).split("&");
   const params = paramsUrl.reduce((accumulator, currentValue) => {
     const [key, value] = currentValue.split("=");
     accumulator[key] = value;
     return accumulator;
   }, {});
-  console.log(params);
   return params;
 };
 
 async function getAccessToken() {
   const docSnap = await getDocs(collection(db, "users"));
-  console.log(auth.currentUser.uid)
   let temp = null;
   docSnap.forEach((thing) => {
-    console.log(thing.data().uid)
     if (thing.data().uid == auth.currentUser.uid) {
       temp = thing.data();
-      console.log(temp)
     }
   });
-  console.log(temp)
   return temp;
 }
 
@@ -90,8 +84,6 @@ function GetVoteStatus(
     if (window.location.hash) {
       const params = getParamsFromSpotifyAuth(window.location.hash);
       spotifyApi.setAccessToken(params.access_token);
-
-      console.log("getting token", params);
     }
   }, [window.location.search]);
 
@@ -264,14 +256,9 @@ function SkipVotingCard({ sessionId }) {
     var promise = getAccessToken();
     promise.then((ret) => {
       setAccessToken(ret.SpotifyToken);
-      console.log(ret.SpotifyToken)
-      console.log(access_token)
       spotifyApi.setAccessToken(ret.SpotifyToken);
     });
-    console.log(access_token);
   }, [isLoaded])
-
-  console.log(access_token)
 
   if (access_token == undefined) {
     setIsLoaded(false)
@@ -289,13 +276,12 @@ function SkipVotingCard({ sessionId }) {
         try {
             //Check if song suggestion already exists
             currentSong = currDoc.data().currentSong;
-            console.log(currentSong);
             const downVotePercentage = 100 - (((upvoteCount * 1.0) / totalUsersInSession) * 100);
             if (
                 currentSong == null ||
                 currentSong === undefined ||
                 currentSong == "undefined" || 
-                currDoc.data().offset != currDoc.data().currSongOffset ||
+                currDoc.data().queueOffset != currDoc.data().currSongOffset ||
                 (totalVoteCount !== 0 && totalVoteCount === totalUsersInSession) ||
                 (totalVoteCount !== 0 &&
                 ((upvoteCount * 1.0) / totalUsersInSession) * 100 > 50)
@@ -354,7 +340,6 @@ function SkipVotingCard({ sessionId }) {
                             groupSessionQuerySnapshot.forEach((newdoc) => {
                                 let offset = newdoc.data().queueOffset;
                                 const newSessionRef = doc(db, "groupSessions", currDoc.id);
-                                console.log(groupSessionQuerySnapshot);
                                 updateDoc(newSessionRef, {
                                     queueOffset: offset + 1
                                 })
@@ -413,7 +398,6 @@ function SkipVotingCard({ sessionId }) {
   const handleVote = (event) => {
     event.preventDefault();
     console.log("vote clicked", event.target.name);
-    console.log(event)
     setVoted(true);
     const groupSessionRef = collection(db, "groupSessions");
     const groupSessionQuery = query(
